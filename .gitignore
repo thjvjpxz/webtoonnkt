@@ -1,0 +1,5 @@
+.mvn
+.vscode
+.target
+node_modules
+.next
