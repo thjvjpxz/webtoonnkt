@@ -1,16 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { ComicData } from "@/types/dashboard";
 
-type ComicData = {
-    id: number;
-    title: string;
-    author: string;
-    views: number;
-    status: "published" | "draft" | "review";
-    lastUpdated: string;
-    coverImage: string;
-};
 
 const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {
     return (
