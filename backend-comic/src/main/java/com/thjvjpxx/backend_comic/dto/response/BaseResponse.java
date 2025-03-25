@@ -19,6 +19,11 @@ public class BaseResponse<T> {
     T data;
     LocalDateTime timestamp;
 
+    Integer page;
+    Integer total;
+    Integer limit;
+    Integer totalPages;
+
     public static <T> BaseResponse<T> success(T data) {
         return BaseResponse.<T>builder()
                 .status(200)
@@ -40,6 +45,18 @@ public class BaseResponse<T> {
                 .status(200)
                 .message(message)
                 .data(data)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static <T> BaseResponse<T> success(T data, int page, int total, int limit, int totalPages) {
+        return BaseResponse.<T>builder()
+                .status(200)
+                .data(data)
+                .page(page)
+                .total(total)
+                .limit(limit)
+                .totalPages(totalPages)
                 .timestamp(LocalDateTime.now())
                 .build();
     }

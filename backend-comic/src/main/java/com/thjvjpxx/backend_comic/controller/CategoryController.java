@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/categories")
@@ -33,9 +32,9 @@ public class CategoryController {
     @GetMapping
     public BaseResponse<List<Category>> getAllCategories(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        return categoryService.getAllCategories(page, size, sortBy);
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String search) {
+        return categoryService.getAllCategories(page, limit, search);
     }
 
     @PostMapping
@@ -44,7 +43,8 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public BaseResponse<Category> updateCategory(@PathVariable String id, @RequestBody CategoryRequest category) {
+    public BaseResponse<Category> updateCategory(@Valid @PathVariable String id,
+            @RequestBody CategoryRequest category) {
         return categoryService.updateCategory(id, category);
     }
 

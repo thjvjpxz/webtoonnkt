@@ -14,4 +14,6 @@ public class CategoryRequest {
 
     @NotEmpty(message = "SLUG_CATEGORY_NOT_EMPTY")
     String slug;
+
+    String description;
 }

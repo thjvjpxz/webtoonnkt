@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.thjvjpxx.backend_comic.dto.request.CategoryRequest;
@@ -21,23 +20,44 @@ import com.thjvjpxx.backend_comic.service.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
 
     @Override
-    public BaseResponse<List<Category>> getAllCategories(int page, int size, String sortBy) {
+    public BaseResponse<List<Category>> getAllCategories(int page, int limit, String search) {
         page = page < 0 ? 0 : page;
-        size = size < 0 ? 10 : size;
-        sortBy = sortBy.isEmpty() ? "id" : sortBy;
+        limit = limit < 0 ? 10 : limit;
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        int originalPage = page;
+
+        page = page == 0 ? 0 : page - 1;
+
+        if (search != null && !search.isEmpty()) {
+            Pageable pageable = PageRequest.of(page, limit);
+            Page<Category> categories = categoryRepository.findByNameContainingOrSlugContaining(search, search,
+                    pageable);
+            return BaseResponse.success(
+                    categories.getContent(),
+                    originalPage,
+                    (int) categories.getTotalElements(),
+                    limit,
+                    categories.getTotalPages());
+        }
+        Pageable pageable = PageRequest.of(page, limit);
         Page<Category> categories = categoryRepository.findAll(pageable);
-        return BaseResponse.success(categories.getContent());
+        return BaseResponse.success(
+                categories.getContent(),
+                originalPage,
+                (int) categories.getTotalElements(),
+                limit,
+                categories.getTotalPages());
     }
 
     @Override
@@ -89,6 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryExist.setName(category.getName());
         categoryExist.setSlug(category.getSlug());
+        categoryExist.setDescription(category.getDescription());
         categoryExist.setUpdatedAt(LocalDateTime.now());
         Category updatedCategory = categoryRepository.save(categoryExist);
         return BaseResponse.success(updatedCategory);

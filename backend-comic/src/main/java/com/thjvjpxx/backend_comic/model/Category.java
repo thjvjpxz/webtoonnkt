@@ -29,6 +29,9 @@ public class Category {
     @Column(name = "slug", unique = true)
     String slug;
 
+    @Column(name = "description")
+    String description;
+
     @Column(name = "created_at")
     @CreationTimestamp
     LocalDateTime createdAt;

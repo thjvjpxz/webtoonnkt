@@ -14,3 +14,8 @@ spring:
       ddl-auto: validate
     show-sql: true
 
+# Cấu hình CORS
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
