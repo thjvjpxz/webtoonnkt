@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: backend-comic
+  datasource:
+    url: jdbc:mysql://localhost:3306/webtoon
+    username: webtoon
+    password: 12345Webtoon
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
