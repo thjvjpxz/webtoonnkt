@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiHome, FiBook, FiFileText, FiTag, FiUsers, FiMessageSquare, FiSettings, FiLogOut, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { SidebarProps } from "@/types/dashboard";
 
-type SidebarProps = {
-    isSidebarOpen: boolean;
-    toggleSidebar: () => void;
-};
 
 export default function Sidebar({ isSidebarOpen, toggleSidebar }: SidebarProps) {
     const pathname = usePathname();

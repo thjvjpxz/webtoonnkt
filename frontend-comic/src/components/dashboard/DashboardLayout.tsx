@@ -1,13 +1,9 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-
-type DashboardLayoutProps = {
-    children: ReactNode;
-    title: string;
-};
+import { DashboardLayoutProps } from "@/types/dashboard";
 
 export default function DashboardLayout({ children, title }: DashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);

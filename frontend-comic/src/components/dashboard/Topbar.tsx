@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FiSearch, FiBell, FiSun, FiMoon } from "react-icons/fi";
+import { FiSearch, FiBell } from "react-icons/fi";
+import { TopbarProps } from "@/types/dashboard";
 
-type TopbarProps = {
-    title: string;
-    isSidebarOpen: boolean;
-};
+
 
 export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
     const [mounted, setMounted] = useState(false);
