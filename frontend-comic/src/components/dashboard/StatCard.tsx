@@ -1,12 +1,6 @@
 import React from "react";
+import { StatCardProps } from "@/types/dashboard";
 
-type StatCardProps = {
-    title: string;
-    value: string | number;
-    icon: React.ReactNode;
-    change?: string;
-    isPositive?: boolean;
-};
 
 const StatCard = ({ title, value, icon, change, isPositive }: StatCardProps) => {
     return (

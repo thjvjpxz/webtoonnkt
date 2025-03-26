@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiHome, FiBook, FiFileText, FiTag, FiUsers, FiMessageSquare, FiSettings, FiLogOut, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { SidebarProps } from "@/types/dashboard";
 
-type SidebarProps = {
-    isSidebarOpen: boolean;
-    toggleSidebar: () => void;
-};
 
 export default function Sidebar({ isSidebarOpen, toggleSidebar }: SidebarProps) {
     const pathname = usePathname();
@@ -19,9 +15,9 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }: SidebarProps) 
 
     const navItems = [
         { path: "/dashboard", icon: <FiHome size={20} />, label: "Tổng quan" },
+        { path: "/dashboard/categories", icon: <FiTag size={20} />, label: "Thể loại" },
         { path: "/dashboard/comics", icon: <FiBook size={20} />, label: "Quản lý truyện" },
         { path: "/dashboard/chapters", icon: <FiFileText size={20} />, label: "Quản lý chapter" },
-        { path: "/dashboard/categories", icon: <FiTag size={20} />, label: "Thể loại" },
         { path: "/dashboard/users", icon: <FiUsers size={20} />, label: "Người dùng" },
         { path: "/dashboard/comments", icon: <FiMessageSquare size={20} />, label: "Bình luận" },
         { path: "/dashboard/settings", icon: <FiSettings size={20} />, label: "Cài đặt" },
@@ -51,8 +47,8 @@ export default function Sidebar({ isSidebarOpen, toggleSidebar }: SidebarProps) 
                             <Link
                                 href={item.path}
                                 className={`flex items-center p-3 rounded-lg ${isActive(item.path)
-                                        ? "text-green-700 bg-green-100 font-medium dark:text-green-400 dark:bg-green-900/40"
-                                        : "text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-green-400"
+                                    ? "text-green-700 bg-green-100 font-medium dark:text-green-400 dark:bg-green-900/40"
+                                    : "text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-green-400"
                                     }`}
                             >
                                 {item.icon}
