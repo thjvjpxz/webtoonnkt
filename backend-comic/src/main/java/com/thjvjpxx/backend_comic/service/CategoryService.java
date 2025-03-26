@@ -9,8 +9,6 @@ import com.thjvjpxx.backend_comic.model.Category;
 public interface CategoryService {
     BaseResponse<List<Category>> getAllCategories(int page, int limit, String search);
 
-    BaseResponse<Category> getCategoryById(String id);
-
     BaseResponse<Category> createCategory(CategoryRequest category);
 
     BaseResponse<Category> updateCategory(String id, CategoryRequest category);
