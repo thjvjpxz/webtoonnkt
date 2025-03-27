@@ -10,8 +10,8 @@ import com.thjvjpxx.backend_comic.enums.ErrorCode;
 
 @RestControllerAdvice
 public class GlobalException {
-    @ExceptionHandler(CategoryException.class)
-    public ResponseEntity<BaseResponse<?>> handleCategoryException(CategoryException ex) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<BaseResponse<?>> handleCategoryException(BaseException ex) {
         ErrorCode errorCode = ex.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
