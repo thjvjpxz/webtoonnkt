@@ -62,9 +62,8 @@ export default function Sidebar({
 
   return (
     <div
-      className={`${
-        isSidebarOpen ? "w-64" : "w-20"
-      } bg-white shadow-md transition-all duration-300 flex flex-col border-r border-green-100 dark:bg-gray-800 dark:border-gray-700`}
+      className={`${isSidebarOpen ? "w-64" : "w-20"
+        } bg-white shadow-md transition-all duration-300 flex flex-col border-r border-green-100 dark:bg-gray-800 dark:border-gray-700`}
     >
       <div className="p-4 flex items-center justify-between border-b border-green-100 dark:border-gray-700">
         {isSidebarOpen ? (
@@ -78,7 +77,7 @@ export default function Sidebar({
         )}
         <button
           onClick={toggleSidebar}
-          className="p-1 rounded-full hover:bg-green-50 text-green-600 dark:hover:bg-gray-700 dark:text-green-400"
+          className="p-1 rounded-full hover:bg-green-50 text-green-600 dark:hover:bg-gray-700 dark:text-green-400 cursor-pointer"
           aria-label={isSidebarOpen ? "Thu gọn sidebar" : "Mở rộng sidebar"}
         >
           {isSidebarOpen ? (
@@ -95,11 +94,10 @@ export default function Sidebar({
             <li key={item.path}>
               <Link
                 href={item.path}
-                className={`flex items-center p-3 rounded-lg ${
-                  isActive(item.path)
-                    ? "text-green-700 bg-green-100 font-medium dark:text-green-400 dark:bg-green-900/40"
-                    : "text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-green-400"
-                }`}
+                className={`flex items-center p-3 rounded-lg ${isActive(item.path)
+                  ? "text-green-700 bg-green-100 font-medium dark:text-green-400 dark:bg-green-900/40"
+                  : "text-gray-700 hover:bg-green-50 hover:text-green-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-green-400"
+                  }`}
               >
                 {item.icon}
                 {isSidebarOpen && <span className="ml-3">{item.label}</span>}
@@ -111,7 +109,7 @@ export default function Sidebar({
 
       <div className="p-4 border-t border-green-100 dark:border-gray-700">
         <button
-          className="flex items-center justify-center w-full p-2 text-rose-500 rounded-lg hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-900/20"
+          className="flex items-center justify-center w-full p-2 text-rose-500 rounded-lg hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-900/20 cursor-pointer"
           aria-label="Đăng xuất"
         >
           <FiLogOut size={20} />

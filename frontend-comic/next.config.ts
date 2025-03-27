@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["placehold.co", "dynamic-media-cdn.tripadvisor.com"],
+    domains: ["placehold.co", "img.otruyenapi.com"],
   },
 };
 

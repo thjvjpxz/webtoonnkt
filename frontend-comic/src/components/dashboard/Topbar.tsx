@@ -47,7 +47,7 @@ export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
             <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
           </div> */}
           <button
-            className="p-2 rounded-full bg-green-50 hover:bg-green-100 text-green-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-400"
+            className="p-2 rounded-full bg-green-50 hover:bg-green-100 text-green-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-400 cursor-pointer"
             aria-label="Thông báo"
           >
             <FiBell size={20} />

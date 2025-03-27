@@ -54,7 +54,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-md mr-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
+        className="p-2 rounded-md mr-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 cursor-pointer"
         aria-label="Trang trước"
       >
         <FiChevronLeft size={20} />
@@ -73,11 +73,10 @@ export default function Pagination({
             <button
               key={`page-${page}`}
               onClick={() => typeof page === "number" && onPageChange(page)}
-              className={`px-3 py-1 rounded-md ${
-                currentPage === page
-                  ? "bg-green-600 text-white dark:bg-green-700"
-                  : "text-gray-700 hover:bg-green-50 dark:text-gray-300 dark:hover:bg-green-900/20"
-              }`}
+              className={`px-3 py-1 rounded-md cursor-pointer ${currentPage === page
+                ? "bg-green-600 text-white dark:bg-green-700"
+                : "text-gray-700 hover:bg-green-50 dark:text-gray-300 dark:hover:bg-green-900/20"
+                }`}
             >
               {page}
             </button>
@@ -88,7 +87,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-md ml-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
+        className="p-2 rounded-md ml-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 cursor-pointer"
         aria-label="Trang sau"
       >
         <FiChevronRight size={20} />

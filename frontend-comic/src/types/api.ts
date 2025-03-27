@@ -45,6 +45,7 @@ export type ComicResponse = {
   author: string;
   thumbUrl: string;
   status: string;
+  originName: string;
   viewsCount: number;
   rating: number;
   followersCount: number;
@@ -61,5 +62,6 @@ export type ComicCreateUpdate = {
   author: string;
   thumbUrl: string;
   status: string;
+  originName: string;
   categories: string[];
 };

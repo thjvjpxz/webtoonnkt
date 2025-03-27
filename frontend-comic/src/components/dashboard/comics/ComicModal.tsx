@@ -11,6 +11,7 @@ import NextImage from "next/image";
 import { uploadCoverImage } from "@/services/comicService";
 import { toast } from "react-hot-toast";
 import { generateSlug } from "@/utils/string";
+import '@/styles/scrollbar.css'
 
 type ComicModalProps = {
   comic: ComicResponse | null;
@@ -33,6 +34,7 @@ export default function ComicModal({
     status: "ongoing",
     categories: [],
     thumbUrl: "",
+    originName: "",
   });
 
   const [errors, setErrors] = useState({
@@ -50,6 +52,7 @@ export default function ComicModal({
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
   const [imageUrl, setImageUrl] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function ComicModal({
         author: comic.author,
         thumbUrl: comic.thumbUrl,
         status: comic.status,
+        originName: comic.originName,
         categories: comic.categories.map((cat) => cat.id),
       });
       setPreviewImage(comic.thumbUrl);
@@ -130,51 +134,11 @@ export default function ComicModal({
   }, [isCategoryDropdownOpen]);
 
   // Xử lý tải lên ảnh bìa
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Kiểm tra loại file
-    if (!file.type.startsWith("image/")) {
-      toast.error("Vui lòng chọn file hình ảnh");
-      return;
-    }
-
-    // Kiểm tra kích thước file (giới hạn 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Kích thước file không được vượt quá 2MB");
-      return;
-    }
-
-    // Hiển thị preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreviewImage(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    // Tải lên server
-    setIsUploading(true);
-    try {
-      const response = await uploadCoverImage(file);
-      if (response.status === 200 && response.data) {
-        setFormData((prev) => ({
-          ...prev,
-          thumbUrl: response.data!.url,
-        }));
-        toast.success("Tải ảnh bìa thành công");
-      } else {
-        toast.error(response.message || "Không thể tải lên ảnh bìa");
-      }
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === "object" && "error" in error
-          ? (error.error as string)
-          : "Đã xảy ra lỗi";
-      toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
-    } finally {
-      setIsUploading(false);
-    }
+    handleFileUpload(file);
   };
 
   // Mở hộp thoại chọn file
@@ -257,8 +221,74 @@ export default function ComicModal({
     img.src = imageUrl;
   };
 
+  // Xử lý sự kiện kéo thả
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  // Tách logic xử lý file
+  const handleFileUpload = async (file: File) => {
+    // Kiểm tra loại file
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file hình ảnh");
+      return;
+    }
+
+    // Kiểm tra kích thước file (giới hạn 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Kích thước file không được vượt quá 2MB");
+      return;
+    }
+
+    // Hiển thị preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewImage(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Tải lên server
+    setIsUploading(true);
+    try {
+      const response = await uploadCoverImage(file);
+      if (response.status === 200 && response.data) {
+        setFormData((prev) => ({
+          ...prev,
+          thumbUrl: response.data!.url,
+        }));
+        toast.success("Tải ảnh bìa thành công");
+      } else {
+        toast.error(response.message || "Không thể tải lên ảnh bìa");
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto custom-scrollbar">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800">
         <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -266,7 +296,7 @@ export default function ComicModal({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
           >
             <FiX size={20} />
           </button>
@@ -274,7 +304,7 @@ export default function ComicModal({
 
         <form
           onSubmit={handleSubmit}
-          className="p-6 max-h-[80vh] overflow-y-auto"
+          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -299,7 +329,7 @@ export default function ComicModal({
                               thumbUrl: "",
                             }));
                           }}
-                          className="absolute top-2 right-2 bg-gray-800/70 text-white p-1.5 rounded-full hover:bg-gray-900/70 transition-colors"
+                          className="absolute top-2 right-2 bg-gray-800/70 text-white p-1.5 rounded-full hover:bg-gray-900/70 transition-colors cursor-pointer"
                         >
                           <FiX size={16} />
                         </button>
@@ -318,22 +348,20 @@ export default function ComicModal({
                         <button
                           type="button"
                           onClick={() => setUploadMethod("file")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                            uploadMethod === "file"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                          }`}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            }`}
                         >
                           Tải lên từ máy tính
                         </button>
                         <button
                           type="button"
                           onClick={() => setUploadMethod("url")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                            uploadMethod === "url"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                          }`}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            }`}
                         >
                           Nhập URL ảnh
                         </button>
@@ -348,27 +376,35 @@ export default function ComicModal({
                             accept="image/*"
                             className="hidden"
                           />
-                          <button
-                            type="button"
+                          <div
+                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
+                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
+                              }`}
                             onClick={handleOpenFileDialog}
-                            disabled={isUploading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
                           >
                             {isUploading ? (
-                              <>
-                                <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Đang tải lên...
-                              </>
+                              <div className="flex flex-col items-center justify-center py-4">
+                                <div className="h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                                <p className="text-gray-600 dark:text-gray-300">Đang tải lên...</p>
+                              </div>
                             ) : (
                               <>
-                                <FiUpload className="mr-2" size={16} />
-                                Chọn file ảnh
+                                <FiUpload className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-3" />
+                                <p className="text-gray-600 dark:text-gray-300 mb-1">
+                                  Kéo thả file ảnh vào đây hoặc
+                                </p>
+                                <p className="text-green-600 font-medium dark:text-green-400">
+                                  Nhấn để chọn file
+                                </p>
                               </>
                             )}
-                          </button>
+                          </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa:
-                            2MB
+                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa: 2MB
                           </p>
                         </div>
                       ) : (
@@ -385,7 +421,7 @@ export default function ComicModal({
                               <button
                                 type="button"
                                 onClick={() => setImageUrl("")}
-                                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
                               >
                                 <FiX size={16} />
                               </button>
@@ -395,7 +431,7 @@ export default function ComicModal({
                             type="button"
                             onClick={handleImageUrlSubmit}
                             disabled={!imageUrl.trim() || isUploading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors cursor-pointer"
                           >
                             {isUploading ? (
                               <>
@@ -430,9 +466,8 @@ export default function ComicModal({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${
-                  errors.name ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${errors.name ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
@@ -452,9 +487,8 @@ export default function ComicModal({
                 name="slug"
                 value={formData.slug}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${
-                  errors.slug ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${errors.slug ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.slug && (
                 <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>
@@ -474,9 +508,8 @@ export default function ComicModal({
                 name="author"
                 value={formData.author}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${
-                  errors.author ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${errors.author ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.author && (
                 <p className="mt-1 text-sm text-rose-500">{errors.author}</p>
@@ -495,11 +528,28 @@ export default function ComicModal({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
               >
                 <option value="ongoing">Đang cập nhật</option>
                 <option value="completed">Đã hoàn thành</option>
               </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Tên gốc
+              </label>
+              <input
+                type="text"
+                id="originName"
+                name="originName"
+                value={formData.originName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
             </div>
 
             <div className="md:col-span-2">
@@ -515,9 +565,8 @@ export default function ComicModal({
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className={`w-full px-3 py-2 border ${
-                  errors.description ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${errors.description ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.description && (
                 <p className="mt-1 text-sm text-rose-500">
@@ -537,9 +586,8 @@ export default function ComicModal({
               )}
               <div className="relative">
                 <div
-                  className={`w-full border ${
-                    errors.categories ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
+                  className={`w-full border ${errors.categories ? "border-rose-500" : "border-gray-300"
+                    } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
                 >
                   <div className="flex flex-wrap gap-2 p-2">
                     {/* Hiển thị các thể loại đã chọn */}
@@ -555,7 +603,7 @@ export default function ComicModal({
                             <button
                               type="button"
                               onClick={() => handleRemoveCategory(category.id)}
-                              className="ml-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                              className="ml-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 cursor-pointer"
                             >
                               <FiX size={16} />
                             </button>
@@ -605,10 +653,10 @@ export default function ComicModal({
                           .includes(categorySearchTerm.toLowerCase()) &&
                         !formData.categories.includes(cat.id)
                     ).length === 0 && (
-                      <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
-                        Không tìm thấy thể loại phù hợp
-                      </div>
-                    )}
+                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                          Không tìm thấy thể loại phù hợp
+                        </div>
+                      )}
                   </div>
                 )}
               </div>
@@ -619,13 +667,13 @@ export default function ComicModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
             >
               {comic ? "Cập nhật" : "Thêm mới"}
             </button>

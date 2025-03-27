@@ -1,12 +1,8 @@
 "use client";
 
 import { FiAlertTriangle } from "react-icons/fi";
+import { DeleteComicModalProps } from "@/types/comic";
 
-type DeleteComicModalProps = {
-  comicTitle: string;
-  onClose: () => void;
-  onConfirm: () => void;
-};
 
 export default function DeleteComicModal({
   comicTitle,
@@ -34,13 +30,13 @@ export default function DeleteComicModal({
           <div className="flex justify-center space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
             >
               Hủy
             </button>
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600"
+              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600 cursor-pointer"
             >
               Xóa
             </button>

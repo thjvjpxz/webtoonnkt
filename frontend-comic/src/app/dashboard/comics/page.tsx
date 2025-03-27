@@ -9,6 +9,7 @@ import {
   FiSearch,
   FiAlertCircle,
   FiFilter,
+  FiEye,
 } from "react-icons/fi";
 import ComicModal from "@/components/dashboard/comics/ComicModal";
 import DeleteComicModal from "@/components/dashboard/comics/DeleteComicModal";
@@ -27,6 +28,7 @@ import {
 } from "@/types/api";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import ViewComic from "@/components/dashboard/comics/ViewComic";
 
 export default function Comics() {
   // State cho danh sách truyện và phân trang
@@ -45,6 +47,7 @@ export default function Comics() {
   // State cho modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [currentComic, setCurrentComic] = useState<ComicResponse | null>(null);
 
   // Lấy danh sách thể loại
@@ -130,7 +133,7 @@ export default function Comics() {
       toast.error(errorMessage || "Đã xảy ra lỗi khi thêm truyện");
     }
   };
-  // ... existing code ...
+
   // Xử lý cập nhật truyện
   const handleUpdateComic = async (comicData: ComicCreateUpdate) => {
     if (!currentComic) return;
@@ -195,6 +198,12 @@ export default function Comics() {
     setIsDeleteModalOpen(true);
   };
 
+  // Xử lý mở modal xem chi tiết truyện
+  const handleOpenViewModal = (comic: ComicResponse) => {
+    setCurrentComic(comic);
+    setIsViewModalOpen(true);
+  }
+
   // Xử lý tìm kiếm
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -245,7 +254,7 @@ export default function Comics() {
 
         <button
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600"
+          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
         >
           <FiPlus size={18} />
           <span>Thêm truyện mới</span>
@@ -292,6 +301,9 @@ export default function Comics() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 border-b border-green-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Danh sách truyện</h2>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-green-50 dark:bg-green-900/30">
@@ -354,14 +366,14 @@ export default function Comics() {
                   </td>
                 </tr>
               ) : (
-                comics.map((comic) => (
+                comics.map((comic, index) => (
                   <tr
                     key={comic.id}
                     className="hover:bg-green-50/50 dark:hover:bg-gray-700/30"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="flex items-center">
-                        <div className="h-12 w-9 flex-shrink-0 mr-3 relative">
+                      <div className="flex items-center justify-center">
+                        <div className="h-24 w-16 flex-shrink-0 mr-3 relative">
                           <Image
                             src={
                               comic.thumbUrl ||
@@ -369,7 +381,9 @@ export default function Comics() {
                             }
                             alt={comic.name}
                             fill
-                            className="object-cover rounded"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover rounded shadow-sm"
+                            priority={index < 3}
                           />
                         </div>
                         <div className="ml-1">
@@ -422,15 +436,22 @@ export default function Comics() {
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <div className="flex space-x-2 justify-center">
                         <button
+                          onClick={() => handleOpenViewModal(comic)}
+                          className="text-blue-600 hover:text-blue-800 flex items-center dark:text-blue-500 dark:hover:text-blue-400 cursor-pointer"
+                          aria-label="Xem chi tiết"
+                        >
+                          <FiEye size={18} />
+                        </button>
+                        <button
                           onClick={() => handleOpenEditModal(comic)}
-                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400"
+                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400 cursor-pointer"
                           aria-label="Sửa truyện"
                         >
                           <FiEdit size={18} />
                         </button>
                         <button
                           onClick={() => handleOpenDeleteModal(comic)}
-                          className="text-rose-600 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300"
+                          className="text-rose-600 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300 cursor-pointer"
                           aria-label="Xóa truyện"
                         >
                           <FiTrash2 size={18} />
@@ -469,6 +490,13 @@ export default function Comics() {
           comicTitle={currentComic.name}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteComic}
+        />
+      )}
+
+      {isViewModalOpen && currentComic && (
+        <ViewComic
+          comic={currentComic}
+          onClose={() => setIsViewModalOpen(false)}
         />
       )}
     </DashboardLayout>

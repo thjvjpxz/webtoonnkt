@@ -20,6 +20,7 @@ import {
 } from "@/services/categoryService";
 import { CategoryResponse, CategoryCreateUpdate } from "@/types/api";
 import { toast } from "react-hot-toast";
+import "@/styles/scrollbar.css";
 
 export default function Categories() {
   // State cho danh sách thể loại và phân trang
@@ -181,7 +182,7 @@ export default function Categories() {
 
         <button
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600"
+          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
         >
           <FiPlus size={18} />
           <span>Thêm thể loại mới</span>
@@ -205,7 +206,7 @@ export default function Categories() {
             <p>{error}</p>
             <button
               onClick={fetchCategories}
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
             >
               Thử lại
             </button>
@@ -215,7 +216,7 @@ export default function Categories() {
             Không tìm thấy thể loại nào
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full">
               <thead className="bg-green-50 dark:bg-green-900/30">
                 <tr>
@@ -278,14 +279,14 @@ export default function Categories() {
                       <div className="flex justify-center space-x-3">
                         <button
                           onClick={() => handleOpenEditModal(category)}
-                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400"
+                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400 cursor-pointer"
                           aria-label="Sửa thể loại"
                         >
                           <FiEdit className="mr-1" size={16} />
                         </button>
                         <button
                           onClick={() => handleOpenDeleteModal(category)}
-                          className="text-rose-500 hover:text-rose-700 flex items-center dark:text-rose-400 dark:hover:text-rose-300"
+                          className="text-rose-500 hover:text-rose-700 flex items-center dark:text-rose-400 dark:hover:text-rose-300 cursor-pointer"
                           aria-label="Xoá thể loại"
                         >
                           <FiTrash2 className="mr-1" size={16} />
