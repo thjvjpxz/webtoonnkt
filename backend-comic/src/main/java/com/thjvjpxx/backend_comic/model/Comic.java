@@ -57,7 +57,7 @@ public class Comic {
     @Column(name = "rating")
     double rating;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
     @Column(name = "created_at")

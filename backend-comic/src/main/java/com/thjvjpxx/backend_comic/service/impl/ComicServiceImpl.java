@@ -1,6 +1,7 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,6 +134,9 @@ public class ComicServiceImpl implements ComicService {
     @Override
     public BaseResponse<Comic> deleteComic(String id) {
         Comic comic = findComicById(id);
+
+        comic.removeCategories(new ArrayList<>(comic.getCategories()));
+
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
     }
