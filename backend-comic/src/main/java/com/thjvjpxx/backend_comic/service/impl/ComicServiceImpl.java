@@ -101,16 +101,16 @@ public class ComicServiceImpl implements ComicService {
             throw new BaseException(ErrorCode.COMIC_NOT_FOUND);
         }
 
-        validateComicRequest(comicRequest);
-
         Comic comic = findComicById(id);
+
+        if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
+                && !comicRequest.getSlug().equals(comic.getSlug())) {
+            validateComicRequest(comicRequest);
+        }
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
         // Remove old categories
-        comic.removeCategories(
-                comic.getCategories()
-                        .stream()
-                        .collect(Collectors.toList()));
+        comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
 
         comic.addCategories(categoriesNew);
         comic.setSlug(comicRequest.getSlug());
