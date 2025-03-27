@@ -1,0 +1,637 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { FiX, FiUpload, FiImage, FiCheck } from "react-icons/fi";
+import {
+  ComicResponse,
+  ComicCreateUpdate,
+  CategoryResponse,
+} from "@/types/api";
+import NextImage from "next/image";
+import { uploadCoverImage } from "@/services/comicService";
+import { toast } from "react-hot-toast";
+import { generateSlug } from "@/utils/string";
+
+type ComicModalProps = {
+  comic: ComicResponse | null;
+  categories: CategoryResponse[];
+  onClose: () => void;
+  onSave: (comic: ComicCreateUpdate) => void;
+};
+
+export default function ComicModal({
+  comic,
+  categories,
+  onClose,
+  onSave,
+}: ComicModalProps) {
+  const [formData, setFormData] = useState<ComicCreateUpdate>({
+    name: "",
+    slug: "",
+    description: "",
+    author: "",
+    status: "ongoing",
+    categories: [],
+    thumbUrl: "",
+  });
+
+  const [errors, setErrors] = useState({
+    name: "",
+    slug: "",
+    author: "",
+    description: "",
+    categories: "",
+  });
+
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
+  const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
+  const [imageUrl, setImageUrl] = useState("");
+
+  // Nếu đang sửa, điền dữ liệu vào form
+  useEffect(() => {
+    if (comic) {
+      setFormData({
+        name: comic.name,
+        slug: comic.slug,
+        description: comic.description,
+        author: comic.author,
+        thumbUrl: comic.thumbUrl,
+        status: comic.status,
+        categories: comic.categories.map((cat) => cat.id),
+      });
+      setPreviewImage(comic.thumbUrl);
+
+      // Nếu có thumbUrl, đặt phương thức tải lên là URL
+      if (comic.thumbUrl) {
+        setImageUrl(comic.thumbUrl);
+        setUploadMethod("url");
+      }
+    }
+  }, [comic]);
+
+  // Xử lý thay đổi input
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+
+    console.log(`Field ${name} changed to: ${value}`);
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Tự động tạo slug khi thay đổi tên
+    if (name === "name") {
+      setFormData((prev) => ({
+        ...prev,
+        slug: generateSlug(value),
+      }));
+    }
+  };
+
+  // Xử lý thêm thể loại
+  const handleAddCategory = (categoryId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: [...prev.categories, categoryId],
+    }));
+    setCategorySearchTerm("");
+  };
+
+  // Xử lý xóa thể loại
+  const handleRemoveCategory = (categoryId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories: prev.categories.filter((id) => id !== categoryId),
+    }));
+  };
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".relative") && isCategoryDropdownOpen) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCategoryDropdownOpen]);
+
+  // Xử lý tải lên ảnh bìa
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Kiểm tra loại file
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file hình ảnh");
+      return;
+    }
+
+    // Kiểm tra kích thước file (giới hạn 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Kích thước file không được vượt quá 2MB");
+      return;
+    }
+
+    // Hiển thị preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewImage(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Tải lên server
+    setIsUploading(true);
+    try {
+      const response = await uploadCoverImage(file);
+      if (response.status === 200 && response.data) {
+        setFormData((prev) => ({
+          ...prev,
+          thumbUrl: response.data!.url,
+        }));
+        toast.success("Tải ảnh bìa thành công");
+      } else {
+        toast.error(response.message || "Không thể tải lên ảnh bìa");
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Mở hộp thoại chọn file
+  const handleOpenFileDialog = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Xác thực form
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {
+      name: "",
+      slug: "",
+      author: "",
+      description: "",
+      categories: "",
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Tên truyện không được để trống";
+      valid = false;
+    }
+
+    if (!formData.slug.trim()) {
+      newErrors.slug = "Slug không được để trống";
+      valid = false;
+    }
+
+    if (!formData.author.trim()) {
+      newErrors.author = "Tên tác giả không được để trống";
+      valid = false;
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Mô tả không được để trống";
+      valid = false;
+    }
+
+    if (formData.categories.length === 0) {
+      newErrors.categories = "Vui lòng chọn ít nhất một thể loại";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  // Xử lý lưu
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      onSave(formData);
+    }
+  };
+
+  // Xử lý khi người dùng nhập URL ảnh
+  const handleImageUrlSubmit = () => {
+    if (!imageUrl.trim()) return;
+
+    setIsUploading(true);
+
+    // Sử dụng window.Image thay vì Image
+    const img = new window.Image();
+    img.onload = () => {
+      setPreviewImage(imageUrl);
+      setFormData((prev) => ({
+        ...prev,
+        thumbUrl: imageUrl,
+      }));
+      setIsUploading(false);
+      toast.success("Đã thêm ảnh bìa từ URL");
+    };
+
+    img.onerror = () => {
+      setIsUploading(false);
+      toast.error("URL ảnh không hợp lệ hoặc không thể truy cập");
+    };
+
+    img.src = imageUrl;
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800">
+        <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            {comic ? "Sửa thông tin truyện" : "Thêm truyện mới"}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 max-h-[80vh] overflow-y-auto"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <div className="flex flex-col border-2 border-dashed border-green-200 rounded-lg p-6 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Phần xem trước ảnh */}
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    {previewImage ? (
+                      <div className="relative w-full h-64 mb-4">
+                        <NextImage
+                          src={previewImage}
+                          alt="Ảnh bìa truyện"
+                          fill
+                          className="object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPreviewImage(null);
+                            setFormData((prev) => ({
+                              ...prev,
+                              thumbUrl: "",
+                            }));
+                          }}
+                          className="absolute top-2 right-2 bg-gray-800/70 text-white p-1.5 rounded-full hover:bg-gray-900/70 transition-colors"
+                        >
+                          <FiX size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-green-500 mb-4 dark:text-green-400 flex items-center justify-center w-full h-64 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        <FiImage size={64} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Phần tùy chọn tải lên */}
+                  <div className="flex-1 flex flex-col">
+                    <div className="mb-4">
+                      <div className="flex space-x-4 mb-4">
+                        <button
+                          type="button"
+                          onClick={() => setUploadMethod("file")}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                            uploadMethod === "file"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                          }`}
+                        >
+                          Tải lên từ máy tính
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUploadMethod("url")}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                            uploadMethod === "url"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                          }`}
+                        >
+                          Nhập URL ảnh
+                        </button>
+                      </div>
+
+                      {uploadMethod === "file" ? (
+                        <div className="space-y-4">
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleImageUpload}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleOpenFileDialog}
+                            disabled={isUploading}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                          >
+                            {isUploading ? (
+                              <>
+                                <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Đang tải lên...
+                              </>
+                            ) : (
+                              <>
+                                <FiUpload className="mr-2" size={16} />
+                                Chọn file ảnh
+                              </>
+                            )}
+                          </button>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa:
+                            2MB
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="Nhập URL ảnh..."
+                              value={imageUrl}
+                              onChange={(e) => setImageUrl(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white pr-10"
+                            />
+                            {imageUrl && (
+                              <button
+                                type="button"
+                                onClick={() => setImageUrl("")}
+                                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                              >
+                                <FiX size={16} />
+                              </button>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleImageUrlSubmit}
+                            disabled={!imageUrl.trim() || isUploading}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                          >
+                            {isUploading ? (
+                              <>
+                                <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Đang xử lý...
+                              </>
+                            ) : (
+                              <>
+                                <FiCheck className="mr-2" size={16} />
+                                Sử dụng URL này
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Tên truyện
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border ${
+                  errors.name ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="slug"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Slug
+              </label>
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border ${
+                  errors.slug ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              />
+              {errors.slug && (
+                <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="author"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Tác giả
+              </label>
+              <input
+                type="text"
+                id="author"
+                name="author"
+                value={formData.author}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border ${
+                  errors.author ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              />
+              {errors.author && (
+                <p className="mt-1 text-sm text-rose-500">{errors.author}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Trạng thái
+              </label>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              >
+                <option value="ongoing">Đang cập nhật</option>
+                <option value="completed">Đã hoàn thành</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+              >
+                Mô tả
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={4}
+                className={`w-full px-3 py-2 border ${
+                  errors.description ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-rose-500">
+                  {errors.description}
+                </p>
+              )}
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
+                Thể loại
+              </label>
+              {errors.categories && (
+                <p className="mb-2 text-sm text-rose-500">
+                  {errors.categories}
+                </p>
+              )}
+              <div className="relative">
+                <div
+                  className={`w-full border ${
+                    errors.categories ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
+                >
+                  <div className="flex flex-wrap gap-2 p-2">
+                    {/* Hiển thị các thể loại đã chọn */}
+                    {formData.categories.length > 0 &&
+                      categories
+                        .filter((cat) => formData.categories.includes(cat.id))
+                        .map((category) => (
+                          <span
+                            key={category.id}
+                            className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                          >
+                            {category.name}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCategory(category.id)}
+                              className="ml-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                            >
+                              <FiX size={16} />
+                            </button>
+                          </span>
+                        ))}
+
+                    {/* Input tìm kiếm */}
+                    <input
+                      type="text"
+                      placeholder={
+                        formData.categories.length === 0
+                          ? "Chọn thể loại..."
+                          : ""
+                      }
+                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white"
+                      onFocus={() => setIsCategoryDropdownOpen(true)}
+                      onChange={(e) => setCategorySearchTerm(e.target.value)}
+                      value={categorySearchTerm}
+                    />
+                  </div>
+                </div>
+
+                {/* Dropdown danh sách thể loại */}
+                {isCategoryDropdownOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    {categories
+                      .filter(
+                        (cat) =>
+                          cat.name
+                            .toLowerCase()
+                            .includes(categorySearchTerm.toLowerCase()) &&
+                          !formData.categories.includes(cat.id)
+                      )
+                      .map((category) => (
+                        <div
+                          key={category.id}
+                          className="px-4 py-2 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20"
+                          onClick={() => handleAddCategory(category.id)}
+                        >
+                          {category.name}
+                        </div>
+                      ))}
+                    {categories.filter(
+                      (cat) =>
+                        cat.name
+                          .toLowerCase()
+                          .includes(categorySearchTerm.toLowerCase()) &&
+                        !formData.categories.includes(cat.id)
+                    ).length === 0 && (
+                      <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                        Không tìm thấy thể loại phù hợp
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+            >
+              {comic ? "Cập nhật" : "Thêm mới"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

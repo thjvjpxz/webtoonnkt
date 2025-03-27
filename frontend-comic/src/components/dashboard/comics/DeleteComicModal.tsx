@@ -2,17 +2,17 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 
-type DeleteConfirmModalProps = {
-  categoryName: string;
+type DeleteComicModalProps = {
+  comicTitle: string;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-export default function DeleteConfirmModal({
-  categoryName,
+export default function DeleteComicModal({
+  comicTitle,
   onClose,
   onConfirm,
-}: DeleteConfirmModalProps) {
+}: DeleteComicModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800">
@@ -26,8 +26,8 @@ export default function DeleteConfirmModal({
           </h3>
 
           <p className="text-gray-600 text-center mb-6 dark:text-gray-400">
-            Bạn có chắc chắn muốn xóa thể loại{" "}
-            <span className="font-semibold">&quot;{categoryName}&quot;</span>?
+            Bạn có chắc chắn muốn xóa truyện{" "}
+            <span className="font-semibold">&quot;{comicTitle}&quot;</span>?
             Hành động này không thể hoàn tác.
           </p>
 
