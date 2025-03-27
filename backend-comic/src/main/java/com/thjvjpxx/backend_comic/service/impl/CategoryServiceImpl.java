@@ -20,12 +20,10 @@ import com.thjvjpxx.backend_comic.service.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
@@ -112,6 +110,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private Category categoryExist(String id) {
         return categoryRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
+
+    @Override
+    public BaseResponse<Category> getCategoryById(String id) {
+        Category category = categoryExist(id);
+        return BaseResponse.success(category);
     }
 
 }

@@ -2,6 +2,7 @@ package com.thjvjpxx.backend_comic.model;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -78,4 +79,13 @@ public class Comic {
     public void removeCategory(Category category) {
         this.categories.remove(category);
     }
+
+    public void addCategories(List<Category> categories) {
+        this.categories.addAll(categories);
+    }
+
+    public void removeCategories(List<Category> categories) {
+        this.categories.removeAll(categories);
+    }
+
 }

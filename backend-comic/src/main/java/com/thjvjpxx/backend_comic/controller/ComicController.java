@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thjvjpxx.backend_comic.dto.request.CategoryRequest;
+import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.model.Category;
-import com.thjvjpxx.backend_comic.service.CategoryService;
+import com.thjvjpxx.backend_comic.model.Comic;
+import com.thjvjpxx.backend_comic.service.ComicService;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -23,38 +23,33 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/categories")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CategoryController {
-    CategoryService categoryService;
+@RequiredArgsConstructor
+@RequestMapping("/comics")
+public class ComicController {
+    ComicService comicService;
 
     @GetMapping
-    public BaseResponse<List<Category>> getAllCategories(
+    public BaseResponse<List<Comic>> getAllComics(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
             @RequestParam(required = false) String search) {
-        return categoryService.getAllCategories(page, limit, search);
+        return comicService.getAllComics(page, limit, search);
     }
 
     @PostMapping
-    public BaseResponse<Category> createCategory(@Valid @RequestBody CategoryRequest category) {
-        return categoryService.createCategory(category);
+    public BaseResponse<Comic> createComic(@Valid @RequestBody ComicRequest comicRequest) {
+        return comicService.createComic(comicRequest);
     }
 
     @PutMapping("/{id}")
-    public BaseResponse<Category> updateCategory(@Valid @PathVariable String id,
-            @RequestBody CategoryRequest category) {
-        return categoryService.updateCategory(id, category);
+    public BaseResponse<Comic> updateComic(@Valid @PathVariable String id,
+            @RequestBody ComicRequest comicRequest) {
+        return comicService.updateComic(id, comicRequest);
     }
 
     @DeleteMapping("/{id}")
-    public BaseResponse<Category> deleteCategory(@PathVariable String id) {
-        return categoryService.deleteCategory(id);
-    }
-
-    @GetMapping("/{id}")
-    public BaseResponse<Category> getCategoryById(@PathVariable String id) {
-        return categoryService.getCategoryById(id);
+    public BaseResponse<Comic> deleteComic(@PathVariable String id) {
+        return comicService.deleteComic(id);
     }
 }
