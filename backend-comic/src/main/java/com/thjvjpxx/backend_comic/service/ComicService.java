@@ -7,7 +7,7 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.model.Comic;
 
 public interface ComicService {
-    BaseResponse<List<Comic>> getAllComics(int page, int limit, String search);
+    BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category);
 
     BaseResponse<Comic> getComicById(String id);
 

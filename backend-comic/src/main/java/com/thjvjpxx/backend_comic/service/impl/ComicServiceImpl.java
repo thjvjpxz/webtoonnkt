@@ -34,7 +34,7 @@ public class ComicServiceImpl implements ComicService {
     CategoryRepository categoryRepository;
 
     @Override
-    public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search) {
+    public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
         page = page < 0 ? 0 : page;
         limit = limit < 0 ? 5 : limit;
 
@@ -46,6 +46,10 @@ public class ComicServiceImpl implements ComicService {
         Page<Comic> comics = null;
         if (search != null && !search.isEmpty()) {
             comics = comicRepository.findBySlugContainingOrNameContaining(search, search, pageable);
+        } else if (status != null && !status.isEmpty()) {
+            comics = comicRepository.findByStatus(status, pageable);
+        } else if (category != null && !category.isEmpty()) {
+            comics = comicRepository.findByCategory(category, pageable);
         } else {
             comics = comicRepository.findAll(pageable);
         }
