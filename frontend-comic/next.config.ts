@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       "img.otruyenapi.com",
       "dynamic-media-cdn.tripadvisor.com",
     ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 

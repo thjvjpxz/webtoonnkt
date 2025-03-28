@@ -434,7 +434,7 @@ export default function Comics() {
                       })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <div className="flex space-x-2 justify-center">
+                      <div className="flex space-x-3 justify-center">
                         <button
                           onClick={() => handleOpenViewModal(comic)}
                           className="text-blue-600 hover:text-blue-800 flex items-center dark:text-blue-500 dark:hover:text-blue-400 cursor-pointer"
