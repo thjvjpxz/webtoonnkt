@@ -7,7 +7,7 @@ export const getComics = async (
   limit: number = 5,
   search?: string,
   status?: string,
-  categoryId?: number
+  category?: string
 ): Promise<ApiResponse<ComicResponse[]>> => {
   let endpoint = `/comics?page=${page}&limit=${limit}`;
 
@@ -19,8 +19,8 @@ export const getComics = async (
     endpoint += `&status=${status}`;
   }
 
-  if (categoryId) {
-    endpoint += `&categoryId=${categoryId}`;
+  if (category) {
+    endpoint += `&category=${category}`;
   }
 
   return await fetchApi<ApiResponse<ComicResponse[]>>(endpoint);
