@@ -16,7 +16,7 @@ export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
   // Render nội dung cơ bản trong quá trình SSR
   if (!mounted) {
     return (
-      <header className="bg-white shadow-sm z-10 border-b border-green-100">
+      <header className="bg-white shadow-sm z-10 border-b border-green-100 dark:bg-gray-800 dark:border-gray-700">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
@@ -38,14 +38,6 @@ export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
           </h2>
         </div>
         <div className="flex items-center space-x-4">
-          {/* <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              className="pl-10 pr-4 py-2 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-            />
-            <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
-          </div> */}
           <button
             className="p-2 rounded-full bg-green-50 hover:bg-green-100 text-green-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-400 cursor-pointer"
             aria-label="Thông báo"

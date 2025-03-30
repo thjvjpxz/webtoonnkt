@@ -1,5 +1,5 @@
-import { fetchApi } from "./api";
-import { ApiResponse, ComicResponse, ComicCreateUpdate } from "@/types/api";
+import { ApiResponse, ComicCreateUpdate, ComicResponse } from "@/types/api";
+import { fetchApi, fetchApiWithFormData } from "./api";
 
 // Lấy danh sách truyện có phân trang
 export const getComics = async (
@@ -7,7 +7,7 @@ export const getComics = async (
   limit: number = 5,
   search?: string,
   status?: string,
-  categoryId?: number
+  category?: string
 ): Promise<ApiResponse<ComicResponse[]>> => {
   let endpoint = `/comics?page=${page}&limit=${limit}`;
 
@@ -19,8 +19,8 @@ export const getComics = async (
     endpoint += `&status=${status}`;
   }
 
-  if (categoryId) {
-    endpoint += `&categoryId=${categoryId}`;
+  if (category) {
+    endpoint += `&category=${category}`;
   }
 
   return await fetchApi<ApiResponse<ComicResponse[]>>(endpoint);
@@ -68,9 +68,9 @@ export const uploadCoverImage = async (
   const formData = new FormData();
   formData.append("file", file);
 
-  return await fetchApi<ApiResponse<{ url: string }>>("/upload/comic-cover", {
+  return await fetchApiWithFormData<ApiResponse<{ url: string }>>("/upload/thumbnail", {
     method: "POST",
     body: formData,
-    headers: {}, // Để fetch tự động thiết lập Content-Type cho FormData
+    headers: {},
   });
 };

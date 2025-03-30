@@ -33,8 +33,10 @@ public class ComicController {
     public BaseResponse<List<Comic>> getAllComics(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(required = false) String search) {
-        return comicService.getAllComics(page, limit, search);
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category) {
+        return comicService.getAllComics(page, limit, search, status, category);
     }
 
     @PostMapping

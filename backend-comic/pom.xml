@@ -30,6 +30,8 @@
 		<java.version>21</java.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.24</lombok.version>
+		<google-auth.version>1.33.1</google-auth.version>
+		<google-api-services-drive.version>v3-rev197-1.25.0</google-api-services-drive.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,6 +86,21 @@
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
 			<version>${mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>${google-auth.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-drive</artifactId>
+			<version>${google-api-services-drive.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-credentials</artifactId>
+			<version>${google-auth.version}</version>
 		</dependency>
 
 	</dependencies>

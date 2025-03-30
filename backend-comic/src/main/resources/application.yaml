@@ -19,3 +19,6 @@ app:
   cors:
     allowed-origins: http://localhost:3000
 
+google-drive:
+  folder-id: 1H89l7BIVVNR3byETuuqZp2OXJpbSsT2R
+

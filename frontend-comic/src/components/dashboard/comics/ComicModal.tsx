@@ -11,7 +11,7 @@ import NextImage from "next/image";
 import { uploadCoverImage } from "@/services/comicService";
 import { toast } from "react-hot-toast";
 import { generateSlug } from "@/utils/string";
-import '@/styles/scrollbar.css'
+import "@/styles/scrollbar.css";
 
 type ComicModalProps = {
   comic: ComicResponse | null;
@@ -40,8 +40,6 @@ export default function ComicModal({
   const [errors, setErrors] = useState({
     name: "",
     slug: "",
-    author: "",
-    description: "",
     categories: "",
   });
 
@@ -53,6 +51,7 @@ export default function ComicModal({
   const [uploadMethod, setUploadMethod] = useState<"file" | "url">("file");
   const [imageUrl, setImageUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
@@ -64,7 +63,7 @@ export default function ComicModal({
         author: comic.author,
         thumbUrl: comic.thumbUrl,
         status: comic.status,
-        originName: comic.originName,
+        originName: comic.originName ? comic.originName : "",
         categories: comic.categories.map((cat) => cat.id),
       });
       setPreviewImage(comic.thumbUrl);
@@ -152,8 +151,6 @@ export default function ComicModal({
     const newErrors = {
       name: "",
       slug: "",
-      author: "",
-      description: "",
       categories: "",
     };
 
@@ -167,16 +164,6 @@ export default function ComicModal({
       valid = false;
     }
 
-    if (!formData.author.trim()) {
-      newErrors.author = "Tên tác giả không được để trống";
-      valid = false;
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = "Mô tả không được để trống";
-      valid = false;
-    }
-
     if (formData.categories.length === 0) {
       newErrors.categories = "Vui lòng chọn ít nhất một thể loại";
       valid = false;
@@ -187,10 +174,47 @@ export default function ComicModal({
   };
 
   // Xử lý lưu
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (!validateForm()) {
+      return;
+    }
+
+    // Nếu có file ảnh đã chọn, tải lên server trước
+    if (selectedFile && uploadMethod === "file") {
+      setIsUploading(true);
+      try {
+        const response = await uploadCoverImage(selectedFile);
+        if (response.status === 200) {
+          // Cập nhật URL ảnh vào formData
+          setFormData((prev) => ({
+            ...prev,
+            thumbUrl: response.message || "",
+          }));
+
+          // Gọi onSave với formData đã cập nhật URL ảnh
+          onSave({
+            ...formData,
+            thumbUrl: response.message || "",
+          });
+
+        } else {
+          toast.error(response.message || "Không thể tải lên ảnh bìa");
+          setIsUploading(false);
+          return;
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          error && typeof error === "object" && "error" in error
+            ? (error.error as string)
+            : "Đã xảy ra lỗi";
+        toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
+        setIsUploading(false);
+        return;
+      }
+    } else {
+      // Nếu không có file mới hoặc sử dụng URL, gọi onSave trực tiếp
       onSave(formData);
     }
   };
@@ -203,6 +227,7 @@ export default function ComicModal({
 
     // Sử dụng window.Image thay vì Image
     const img = new window.Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       setPreviewImage(imageUrl);
       setFormData((prev) => ({
@@ -243,7 +268,7 @@ export default function ComicModal({
   };
 
   // Tách logic xử lý file
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = (file: File) => {
     // Kiểm tra loại file
     if (!file.type.startsWith("image/")) {
       toast.error("Vui lòng chọn file hình ảnh");
@@ -256,35 +281,15 @@ export default function ComicModal({
       return;
     }
 
+    // Lưu file đã chọn
+    setSelectedFile(file);
+
     // Hiển thị preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewImage(e.target?.result as string);
     };
     reader.readAsDataURL(file);
-
-    // Tải lên server
-    setIsUploading(true);
-    try {
-      const response = await uploadCoverImage(file);
-      if (response.status === 200 && response.data) {
-        setFormData((prev) => ({
-          ...prev,
-          thumbUrl: response.data!.url,
-        }));
-        toast.success("Tải ảnh bìa thành công");
-      } else {
-        toast.error(response.message || "Không thể tải lên ảnh bìa");
-      }
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === "object" && "error" in error
-          ? (error.error as string)
-          : "Đã xảy ra lỗi";
-      toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
-    } finally {
-      setIsUploading(false);
-    }
   };
 
   return (
@@ -324,6 +329,7 @@ export default function ComicModal({
                           type="button"
                           onClick={() => {
                             setPreviewImage(null);
+                            setSelectedFile(null);
                             setFormData((prev) => ({
                               ...prev,
                               thumbUrl: "",
@@ -389,7 +395,9 @@ export default function ComicModal({
                             {isUploading ? (
                               <div className="flex flex-col items-center justify-center py-4">
                                 <div className="h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                                <p className="text-gray-600 dark:text-gray-300">Đang tải lên...</p>
+                                <p className="text-gray-600 dark:text-gray-300">
+                                  Đang tải lên...
+                                </p>
                               </div>
                             ) : (
                               <>
@@ -404,7 +412,8 @@ export default function ComicModal({
                             )}
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa: 2MB
+                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa:
+                            2MB
                           </p>
                         </div>
                       ) : (
@@ -508,12 +517,8 @@ export default function ComicModal({
                 name="author"
                 value={formData.author}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.author ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
-              {errors.author && (
-                <p className="mt-1 text-sm text-rose-500">{errors.author}</p>
-              )}
             </div>
 
             <div>
@@ -565,14 +570,8 @@ export default function ComicModal({
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className={`w-full px-3 py-2 border ${errors.description ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
-              {errors.description && (
-                <p className="mt-1 text-sm text-rose-500">
-                  {errors.description}
-                </p>
-              )}
             </div>
 
             <div className="md:col-span-2">

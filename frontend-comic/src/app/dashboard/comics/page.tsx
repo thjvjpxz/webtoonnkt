@@ -39,7 +39,7 @@ export default function Comics() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(
+  const [categoryFilter, setCategoryFilter] = useState<string | undefined>(
     undefined
   );
   const [error, setError] = useState<string | null>(null);
@@ -202,7 +202,7 @@ export default function Comics() {
   const handleOpenViewModal = (comic: ComicResponse) => {
     setCurrentComic(comic);
     setIsViewModalOpen(true);
-  }
+  };
 
   // Xử lý tìm kiếm
   const handleSearch = (e: React.FormEvent) => {
@@ -272,8 +272,8 @@ export default function Comics() {
             className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
           >
             <option value="">Tất cả trạng thái</option>
-            <option value="published">Đang cập nhật</option>
-            <option value="draft">Đã hoàn thành</option>
+            <option value="ongoing">Đang cập nhật</option>
+            <option value="completed">Đã hoàn thành</option>
           </select>
           <FiFilter className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
         </div>
@@ -282,9 +282,7 @@ export default function Comics() {
           <select
             value={categoryFilter}
             onChange={(e) => {
-              setCategoryFilter(
-                e.target.value ? parseInt(e.target.value) : undefined
-              );
+              setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
             className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
@@ -302,7 +300,9 @@ export default function Comics() {
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
         <div className="p-6 border-b border-green-100 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Danh sách truyện</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Danh sách truyện
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -372,7 +372,7 @@ export default function Comics() {
                     className="hover:bg-green-50/50 dark:hover:bg-gray-700/30"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="flex items-center justify-center">
+                      <div className="flex">
                         <div className="h-24 w-16 flex-shrink-0 mr-3 relative">
                           <Image
                             src={
@@ -434,7 +434,7 @@ export default function Comics() {
                       })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <div className="flex space-x-2 justify-center">
+                      <div className="flex space-x-3 justify-center">
                         <button
                           onClick={() => handleOpenViewModal(comic)}
                           className="text-blue-600 hover:text-blue-800 flex items-center dark:text-blue-500 dark:hover:text-blue-400 cursor-pointer"
