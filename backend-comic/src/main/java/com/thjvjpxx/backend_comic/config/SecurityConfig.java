@@ -25,8 +25,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/categories/**").permitAll()
-                        .requestMatchers("/comics/**").permitAll()
+                        .requestMatchers("/**").permitAll()
+                        // .requestMatchers("/categories/**").permitAll()
+                        // .requestMatchers("/comics/**").permitAll()
+                        // .requestMatchers("/upload/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

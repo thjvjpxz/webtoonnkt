@@ -20,6 +20,8 @@ import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
+import com.thjvjpxx.backend_comic.service.GoogleDriveService;
+import com.thjvjpxx.backend_comic.utils.string;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class ComicServiceImpl implements ComicService {
     ComicRepository comicRepository;
     ComicMapper comicMapper;
     CategoryRepository categoryRepository;
+    GoogleDriveService googleDriveService;
 
     @Override
     public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
@@ -114,7 +117,6 @@ public class ComicServiceImpl implements ComicService {
         }
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
-        // Remove old categories
         comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
 
         comic.addCategories(categoriesNew);
@@ -141,6 +143,7 @@ public class ComicServiceImpl implements ComicService {
 
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
 
+        googleDriveService.removeFile(string.getIdFromUrl(comic.getThumbUrl()));
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
     }
