@@ -67,4 +67,38 @@ export const fetchApi = async <T>(
     } catch (error) {
         throw handleError(error);
     }
-}; 
+};
+
+export const fetchApiWithFormData = async <T>(
+    endpoint: string,
+    options: RequestInit = {}
+): Promise<T> => {
+    try {
+        const url = `${API_URL}${endpoint}`;
+
+        // Thiết lập headers mặc định
+        const headers = {
+            ...options.headers,
+        };
+
+        const response = await fetch(url, {
+            ...options,
+            headers,
+        });
+
+        // Kiểm tra nếu response không ok
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw {
+                response: {
+                    status: response.status,
+                    data: errorData,
+                },
+            };
+        }
+
+        return await response.json();
+    } catch (error) {
+        throw handleError(error);
+    }
+};

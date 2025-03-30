@@ -372,7 +372,7 @@ export default function Comics() {
                     className="hover:bg-green-50/50 dark:hover:bg-gray-700/30"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="flex items-center justify-center">
+                      <div className="flex">
                         <div className="h-24 w-16 flex-shrink-0 mr-3 relative">
                           <Image
                             src={
