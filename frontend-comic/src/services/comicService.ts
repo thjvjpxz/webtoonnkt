@@ -33,26 +33,26 @@ export const getComic = async (
   return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`);
 };
 
-// Tạo truyện mới
-export const createComic = async (
-  data: ComicCreateUpdate
-): Promise<ApiResponse<ComicResponse>> => {
-  return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-};
+// // Tạo truyện mới
+// export const createComic = async (
+//   data: ComicCreateUpdate
+// ): Promise<ApiResponse<ComicResponse>> => {
+//   return await fetchApi<ApiResponse<ComicResponse>>("/comics", {
+//     method: "POST",
+//     body: JSON.stringify(data),
+//   });
+// };
 
-// Cập nhật truyện
-export const updateComic = async (
-  id: number,
-  data: ComicCreateUpdate
-): Promise<ApiResponse<ComicResponse>> => {
-  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(`/comics/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-};
+// // Cập nhật truyện
+// export const updateComic = async (
+//   id: number,
+//   data: ComicCreateUpdate
+// ): Promise<ApiResponse<ComicResponse>> => {
+//   return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`, {
+//     method: "PUT",
+//     body: JSON.stringify(data),
+//   });
+// };
 
 // Xóa truyện
 export const deleteComic = async (id: number): Promise<ApiResponse<null>> => {
@@ -68,22 +68,29 @@ export const uploadCoverImage = async (
   const formData = new FormData();
   formData.append("file", file);
 
-  return await fetchApiWithFormData<ApiResponse<{ url: string }>>("/upload/thumbnail", {
-    method: "POST",
-    body: formData,
-    headers: {},
-  });
+  return await fetchApiWithFormData<ApiResponse<{ url: string }>>(
+    "/upload/thumbnail",
+    {
+      method: "POST",
+      body: formData,
+      headers: {},
+    }
+  );
 };
 
 // Tạo truyện mới với ảnh bìa
 export const createComicWithCover = async (
   data: ComicCreateUpdate,
-  file: File
+  file?: File
 ): Promise<ApiResponse<ComicResponse>> => {
-
   const formData = new FormData();
-  formData.append('data', JSON.stringify(data));
-  formData.append('cover', file);
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(data)], { type: "application/json" })
+  );
+  if (file) {
+    formData.append("cover", file);
+  }
 
   return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
     method: "POST",
@@ -95,15 +102,22 @@ export const createComicWithCover = async (
 export const updateComicWithCover = async (
   id: number,
   data: ComicCreateUpdate,
-  file: File
+  file?: File
 ): Promise<ApiResponse<ComicResponse>> => {
   const formData = new FormData();
-  formData.append('data', JSON.stringify(data));
-  formData.append('cover', file);
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(data)], { type: "application/json" })
+  );
+  if (file) {
+    formData.append("cover", file);
+  }
 
-
-  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(`/comics/${id}`, {
-    method: "PUT",
-    body: formData,
-  });
+  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(
+    `/comics/${id}`,
+    {
+      method: "PUT",
+      body: formData,
+    }
+  );
 };

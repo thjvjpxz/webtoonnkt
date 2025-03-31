@@ -1,24 +1,13 @@
 "use client";
 
-import { createComicWithCover, updateComicWithCover } from "@/services/comicService";
 import "@/styles/scrollbar.css";
-import {
-  CategoryResponse,
-  ComicCreateUpdate,
-  ComicResponse,
-} from "@/types/api";
+import { ComicCreateUpdate } from "@/types/api";
+import { ComicModalProps } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FiCheck, FiImage, FiUpload, FiX } from "react-icons/fi";
-
-type ComicModalProps = {
-  comic: ComicResponse | null;
-  categories: CategoryResponse[];
-  onClose: () => void;
-  onSave: (comic: ComicCreateUpdate) => void;
-};
 
 export default function ComicModal({
   comic,
@@ -180,26 +169,18 @@ export default function ComicModal({
     }
 
     // Cập nhật formData với URL ảnh nếu đang sử dụng phương thức URL
-    let dataToSubmit = { ...formData };
+    const dataToSubmit = { ...formData };
     if (uploadMethod === "url" && imageUrl.trim()) {
       dataToSubmit.thumbUrl = imageUrl;
     }
 
     setIsUploading(true);
     try {
-      if (selectedFile && uploadMethod === "file") {
-        // Nếu có file ảnh và đang sử dụng phương thức tải lên file
-        if (comic) {
-          // Cập nhật truyện với ảnh
-          await updateComicWithCover(comic.id, dataToSubmit, selectedFile);
-        } else {
-          // Tạo truyện mới với ảnh
-          await createComicWithCover(dataToSubmit, selectedFile);
-        }
-      } else {
-        // Nếu không có file ảnh hoặc đang sử dụng URL
-        onSave(dataToSubmit);
-      }
+      // Gọi hàm onSave với dữ liệu và file (nếu có)
+      await onSave(
+        dataToSubmit,
+        uploadMethod === "file" && selectedFile ? selectedFile : undefined
+      );
     } catch (error: unknown) {
       const errorMessage =
         error && typeof error === "object" && "error" in error
@@ -346,20 +327,22 @@ export default function ComicModal({
                         <button
                           type="button"
                           onClick={() => setUploadMethod("file")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                            }`}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                            uploadMethod === "file"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                          }`}
                         >
                           Tải lên từ máy tính
                         </button>
                         <button
                           type="button"
                           onClick={() => setUploadMethod("url")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                            }`}
+                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                            uploadMethod === "url"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                          }`}
                         >
                           Nhập URL ảnh
                         </button>
@@ -375,10 +358,11 @@ export default function ComicModal({
                             className="hidden"
                           />
                           <div
-                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
-                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
-                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
-                              }`}
+                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                              isDragging
+                                ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+                                : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
+                            }`}
                             onClick={handleOpenFileDialog}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
@@ -467,8 +451,9 @@ export default function ComicModal({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.name ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${
+                  errors.name ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
@@ -488,8 +473,9 @@ export default function ComicModal({
                 name="slug"
                 value={formData.slug}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.slug ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`w-full px-3 py-2 border ${
+                  errors.slug ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               {errors.slug && (
                 <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>
@@ -577,8 +563,9 @@ export default function ComicModal({
               )}
               <div className="relative">
                 <div
-                  className={`w-full border ${errors.categories ? "border-rose-500" : "border-gray-300"
-                    } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
+                  className={`w-full border ${
+                    errors.categories ? "border-rose-500" : "border-gray-300"
+                  } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
                 >
                   <div className="flex flex-wrap gap-2 p-2">
                     {/* Hiển thị các thể loại đã chọn */}
@@ -644,10 +631,10 @@ export default function ComicModal({
                           .includes(categorySearchTerm.toLowerCase()) &&
                         !formData.categories.includes(cat.id)
                     ).length === 0 && (
-                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
-                          Không tìm thấy thể loại phù hợp
-                        </div>
-                      )}
+                      <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                        Không tìm thấy thể loại phù hợp
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

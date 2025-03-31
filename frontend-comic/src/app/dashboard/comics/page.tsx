@@ -1,34 +1,34 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import {
-  FiPlus,
-  FiEdit,
-  FiTrash2,
-  FiSearch,
-  FiAlertCircle,
-  FiFilter,
-  FiEye,
-} from "react-icons/fi";
 import ComicModal from "@/components/dashboard/comics/ComicModal";
 import DeleteComicModal from "@/components/dashboard/comics/DeleteComicModal";
+import ViewComic from "@/components/dashboard/comics/ViewComic";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Pagination from "@/components/dashboard/Pagination";
-import {
-  getComics,
-  createComic,
-  updateComic,
-  deleteComic,
-} from "@/services/comicService";
 import { getCategories } from "@/services/categoryService";
 import {
-  ComicResponse,
-  ComicCreateUpdate,
+  createComicWithCover,
+  deleteComic,
+  getComics,
+  updateComicWithCover,
+} from "@/services/comicService";
+import {
   CategoryResponse,
+  ComicCreateUpdate,
+  ComicResponse,
 } from "@/types/api";
-import { toast } from "react-hot-toast";
 import Image from "next/image";
-import ViewComic from "@/components/dashboard/comics/ViewComic";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import {
+  FiAlertCircle,
+  FiEdit,
+  FiEye,
+  FiFilter,
+  FiPlus,
+  FiSearch,
+  FiTrash2,
+} from "react-icons/fi";
 
 export default function Comics() {
   // State cho danh sách truyện và phân trang
@@ -114,9 +114,9 @@ export default function Comics() {
   }, [fetchCategories]);
 
   // Xử lý thêm truyện mới
-  const handleAddComic = async (comicData: ComicCreateUpdate) => {
+  const handleAddComic = async (comicData: ComicCreateUpdate, file?: File) => {
     try {
-      const response = await createComic(comicData);
+      const response = await createComicWithCover(comicData, file);
 
       if (response.status === 200) {
         toast.success("Thêm truyện thành công");
@@ -135,11 +135,18 @@ export default function Comics() {
   };
 
   // Xử lý cập nhật truyện
-  const handleUpdateComic = async (comicData: ComicCreateUpdate) => {
+  const handleUpdateComic = async (
+    comicData: ComicCreateUpdate,
+    file?: File
+  ) => {
     if (!currentComic) return;
 
     try {
-      const response = await updateComic(currentComic.id, comicData);
+      const response = await updateComicWithCover(
+        currentComic.id,
+        comicData,
+        file
+      );
 
       if (response.status === 200) {
         toast.success("Cập nhật truyện thành công");
@@ -371,8 +378,8 @@ export default function Comics() {
                     key={comic.id}
                     className="hover:bg-green-50/50 dark:hover:bg-gray-700/30"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="flex">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
                         <div className="h-24 w-16 flex-shrink-0 mr-3 relative">
                           <Image
                             src={
