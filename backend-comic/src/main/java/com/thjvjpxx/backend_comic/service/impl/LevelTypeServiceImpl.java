@@ -76,8 +76,11 @@ public class LevelTypeServiceImpl implements LevelTypeService {
 
     @Override
     public BaseResponse<?> deleteLevelType(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteLevelType'");
+        validation.checkNullId(id);
+
+        LevelType levelType = getLevelTypeById(id);
+        levelTypeRepository.delete(levelType);
+        return BaseResponse.success(levelType);
     }
 
 }

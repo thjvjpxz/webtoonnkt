@@ -51,8 +51,8 @@ public class ComicController {
     }
 
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public BaseResponse<Comic> updateComic(@Valid @PathVariable String id,
-            @RequestPart("data") ComicRequest comicRequest,
+    public BaseResponse<Comic> updateComic(@PathVariable String id,
+            @Valid @RequestPart("data") ComicRequest comicRequest,
             @RequestPart(value = "cover", required = false) MultipartFile cover) {
         return comicService.updateComic(id, comicRequest, cover);
     }

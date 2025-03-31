@@ -35,7 +35,8 @@ public class Level {
     @Column(name = "exp_required")
     double expRequired;
 
-    String url_gif;
+    @Column(name = "url_gif")
+    String urlGif;
 
     @Column(name = "created_at")
     @CreationTimestamp
