@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { FiX, FiUpload, FiImage, FiCheck } from "react-icons/fi";
-import {
-  ComicResponse,
-  ComicCreateUpdate,
-  CategoryResponse,
-} from "@/types/api";
-import NextImage from "next/image";
-import { uploadCoverImage } from "@/services/comicService";
-import { toast } from "react-hot-toast";
-import { generateSlug } from "@/utils/string";
+import { createComicWithCover, updateComicWithCover } from "@/services/comicService";
 import "@/styles/scrollbar.css";
+import {
+  CategoryResponse,
+  ComicCreateUpdate,
+  ComicResponse,
+} from "@/types/api";
+import { generateSlug } from "@/utils/string";
+import NextImage from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
+import { FiCheck, FiImage, FiUpload, FiX } from "react-icons/fi";
 
 type ComicModalProps = {
   comic: ComicResponse | null;
@@ -83,8 +83,6 @@ export default function ComicModal({
     >
   ) => {
     const { name, value } = e.target;
-
-    console.log(`Field ${name} changed to: ${value}`);
 
     setFormData((prev) => ({
       ...prev,
@@ -181,41 +179,35 @@ export default function ComicModal({
       return;
     }
 
-    // Nếu có file ảnh đã chọn, tải lên server trước
-    if (selectedFile && uploadMethod === "file") {
-      setIsUploading(true);
-      try {
-        const response = await uploadCoverImage(selectedFile);
-        if (response.status === 200) {
-          // Cập nhật URL ảnh vào formData
-          setFormData((prev) => ({
-            ...prev,
-            thumbUrl: response.message || "",
-          }));
+    // Cập nhật formData với URL ảnh nếu đang sử dụng phương thức URL
+    let dataToSubmit = { ...formData };
+    if (uploadMethod === "url" && imageUrl.trim()) {
+      dataToSubmit.thumbUrl = imageUrl;
+    }
 
-          // Gọi onSave với formData đã cập nhật URL ảnh
-          onSave({
-            ...formData,
-            thumbUrl: response.message || "",
-          });
-
+    setIsUploading(true);
+    try {
+      if (selectedFile && uploadMethod === "file") {
+        // Nếu có file ảnh và đang sử dụng phương thức tải lên file
+        if (comic) {
+          // Cập nhật truyện với ảnh
+          await updateComicWithCover(comic.id, dataToSubmit, selectedFile);
         } else {
-          toast.error(response.message || "Không thể tải lên ảnh bìa");
-          setIsUploading(false);
-          return;
+          // Tạo truyện mới với ảnh
+          await createComicWithCover(dataToSubmit, selectedFile);
         }
-      } catch (error: unknown) {
-        const errorMessage =
-          error && typeof error === "object" && "error" in error
-            ? (error.error as string)
-            : "Đã xảy ra lỗi";
-        toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
-        setIsUploading(false);
-        return;
+      } else {
+        // Nếu không có file ảnh hoặc đang sử dụng URL
+        onSave(dataToSubmit);
       }
-    } else {
-      // Nếu không có file mới hoặc sử dụng URL, gọi onSave trực tiếp
-      onSave(formData);
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi lưu truyện");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -276,8 +268,8 @@ export default function ComicModal({
     }
 
     // Kiểm tra kích thước file (giới hạn 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Kích thước file không được vượt quá 2MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Kích thước file không được vượt quá 10MB");
       return;
     }
 

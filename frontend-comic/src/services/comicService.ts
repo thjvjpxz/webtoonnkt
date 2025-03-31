@@ -37,7 +37,7 @@ export const getComic = async (
 export const createComic = async (
   data: ComicCreateUpdate
 ): Promise<ApiResponse<ComicResponse>> => {
-  return await fetchApi<ApiResponse<ComicResponse>>("/comics", {
+  return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -48,7 +48,7 @@ export const updateComic = async (
   id: number,
   data: ComicCreateUpdate
 ): Promise<ApiResponse<ComicResponse>> => {
-  return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`, {
+  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(`/comics/${id}`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
@@ -72,5 +72,38 @@ export const uploadCoverImage = async (
     method: "POST",
     body: formData,
     headers: {},
+  });
+};
+
+// Tạo truyện mới với ảnh bìa
+export const createComicWithCover = async (
+  data: ComicCreateUpdate,
+  file: File
+): Promise<ApiResponse<ComicResponse>> => {
+
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(data));
+  formData.append('cover', file);
+
+  return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
+    method: "POST",
+    body: formData,
+  });
+};
+
+// Cập nhật truyện với ảnh bìa
+export const updateComicWithCover = async (
+  id: number,
+  data: ComicCreateUpdate,
+  file: File
+): Promise<ApiResponse<ComicResponse>> => {
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(data));
+  formData.append('cover', file);
+
+
+  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(`/comics/${id}`, {
+    method: "PUT",
+    body: formData,
   });
 };

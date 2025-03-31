@@ -78,6 +78,7 @@ export const fetchApiWithFormData = async <T>(
 
         // Thiết lập headers mặc định
         const headers = {
+            "Content-Type": "multipart/form-data",
             ...options.headers,
         };
 
