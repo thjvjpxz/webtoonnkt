@@ -178,6 +178,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
+        @SuppressWarnings("unchecked")
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.getData();
         for (Map<String, Object> item : items) {
             if (item.get("name").equals(fileName)) {
