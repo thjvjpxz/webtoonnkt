@@ -26,6 +26,11 @@ public class FileController {
         return googleDriveService.uploadFile(file, GoogleDriveConstants.FOLDER_ID_THUMBNAIL);
     }
 
+    @PostMapping("/upload/level-gif")
+    public BaseResponse<?> uploadLevelGif(@RequestBody MultipartFile file) {
+        return googleDriveService.uploadFile(file, GoogleDriveConstants.FOLDER_ID_LEVEL);
+    }
+
     @GetMapping("/get-files-and-folders")
     public BaseResponse<?> getFilesAndFolders() {
         return googleDriveService.getFilesAndFolders();

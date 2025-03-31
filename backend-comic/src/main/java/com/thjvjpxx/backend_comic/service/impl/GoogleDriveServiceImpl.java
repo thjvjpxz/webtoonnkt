@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,6 +59,11 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private String uploadInputStream(InputStream inputStream, String mimeType, String fileName, String folderId)
             throws IOException {
+        var response = checkFileExists(fileName, folderId);
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.FILE_EXISTS);
+        }
+
         File fileMetadata = new File();
         fileMetadata.setName(fileName);
         fileMetadata.setParents(Collections.singletonList(folderId));
@@ -163,5 +169,24 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public BaseResponse<?> checkFileExists(String fileName, String type) {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new BaseException(ErrorCode.INVALID_ARGUMENT);
+        }
+
+        var response = getFilesAndFolders();
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Map<String, Object>> items = (List<Map<String, Object>>) response.getData();
+        for (Map<String, Object> item : items) {
+            if (item.get("name").equals(fileName)) {
+                return BaseResponse.success(true);
+            }
+        }
+        return BaseResponse.success(false);
     }
 }

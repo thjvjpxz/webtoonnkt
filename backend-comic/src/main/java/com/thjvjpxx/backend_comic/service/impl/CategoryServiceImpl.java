@@ -16,6 +16,7 @@ import com.thjvjpxx.backend_comic.mapper.CategoryMapper;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.service.CategoryService;
+import com.thjvjpxx.backend_comic.utils.validation;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -59,14 +60,11 @@ public class CategoryServiceImpl implements CategoryService {
         }
         validateCategory(category);
         Category newCategory = categoryMapper.toCategory(category);
-        newCategory.setCreatedAt(LocalDateTime.now());
-        newCategory.setUpdatedAt(LocalDateTime.now());
         Category savedCategory = categoryRepository.save(newCategory);
         return BaseResponse.success(savedCategory);
     }
 
     private void validateCategory(CategoryRequest category) {
-
         categoryRepository.findBySlug(category.getSlug()).ifPresent(c -> {
             throw new BaseException(ErrorCode.CATEGORY_DUPLICATE);
         });
@@ -77,9 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<Category> updateCategory(String id, CategoryRequest category) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        validation.checkNullId(id);
         if (category == null) {
             throw new BaseException(ErrorCode.CATEGORY_INVALID);
         }
@@ -93,16 +89,14 @@ public class CategoryServiceImpl implements CategoryService {
         categoryExist.setName(category.getName());
         categoryExist.setSlug(category.getSlug());
         categoryExist.setDescription(category.getDescription());
-        categoryExist.setUpdatedAt(LocalDateTime.now());
+
         Category updatedCategory = categoryRepository.save(categoryExist);
         return BaseResponse.success(updatedCategory);
     }
 
     @Override
     public BaseResponse<Category> deleteCategory(String id) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        validation.checkNullId(id);
         Category category = categoryExist(id);
         categoryRepository.delete(category);
         return BaseResponse.success(category);
@@ -114,6 +108,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<Category> getCategoryById(String id) {
+        validation.checkNullId(id);
         Category category = categoryExist(id);
         return BaseResponse.success(category);
     }

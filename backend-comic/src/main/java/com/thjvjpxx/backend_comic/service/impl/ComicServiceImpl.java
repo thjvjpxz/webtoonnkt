@@ -1,6 +1,5 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,8 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
@@ -22,6 +24,7 @@ import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
 import com.thjvjpxx.backend_comic.service.GoogleDriveService;
 import com.thjvjpxx.backend_comic.utils.string;
+import com.thjvjpxx.backend_comic.utils.validation;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -67,24 +70,25 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<Comic> getComicById(String id) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.COMIC_NOT_FOUND);
-        }
+        validation.checkNullId(id);
 
         Comic comic = comicRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
         return BaseResponse.success(comic);
     }
 
     @Override
-    public BaseResponse<Comic> createComic(ComicRequest comicRequest) {
+    public BaseResponse<Comic> createComic(ComicRequest comicRequest, MultipartFile cover) {
         validateComicRequest(comicRequest);
+        if (cover != null) {
+            var response = googleDriveService.uploadFile(cover, GoogleDriveConstants.TYPE_THUMBNAIL);
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+            }
+        }
         Comic comic = comicMapper.toComic(comicRequest);
         List<String> categories = comicRequest.getCategories();
 
         comic.addCategories(convertCategories(categories));
-
-        comic.setCreatedAt(LocalDateTime.now());
-        comic.setUpdatedAt(LocalDateTime.now());
 
         comicRepository.save(comic);
         return BaseResponse.success(comic);
@@ -104,10 +108,8 @@ public class ComicServiceImpl implements ComicService {
     }
 
     @Override
-    public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.COMIC_NOT_FOUND);
-        }
+    public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
+        validation.checkNullId(id);
 
         Comic comic = findComicById(id);
 
@@ -115,6 +117,14 @@ public class ComicServiceImpl implements ComicService {
                 && !comicRequest.getSlug().equals(comic.getSlug())) {
             validateComicRequest(comicRequest);
         }
+
+        if (cover != null) {
+            var response = googleDriveService.uploadFile(cover, GoogleDriveConstants.TYPE_THUMBNAIL);
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+            }
+        }
+
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
         comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
@@ -127,18 +137,20 @@ public class ComicServiceImpl implements ComicService {
         comic.setStatus(comicRequest.getStatus());
         comic.setThumbUrl(comicRequest.getThumbUrl());
         comic.setOriginName(comicRequest.getOriginName());
-        comic.setUpdatedAt(LocalDateTime.now());
 
         comicRepository.save(comic);
         return BaseResponse.success(comic);
     }
 
     private Comic findComicById(String id) {
+        validation.checkNullId(id);
         return comicRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
     }
 
     @Override
     public BaseResponse<Comic> deleteComic(String id) {
+        validation.checkNullId(id);
+
         Comic comic = findComicById(id);
 
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
