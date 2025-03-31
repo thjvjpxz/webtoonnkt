@@ -1,6 +1,5 @@
 package com.thjvjpxx.backend_comic.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,8 +30,8 @@ public class FileController {
         return googleDriveService.uploadFile(file, GoogleDriveConstants.FOLDER_ID_LEVEL);
     }
 
-    @GetMapping("/get-files-and-folders")
-    public BaseResponse<?> getFilesAndFolders() {
-        return googleDriveService.getFilesAndFolders();
-    }
+    // @GetMapping("/get-files-and-folders")
+    // public BaseResponse<?> getFilesAndFolders() {
+    // return googleDriveService.getFilesAndFolders();
+    // }
 }

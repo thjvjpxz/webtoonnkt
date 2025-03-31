@@ -79,16 +79,21 @@ public class ComicServiceImpl implements ComicService {
     @Override
     public BaseResponse<Comic> createComic(ComicRequest comicRequest, MultipartFile cover) {
         validateComicRequest(comicRequest);
+        String thumbUrl = null;
         if (cover != null) {
-            var response = googleDriveService.uploadFile(cover, GoogleDriveConstants.TYPE_THUMBNAIL);
+            var response = googleDriveService.uploadFile(
+                    cover,
+                    GoogleDriveConstants.TYPE_THUMBNAIL,
+                    comicRequest.getSlug() + "_thumb");
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
+            thumbUrl = response.getMessage();
         }
         Comic comic = comicMapper.toComic(comicRequest);
         List<String> categories = comicRequest.getCategories();
-
         comic.addCategories(convertCategories(categories));
+        comic.setThumbUrl(thumbUrl);
 
         comicRepository.save(comic);
         return BaseResponse.success(comic);
@@ -118,11 +123,16 @@ public class ComicServiceImpl implements ComicService {
             validateComicRequest(comicRequest);
         }
 
+        String thumbUrl = comic.getThumbUrl();
         if (cover != null) {
-            var response = googleDriveService.uploadFile(cover, GoogleDriveConstants.TYPE_THUMBNAIL);
+            var response = googleDriveService.uploadFile(
+                    cover,
+                    GoogleDriveConstants.TYPE_THUMBNAIL,
+                    comicRequest.getSlug() + "_thumb");
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
+            thumbUrl = response.getMessage();
         }
 
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
@@ -135,7 +145,7 @@ public class ComicServiceImpl implements ComicService {
         comic.setDescription(comicRequest.getDescription());
         comic.setAuthor(comicRequest.getAuthor());
         comic.setStatus(comicRequest.getStatus());
-        comic.setThumbUrl(comicRequest.getThumbUrl());
+        comic.setThumbUrl(thumbUrl);
         comic.setOriginName(comicRequest.getOriginName());
 
         comicRepository.save(comic);
@@ -155,7 +165,11 @@ public class ComicServiceImpl implements ComicService {
 
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
 
-        googleDriveService.removeFile(string.getIdFromUrl(comic.getThumbUrl()));
+        if (comic.getThumbUrl() != null &&
+                !comic.getThumbUrl().isEmpty() &&
+                comic.getThumbUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+            googleDriveService.removeFile(string.getIdFromUrl(comic.getThumbUrl()));
+        }
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
     }

@@ -3,6 +3,9 @@ package com.thjvjpxx.backend_comic.constant;
 public class GoogleDriveConstants {
     public static final String MIME_TYPE_FOLDER = "application/vnd.google-apps.folder";
 
+    // Url img
+    public static final String URL_IMG_GOOGLE_DRIVE = "https://lh3.googleusercontent.com/d/";
+
     // Query
     public static final String QUERY_ALL_IN_FOLDERS = "'%s' in parents and trashed = false";
 
