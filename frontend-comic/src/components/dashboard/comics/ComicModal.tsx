@@ -41,6 +41,7 @@ export default function ComicModal({
   const [imageUrl, setImageUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
@@ -174,6 +175,7 @@ export default function ComicModal({
       dataToSubmit.thumbUrl = imageUrl;
     }
 
+    setIsSubmitting(true);
     setIsUploading(true);
     try {
       // Gọi hàm onSave với dữ liệu và file (nếu có)
@@ -189,6 +191,7 @@ export default function ComicModal({
       toast.error(errorMessage || "Đã xảy ra lỗi khi lưu truyện");
     } finally {
       setIsUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -282,8 +285,22 @@ export default function ComicModal({
 
         <form
           onSubmit={handleSubmit}
-          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar"
+          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar relative"
         >
+          {/* Overlay khi đang submit */}
+          {isSubmitting && (
+            <div className="absolute inset-0 bg-gray-900/20 dark:bg-gray-900/40 flex items-center justify-center rounded-xl z-10">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex items-center space-x-3">
+                <div className="h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">
+                  {comic
+                    ? "Đang cập nhật truyện..."
+                    : "Đang thêm truyện mới..."}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
               <div className="flex flex-col border-2 border-dashed border-green-200 rounded-lg p-6 dark:border-gray-700">
@@ -645,15 +662,26 @@ export default function ComicModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {comic ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {comic ? "Đang cập nhật..." : "Đang thêm..."}
+                </>
+              ) : comic ? (
+                "Cập nhật"
+              ) : (
+                "Thêm mới"
+              )}
             </button>
           </div>
         </form>
