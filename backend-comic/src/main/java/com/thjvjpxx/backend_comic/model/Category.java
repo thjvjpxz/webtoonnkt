@@ -21,6 +21,7 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     String id;
 
     @Column(name = "name")

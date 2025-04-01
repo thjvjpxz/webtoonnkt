@@ -23,6 +23,7 @@ public class Level {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     String id;
 
     @Column(name = "level_number")
@@ -30,6 +31,7 @@ public class Level {
 
     String name;
 
+    @Column(columnDefinition = "VARCHAR(7)")
     String color;
 
     @Column(name = "exp_required")

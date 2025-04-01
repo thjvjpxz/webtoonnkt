@@ -20,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 public class LevelType {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     String id;
 
     @Column(name = "name", unique = true)
