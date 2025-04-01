@@ -20,12 +20,13 @@ public class string {
     public static String generateSlug(String input) {
         if (input == null || input.isEmpty()) {
             return null;
+        }
 
         String result = input.toLowerCase();
 
         result = Normalizer.normalize(result, Normalizer.Form.NFD);
         result = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(result).replaceAll("");
-        
+
         result = result.replace("đ", "d");
 
         result = result.replaceAll("[^a-z0-9]", "-");
