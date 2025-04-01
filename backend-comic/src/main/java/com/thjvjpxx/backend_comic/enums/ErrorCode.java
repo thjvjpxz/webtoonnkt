@@ -33,8 +33,10 @@ public enum ErrorCode {
     LEVEL_NUMBER_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Level không được trống!"),
     LEVEL_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên level không được trống!"),
     LEVEL_EXP_REQUIRED_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Exp cần để đạt level không được trống!"),
+    LEVEL_EXP_REQUIRED_NOT_MIN(HttpStatus.BAD_REQUEST, "Exp cần để đạt level phải lớn hơn hoặc bằng 0!"),
     LEVEL_DUPLICATE(HttpStatus.BAD_REQUEST, "Level đã tồn tại!"),
     LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Level không tồn tại!"),
+    LEVEL_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Level phải lớn hơn hoặc bằng 1!"),
 
     // Handle File
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File không tồn tại!"),

@@ -19,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LevelTypeServiceImpl implements LevelTypeService {
     LevelTypeRepository levelTypeRepository;
 

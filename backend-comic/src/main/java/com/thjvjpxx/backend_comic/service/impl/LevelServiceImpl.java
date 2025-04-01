@@ -2,6 +2,9 @@ package com.thjvjpxx.backend_comic.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +39,32 @@ public class LevelServiceImpl implements LevelService {
 
     private boolean isLevelExists(String levelName) {
         return levelRepository.existsByName(levelName);
+    }
+
+    @Override
+    public BaseResponse<?> getLevelWithPagination(int page, int limit, String search) {
+        page = page < 0 ? 0 : page;
+        limit = limit < 0 ? 5 : limit;
+
+        int originalPage = page;
+
+        page = page == 0 ? 0 : page - 1;
+
+        Pageable pageable = PageRequest.of(page, limit);
+
+        Page<Level> levels;
+        if (search != null && !search.isEmpty()) {
+            levels = levelRepository.findByNameContaining(search, pageable);
+        } else {
+            levels = levelRepository.findAll(pageable);
+        }
+
+        return BaseResponse.success(
+                levels.getContent(),
+                originalPage,
+                (int) levels.getTotalElements(),
+                limit,
+                levels.getTotalPages());
     }
 
     @Override
@@ -115,6 +144,11 @@ public class LevelServiceImpl implements LevelService {
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
         levelRepository.delete(level);
+        if (level.getUrlGif() != null
+                && !level.getUrlGif().isEmpty()
+                && level.getUrlGif().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+            googleDriveService.removeFile(string.getIdFromUrl(level.getUrlGif()));
+        }
 
         return BaseResponse.success(level);
     }

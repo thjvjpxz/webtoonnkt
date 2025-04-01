@@ -6,6 +6,8 @@ import com.thjvjpxx.backend_comic.dto.request.LevelRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 
 public interface LevelService {
+    BaseResponse<?> getLevelWithPagination(int page, int limit, String search);
+
     BaseResponse<?> getAllLevel();
 
     BaseResponse<?> createLevel(LevelRequest request, MultipartFile file);
