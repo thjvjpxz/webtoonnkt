@@ -276,20 +276,22 @@ export default function Categories() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex justify-center space-x-3">
+                      <div className="flex justify-center space-x-2">
                         <button
                           onClick={() => handleOpenEditModal(category)}
-                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400 cursor-pointer"
+                          className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
                           aria-label="Sửa thể loại"
+                          title="Sửa"
                         >
-                          <FiEdit className="mr-1" size={16} />
+                          <FiEdit size={16} />
                         </button>
                         <button
                           onClick={() => handleOpenDeleteModal(category)}
-                          className="text-rose-500 hover:text-rose-700 flex items-center dark:text-rose-400 dark:hover:text-rose-300 cursor-pointer"
+                          className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
                           aria-label="Xoá thể loại"
+                          title="Xóa"
                         >
-                          <FiTrash2 className="mr-1" size={16} />
+                          <FiTrash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -300,7 +302,7 @@ export default function Categories() {
           </div>
         )}
 
-        {totalPages > 1 && (
+        {!isLoading && !error && categories.length > 0 && (
           <div className="p-4 border-t border-green-100 dark:border-gray-700">
             <Pagination
               currentPage={currentPage}

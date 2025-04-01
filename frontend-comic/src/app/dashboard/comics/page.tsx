@@ -444,24 +444,27 @@ export default function Comics() {
                       <div className="flex space-x-3 justify-center">
                         <button
                           onClick={() => handleOpenViewModal(comic)}
-                          className="text-blue-600 hover:text-blue-800 flex items-center dark:text-blue-500 dark:hover:text-blue-400 cursor-pointer"
+                          className="p-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-500 dark:hover:bg-blue-900/50 cursor-pointer"
                           aria-label="Xem chi tiết"
+                          title="Xem chi tiết"
                         >
-                          <FiEye size={18} />
+                          <FiEye size={16} />
                         </button>
                         <button
                           onClick={() => handleOpenEditModal(comic)}
-                          className="text-green-600 hover:text-green-800 flex items-center dark:text-green-500 dark:hover:text-green-400 cursor-pointer"
+                          className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
                           aria-label="Sửa truyện"
+                          title="Sửa"
                         >
-                          <FiEdit size={18} />
+                          <FiEdit size={16} />
                         </button>
                         <button
                           onClick={() => handleOpenDeleteModal(comic)}
-                          className="text-rose-600 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300 cursor-pointer"
+                          className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
                           aria-label="Xóa truyện"
+                          title="Xóa"
                         >
-                          <FiTrash2 size={18} />
+                          <FiTrash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -471,17 +474,18 @@ export default function Comics() {
             </tbody>
           </table>
         </div>
+        {!isLoading && !error && comics.length > 0 && (
+          <div className="p-4 border-t border-green-100 dark:border-gray-700">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
 
-      {!isLoading && !error && comics.length > 0 && (
-        <div className="mt-6">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
+
 
       {isModalOpen && (
         <ComicModal

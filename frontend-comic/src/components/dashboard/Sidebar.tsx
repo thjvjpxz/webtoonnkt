@@ -13,6 +13,7 @@ import {
   FiLogOut,
   FiChevronLeft,
   FiChevronRight,
+  FiAward,
 } from "react-icons/fi";
 import { SidebarProps } from "@/types/dashboard";
 
@@ -37,6 +38,11 @@ export default function Sidebar({
       path: "/dashboard/comics",
       icon: <FiBook size={20} />,
       label: "Quản lý truyện",
+    },
+    {
+      path: "/dashboard/levels",
+      icon: <FiAward size={20} />,
+      label: "Cấp độ",
     },
     {
       path: "/dashboard/chapters",
