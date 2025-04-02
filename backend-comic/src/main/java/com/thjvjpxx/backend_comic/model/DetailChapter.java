@@ -32,5 +32,5 @@ public class DetailChapter {
 
     @ManyToOne
     @JoinColumn(name = "chapter_id", nullable = false)
-    String chapter;
+    Chapter chapter;
 }
