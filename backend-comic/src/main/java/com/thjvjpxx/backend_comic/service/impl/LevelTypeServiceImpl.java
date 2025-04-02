@@ -11,7 +11,7 @@ import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.LevelType;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.service.LevelTypeService;
-import com.thjvjpxx.backend_comic.utils.validation;
+import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class LevelTypeServiceImpl implements LevelTypeService {
     }
 
     private LevelType getLevelTypeById(String id) {
-        validation.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
         return levelTypeRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
@@ -61,7 +61,7 @@ public class LevelTypeServiceImpl implements LevelTypeService {
 
     @Override
     public BaseResponse<?> updateLevelType(String id, LevelTypeRequest levelTypeRequest) {
-        validation.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
         LevelType levelType = getLevelTypeById(id);
 
@@ -76,7 +76,7 @@ public class LevelTypeServiceImpl implements LevelTypeService {
 
     @Override
     public BaseResponse<?> deleteLevelType(String id) {
-        validation.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
         LevelType levelType = getLevelTypeById(id);
         levelTypeRepository.delete(levelType);

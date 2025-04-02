@@ -3,7 +3,6 @@ package com.thjvjpxx.backend_comic.service.impl;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,9 @@ import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.service.GoogleDriveService;
 import com.thjvjpxx.backend_comic.service.LevelService;
-import com.thjvjpxx.backend_comic.utils.string;
-import com.thjvjpxx.backend_comic.utils.validation;
+import com.thjvjpxx.backend_comic.utils.PaginationUtils;
+import com.thjvjpxx.backend_comic.utils.StringUtils;
+import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +43,8 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public BaseResponse<?> getLevelWithPagination(int page, int limit, String search) {
-        page = page < 0 ? 0 : page;
-        limit = limit < 0 ? 5 : limit;
-
+        Pageable pageable = PaginationUtils.createPageable(page, limit);
         int originalPage = page;
-
-        page = page == 0 ? 0 : page - 1;
-
-        Pageable pageable = PageRequest.of(page, limit);
 
         Page<Level> levels;
         if (search != null && !search.isEmpty()) {
@@ -79,7 +73,7 @@ public class LevelServiceImpl implements LevelService {
             throw new BaseException(ErrorCode.LEVEL_DUPLICATE);
         }
 
-        String nameNormalize = string.generateSlug(request.getName());
+        String nameNormalize = StringUtils.generateSlug(request.getName());
 
         String urlGif = null;
         if (file != null) {
@@ -103,7 +97,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public BaseResponse<?> updateLevel(String id, LevelRequest request, MultipartFile file) {
-        validation.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
@@ -112,7 +106,7 @@ public class LevelServiceImpl implements LevelService {
         }
 
         String urlGif = level.getUrlGif();
-        String nameNormalize = string.generateSlug(request.getName());
+        String nameNormalize = StringUtils.generateSlug(request.getName());
         if (file != null) {
             var response = googleDriveService.uploadFile(file, GoogleDriveConstants.TYPE_LEVEL, nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
@@ -139,7 +133,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public BaseResponse<?> deleteLevel(String id) {
-        validation.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
@@ -147,7 +141,7 @@ public class LevelServiceImpl implements LevelService {
         if (level.getUrlGif() != null
                 && !level.getUrlGif().isEmpty()
                 && level.getUrlGif().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.removeFile(string.getIdFromUrl(level.getUrlGif()));
+            googleDriveService.removeFile(StringUtils.getIdFromUrl(level.getUrlGif()));
         }
 
         return BaseResponse.success(level);

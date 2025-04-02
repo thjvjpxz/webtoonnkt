@@ -3,7 +3,7 @@ package com.thjvjpxx.backend_comic.utils;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
-public class string {
+public class StringUtils {
     public static String getIdFromUrl(String url) {
         if (url == null || url.isEmpty()) {
             return null;
