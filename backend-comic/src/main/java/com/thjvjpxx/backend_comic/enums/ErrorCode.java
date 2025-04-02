@@ -38,6 +38,12 @@ public enum ErrorCode {
     LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Level không tồn tại!"),
     LEVEL_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Level phải lớn hơn hoặc bằng 1!"),
 
+    // Chapter
+    CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được trống!"),
+    CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chapter không được trống!"),
+    CHAPTER_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Số chapter phải lớn hơn hoặc bằng 0!"),
+    COMIC_ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Truyện không được trống!"),
+
     // Handle File
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File không tồn tại!"),
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST, "Tham số không hợp lệ!"),
