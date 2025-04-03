@@ -1,10 +1,8 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +14,8 @@ import com.thjvjpxx.backend_comic.mapper.CategoryMapper;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.service.CategoryService;
+import com.thjvjpxx.backend_comic.utils.PaginationUtils;
+import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +30,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<List<Category>> getAllCategories(int page, int limit, String search) {
-        page = page < 0 ? 0 : page;
-        limit = limit < 0 ? 5 : limit;
-
+        Pageable pageable = PaginationUtils.createPageable(page, limit);
         int originalPage = page;
 
-        page = page == 0 ? 0 : page - 1;
-
-        Pageable pageable = PageRequest.of(page, limit);
         Page<Category> categories = null;
         if (search != null && !search.isEmpty()) {
             categories = categoryRepository.findByNameContainingOrSlugContaining(search, search, pageable);
@@ -59,14 +54,11 @@ public class CategoryServiceImpl implements CategoryService {
         }
         validateCategory(category);
         Category newCategory = categoryMapper.toCategory(category);
-        newCategory.setCreatedAt(LocalDateTime.now());
-        newCategory.setUpdatedAt(LocalDateTime.now());
         Category savedCategory = categoryRepository.save(newCategory);
         return BaseResponse.success(savedCategory);
     }
 
     private void validateCategory(CategoryRequest category) {
-
         categoryRepository.findBySlug(category.getSlug()).ifPresent(c -> {
             throw new BaseException(ErrorCode.CATEGORY_DUPLICATE);
         });
@@ -77,9 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<Category> updateCategory(String id, CategoryRequest category) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        ValidationUtils.checkNullId(id);
         if (category == null) {
             throw new BaseException(ErrorCode.CATEGORY_INVALID);
         }
@@ -93,16 +83,14 @@ public class CategoryServiceImpl implements CategoryService {
         categoryExist.setName(category.getName());
         categoryExist.setSlug(category.getSlug());
         categoryExist.setDescription(category.getDescription());
-        categoryExist.setUpdatedAt(LocalDateTime.now());
+
         Category updatedCategory = categoryRepository.save(categoryExist);
         return BaseResponse.success(updatedCategory);
     }
 
     @Override
     public BaseResponse<Category> deleteCategory(String id) {
-        if (id == null || id.isEmpty()) {
-            throw new BaseException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        ValidationUtils.checkNullId(id);
         Category category = categoryExist(id);
         categoryRepository.delete(category);
         return BaseResponse.success(category);
@@ -114,6 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<Category> getCategoryById(String id) {
+        ValidationUtils.checkNullId(id);
         Category category = categoryExist(id);
         return BaseResponse.success(category);
     }

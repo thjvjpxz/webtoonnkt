@@ -90,7 +90,7 @@ export default function CategoryModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
         <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             {category ? "Sửa thể loại" : "Thêm thể loại mới"}
@@ -117,9 +117,8 @@ export default function CategoryModal({
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border ${
-                errors.name ? "border-rose-500" : "border-gray-300"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              className={`w-full px-3 py-2 border ${errors.name ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
@@ -139,9 +138,8 @@ export default function CategoryModal({
               name="slug"
               value={formData.slug}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border ${
-                errors.slug ? "border-rose-500" : "border-gray-300"
-              } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              className={`w-full px-3 py-2 border ${errors.slug ? "border-rose-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             />
             {errors.slug && (
               <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>

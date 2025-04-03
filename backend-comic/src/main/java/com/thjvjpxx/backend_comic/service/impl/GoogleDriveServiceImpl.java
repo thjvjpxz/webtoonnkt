@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,16 +33,12 @@ import lombok.experimental.FieldDefaults;
 public class GoogleDriveServiceImpl implements GoogleDriveService {
     final Drive driveService;
 
-    @Value("${google-drive.folder-id}")
-    String folderId; // Folder webtoon
-
-    private BaseResponse<?> handleUploadFile(MultipartFile file, String folderId) {
+    private BaseResponse<?> handleUploadFile(MultipartFile file, String folderId, String fileName) {
         checkFile(file);
 
         try {
             InputStream inputStream = file.getInputStream();
             String mimeType = file.getContentType();
-            String fileName = file.getOriginalFilename();
             String url = uploadInputStream(inputStream, mimeType, fileName, folderId);
             return BaseResponse.success(url);
         } catch (IOException e) {
@@ -58,6 +54,13 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private String uploadInputStream(InputStream inputStream, String mimeType, String fileName, String folderId)
             throws IOException {
+        var response = checkFileExists(fileName, mimeType, folderId);
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+        } else if ((boolean) response.getData()) {
+            throw new BaseException(ErrorCode.FILE_EXISTS);
+        }
+
         File fileMetadata = new File();
         fileMetadata.setName(fileName);
         fileMetadata.setParents(Collections.singletonList(folderId));
@@ -70,21 +73,21 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
                 .setFields("id")
                 .execute();
 
-        String url = "https://lh3.googleusercontent.com/d/" + uploadedFile.getId();
+        String url = GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE + uploadedFile.getId();
         return url;
     }
 
     @Override
-    public BaseResponse<?> uploadFile(MultipartFile file, String type) {
+    public BaseResponse<?> uploadFile(MultipartFile file, String type, String fileName) {
         switch (type) {
             case GoogleDriveConstants.TYPE_THUMBNAIL:
-                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_THUMBNAIL);
+                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_THUMBNAIL, fileName);
             case GoogleDriveConstants.TYPE_COMIC:
-                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_COMIC);
+                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_COMIC, fileName);
             case GoogleDriveConstants.TYPE_LEVEL:
-                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_LEVEL);
+                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_LEVEL, fileName);
             case GoogleDriveConstants.TYPE_AVATAR:
-                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_AVATAR);
+                return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_AVATAR, fileName);
             default:
                 throw new BaseException(ErrorCode.TYPE_NOT_FOUND);
         }
@@ -102,10 +105,10 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public BaseResponse<?> createFolder(String folderName) {
+    public BaseResponse<?> createFolder(String folderName, String parentFolderId) {
         File fileMetadata = new File();
         fileMetadata.setName(folderName);
-        fileMetadata.setParents(Collections.singletonList(folderId));
+        fileMetadata.setParents(Collections.singletonList(parentFolderId));
         fileMetadata.setMimeType(GoogleDriveConstants.MIME_TYPE_FOLDER);
 
         try {
@@ -134,7 +137,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public BaseResponse<?> getFilesAndFolders() {
+    public BaseResponse<?> getFilesAndFolders(String folderId) {
         if (folderId == null || folderId.isEmpty()) {
             throw new BaseException(ErrorCode.INVALID_ARGUMENT);
         }
@@ -163,5 +166,25 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public BaseResponse<?> checkFileExists(String fileName, String type, String folderId) {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new BaseException(ErrorCode.INVALID_ARGUMENT);
+        }
+
+        var response = getFilesAndFolders(folderId);
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> items = (List<Map<String, Object>>) response.getData();
+        for (Map<String, Object> item : items) {
+            if (item.get("name").equals(fileName)) {
+                return BaseResponse.success(true);
+            }
+        }
+        return BaseResponse.success(false);
     }
 }

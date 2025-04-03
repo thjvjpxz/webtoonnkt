@@ -5,11 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 
 public interface GoogleDriveService {
-    BaseResponse<?> uploadFile(MultipartFile file, String type);
+    BaseResponse<?> uploadFile(MultipartFile file, String type, String fileName);
 
     BaseResponse<?> removeFile(String fileId);
 
-    BaseResponse<?> createFolder(String folderName);
+    BaseResponse<?> createFolder(String folderName, String parentFolderId);
 
-    BaseResponse<?> getFilesAndFolders();
+    BaseResponse<?> getFilesAndFolders(String folderId);
+
 }

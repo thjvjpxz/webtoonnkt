@@ -16,25 +16,18 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-@Entity(name = "categories")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity(name = "level_types")
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Category {
-
+public class LevelType {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
     String id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     String name;
-
-    @Column(name = "slug", unique = true)
-    String slug;
-
-    @Column(name = "description")
-    String description;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -43,4 +36,5 @@ public class Category {
     @Column(name = "updated_at")
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
 }

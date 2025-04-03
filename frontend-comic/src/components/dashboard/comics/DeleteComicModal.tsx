@@ -11,7 +11,7 @@ export default function DeleteComicModal({
 }: DeleteComicModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
         <div className="p-6">
           <div className="flex items-center justify-center mb-4 text-rose-500">
             <FiAlertTriangle size={48} />

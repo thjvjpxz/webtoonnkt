@@ -24,7 +24,7 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto custom-scrollbar">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800 dark:border dark:border-gray-700">
         <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Chi tiết truyện

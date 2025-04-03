@@ -1,24 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { FiX, FiUpload, FiImage, FiCheck } from "react-icons/fi";
-import {
-  ComicResponse,
-  ComicCreateUpdate,
-  CategoryResponse,
-} from "@/types/api";
-import NextImage from "next/image";
-import { uploadCoverImage } from "@/services/comicService";
-import { toast } from "react-hot-toast";
-import { generateSlug } from "@/utils/string";
 import "@/styles/scrollbar.css";
-
-type ComicModalProps = {
-  comic: ComicResponse | null;
-  categories: CategoryResponse[];
-  onClose: () => void;
-  onSave: (comic: ComicCreateUpdate) => void;
-};
+import { ComicCreateUpdate } from "@/types/api";
+import { ComicModalProps } from "@/types/comic";
+import { generateSlug } from "@/utils/string";
+import NextImage from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
+import { FiCheck, FiImage, FiUpload, FiX } from "react-icons/fi";
 
 export default function ComicModal({
   comic,
@@ -52,6 +41,7 @@ export default function ComicModal({
   const [imageUrl, setImageUrl] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
@@ -83,8 +73,6 @@ export default function ComicModal({
     >
   ) => {
     const { name, value } = e.target;
-
-    console.log(`Field ${name} changed to: ${value}`);
 
     setFormData((prev) => ({
       ...prev,
@@ -181,41 +169,29 @@ export default function ComicModal({
       return;
     }
 
-    // Nếu có file ảnh đã chọn, tải lên server trước
-    if (selectedFile && uploadMethod === "file") {
-      setIsUploading(true);
-      try {
-        const response = await uploadCoverImage(selectedFile);
-        if (response.status === 200) {
-          // Cập nhật URL ảnh vào formData
-          setFormData((prev) => ({
-            ...prev,
-            thumbUrl: response.message || "",
-          }));
+    // Cập nhật formData với URL ảnh nếu đang sử dụng phương thức URL
+    const dataToSubmit = { ...formData };
+    if (uploadMethod === "url" && imageUrl.trim()) {
+      dataToSubmit.thumbUrl = imageUrl;
+    }
 
-          // Gọi onSave với formData đã cập nhật URL ảnh
-          onSave({
-            ...formData,
-            thumbUrl: response.message || "",
-          });
-
-        } else {
-          toast.error(response.message || "Không thể tải lên ảnh bìa");
-          setIsUploading(false);
-          return;
-        }
-      } catch (error: unknown) {
-        const errorMessage =
-          error && typeof error === "object" && "error" in error
-            ? (error.error as string)
-            : "Đã xảy ra lỗi";
-        toast.error(errorMessage || "Đã xảy ra lỗi khi tải lên ảnh bìa");
-        setIsUploading(false);
-        return;
-      }
-    } else {
-      // Nếu không có file mới hoặc sử dụng URL, gọi onSave trực tiếp
-      onSave(formData);
+    setIsSubmitting(true);
+    setIsUploading(true);
+    try {
+      // Gọi hàm onSave với dữ liệu và file (nếu có)
+      await onSave(
+        dataToSubmit,
+        uploadMethod === "file" && selectedFile ? selectedFile : undefined
+      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi lưu truyện");
+    } finally {
+      setIsUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -276,8 +252,8 @@ export default function ComicModal({
     }
 
     // Kiểm tra kích thước file (giới hạn 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Kích thước file không được vượt quá 2MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Kích thước file không được vượt quá 10MB");
       return;
     }
 
@@ -294,7 +270,7 @@ export default function ComicModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto custom-scrollbar">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800 dark:border dark:border-gray-700">
         <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             {comic ? "Sửa thông tin truyện" : "Thêm truyện mới"}
@@ -309,8 +285,22 @@ export default function ComicModal({
 
         <form
           onSubmit={handleSubmit}
-          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar"
+          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar relative"
         >
+          {/* Overlay khi đang submit */}
+          {isSubmitting && (
+            <div className="absolute inset-0 bg-gray-900/20 dark:bg-gray-900/40 flex items-center justify-center rounded-xl z-10">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex items-center space-x-3">
+                <div className="h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">
+                  {comic
+                    ? "Đang cập nhật truyện..."
+                    : "Đang thêm truyện mới..."}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
               <div className="flex flex-col border-2 border-dashed border-green-200 rounded-lg p-6 dark:border-gray-700">
@@ -355,8 +345,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("file")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Tải lên từ máy tính
@@ -365,8 +355,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("url")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Nhập URL ảnh
@@ -384,8 +374,8 @@ export default function ComicModal({
                           />
                           <div
                             className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
-                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
-                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
+                                ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+                                : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
                               }`}
                             onClick={handleOpenFileDialog}
                             onDragOver={handleDragOver}
@@ -666,15 +656,26 @@ export default function ComicModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {comic ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {comic ? "Đang cập nhật..." : "Đang thêm..."}
+                </>
+              ) : comic ? (
+                "Cập nhật"
+              ) : (
+                "Thêm mới"
+              )}
             </button>
           </div>
         </form>

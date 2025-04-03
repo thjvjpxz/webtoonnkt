@@ -2,15 +2,17 @@ package com.thjvjpxx.backend_comic.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -21,11 +23,13 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RequestMapping("/comics")
+@Slf4j
 public class ComicController {
     ComicService comicService;
 
@@ -39,15 +43,18 @@ public class ComicController {
         return comicService.getAllComics(page, limit, search, status, category);
     }
 
-    @PostMapping
-    public BaseResponse<Comic> createComic(@Valid @RequestBody ComicRequest comicRequest) {
-        return comicService.createComic(comicRequest);
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public BaseResponse<Comic> createComic(
+            @Valid @RequestPart("data") ComicRequest comicRequest,
+            @RequestPart(value = "cover", required = false) MultipartFile cover) {
+        return comicService.createComic(comicRequest, cover);
     }
 
-    @PutMapping("/{id}")
-    public BaseResponse<Comic> updateComic(@Valid @PathVariable String id,
-            @RequestBody ComicRequest comicRequest) {
-        return comicService.updateComic(id, comicRequest);
+    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public BaseResponse<Comic> updateComic(@PathVariable String id,
+            @Valid @RequestPart("data") ComicRequest comicRequest,
+            @RequestPart(value = "cover", required = false) MultipartFile cover) {
+        return comicService.updateComic(id, comicRequest, cover);
     }
 
     @DeleteMapping("/{id}")
