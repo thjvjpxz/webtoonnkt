@@ -33,49 +33,11 @@ export const getComic = async (
   return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`);
 };
 
-// // Tạo truyện mới
-// export const createComic = async (
-//   data: ComicCreateUpdate
-// ): Promise<ApiResponse<ComicResponse>> => {
-//   return await fetchApi<ApiResponse<ComicResponse>>("/comics", {
-//     method: "POST",
-//     body: JSON.stringify(data),
-//   });
-// };
-
-// // Cập nhật truyện
-// export const updateComic = async (
-//   id: number,
-//   data: ComicCreateUpdate
-// ): Promise<ApiResponse<ComicResponse>> => {
-//   return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`, {
-//     method: "PUT",
-//     body: JSON.stringify(data),
-//   });
-// };
-
 // Xóa truyện
 export const deleteComic = async (id: number): Promise<ApiResponse<null>> => {
   return await fetchApi<ApiResponse<null>>(`/comics/${id}`, {
     method: "DELETE",
   });
-};
-
-// Tải lên ảnh bìa
-export const uploadCoverImage = async (
-  file: File
-): Promise<ApiResponse<{ url: string }>> => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  return await fetchApiWithFormData<ApiResponse<{ url: string }>>(
-    "/upload/thumbnail",
-    {
-      method: "POST",
-      body: formData,
-      headers: {},
-    }
-  );
 };
 
 // Tạo truyện mới với ảnh bìa

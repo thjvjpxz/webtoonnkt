@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import {
   FiPlus,
@@ -14,6 +13,7 @@ import DeleteConfirmModal from "@/components/dashboard/categories/DeleteConfirmM
 import Pagination from "@/components/dashboard/Pagination";
 import "@/styles/scrollbar.css";
 import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { formatDate } from "@/utils/helpers";
 
 export default function Categories() {
   const {
@@ -130,28 +130,10 @@ export default function Categories() {
                         {category.description}
                       </td>
                       <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(category.createdAt).toLocaleDateString(
-                          "vi-VN",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
+                        {formatDate(category.createdAt)}
                       </td>
                       <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(category.updatedAt).toLocaleDateString(
-                          "vi-VN",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
+                        {formatDate(category.updatedAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex justify-center space-x-2">
