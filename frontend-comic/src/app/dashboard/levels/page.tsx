@@ -33,6 +33,7 @@ import {
   LevelTypeResponse,
   LevelTypeRequest,
 } from "@/types/level";
+import { formatDate } from "@/utils/helpers";
 
 export default function Levels() {
   // Trạng thái chung
@@ -594,24 +595,12 @@ export default function Levels() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="text-gray-600 dark:text-gray-400">
-                            {new Date(levelType.createdAt).toLocaleDateString('vi-VN', {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {formatDate(levelType.createdAt)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="text-gray-600 dark:text-gray-400">
-                            {new Date(levelType.updatedAt).toLocaleDateString('vi-VN', {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {formatDate(levelType.updatedAt)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
