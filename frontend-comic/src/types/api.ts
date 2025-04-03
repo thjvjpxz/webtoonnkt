@@ -65,3 +65,42 @@ export type ComicCreateUpdate = {
   originName: string;
   categories: string[];
 };
+
+// Định nghĩa kiểu dữ liệu cho chapter
+export type ChapterResponse = {
+  id: number;
+  title: string;
+  chapterNumber: number;
+  status: string;
+  comicId: number;
+  comicName?: string;
+  comic?: ComicResponse;
+  detailChapters: DetailChapterResponse[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Định nghĩa kiểu dữ liệu cho detail chapter
+export type DetailChapterResponse = {
+  id: number;
+  imgUrl: string;
+  orderNumber: number;
+  chapterId: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Định nghĩa kiểu dữ liệu cho việc tạo/cập nhật chapter
+export type ChapterCreateUpdate = {
+  title: string;
+  status: string;
+  chapterNumber: number;
+  comicId: string;
+  detailChapters: DetailChapterCreateUpdate[];
+};
+
+// Định nghĩa kiểu dữ liệu cho việc tạo/cập nhật detail chapter
+export type DetailChapterCreateUpdate = {
+  imgUrl: string;
+  orderNumber: number;
+};
