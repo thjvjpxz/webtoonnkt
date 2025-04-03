@@ -14,4 +14,9 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 
     Page<Chapter> findByTitleContaining(String title, Pageable pageable);
 
+    Page<Chapter> findByComicId(String comicId, Pageable pageable);
+
+    Page<Chapter> findByComicIdAndTitleContaining(String comicId, String title, Pageable pageable);
+
+    Page<Chapter> findByComicIdAndStatus(String comicId, String status, Pageable pageable);
 }

@@ -1,46 +1,38 @@
 package com.thjvjpxx.backend_comic.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
+import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
+import com.thjvjpxx.backend_comic.dto.request.DetailChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse.DetailChapterResponse;
 import com.thjvjpxx.backend_comic.model.Chapter;
+import com.thjvjpxx.backend_comic.model.DetailChapter;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+@Mapper(componentModel = "spring")
+public interface ChapterMapper {
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "localDateTimeToString")
+    ChapterResponse toChapterResponse(Chapter chapter);
 
-@Component
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ChapterMapper {
-    public ChapterResponse toChapterResponse(Chapter chapter) {
-        if (chapter == null) {
-            return null;
-        }
-
-        ChapterResponse chapterResponse = ChapterResponse.builder()
-                .id(chapter.getId())
-                .title(chapter.getTitle())
-                .chapterNumber(chapter.getChapterNumber())
-                .comic(chapter.getComic())
-                .createdAt(chapter.getCreatedAt().toString())
-                .updatedAt(chapter.getUpdatedAt().toString())
-                .build();
-
-        List<DetailChapterResponse> detailChapterResponses = chapter.getDetailChapters().stream()
-                .map(detailChapter -> DetailChapterResponse.builder()
-                        .id(detailChapter.getId())
-                        .imgUrl(detailChapter.getImgUrl())
-                        .orderNumber(detailChapter.getOrderNumber())
-                        .build())
-                .collect(Collectors.toList());
-
-        chapterResponse.setDetailChapters(detailChapterResponses);
-
-        return chapterResponse;
+    @Named("localDateTimeToString")
+    default String localDateTimeToString(LocalDateTime localDateTime) {
+        return localDateTime.toString();
     }
+
+    DetailChapterResponse toDetailChapterResponse(DetailChapter detailChapter);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "comic", ignore = true)
+    Chapter toChapter(ChapterRequest chapterRequest);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "chapter", ignore = true)
+    DetailChapter toDetailChapter(DetailChapterRequest detailChapterRequest);
 }

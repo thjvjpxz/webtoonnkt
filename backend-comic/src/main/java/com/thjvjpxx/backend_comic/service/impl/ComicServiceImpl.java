@@ -13,12 +13,16 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
+import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
 import com.thjvjpxx.backend_comic.mapper.ComicMapper;
 import com.thjvjpxx.backend_comic.model.Category;
+import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
+import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
 import com.thjvjpxx.backend_comic.service.GoogleDriveService;
@@ -38,6 +42,8 @@ public class ComicServiceImpl implements ComicService {
     ComicMapper comicMapper;
     CategoryRepository categoryRepository;
     GoogleDriveService googleDriveService;
+    ChapterRepository chapterRepository;
+    ChapterMapper chapterMapper;
 
     @Override
     public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
@@ -166,6 +172,32 @@ public class ComicServiceImpl implements ComicService {
         }
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
+    }
+
+    @Override
+    public BaseResponse<List<ChapterResponse>> getAllChapters(int page, int limit, String search, String status,
+            String comicId) {
+        Pageable pageable = PaginationUtils.createPageable(page, limit);
+        int originalPage = page;
+        Page<Chapter> chapters = null;
+        if (search != null && !search.isEmpty()) {
+            chapters = chapterRepository.findByComicIdAndTitleContaining(comicId, search, pageable);
+        } else if (status != null && !status.isEmpty()) {
+            chapters = chapterRepository.findByComicIdAndStatus(comicId, status, pageable);
+        } else {
+            chapters = chapterRepository.findByComicId(comicId, pageable);
+        }
+
+        List<ChapterResponse> chapterResponses = chapters.getContent().stream()
+                .map(chapterMapper::toChapterResponse)
+                .collect(Collectors.toList());
+
+        return BaseResponse.success(
+                chapterResponses,
+                originalPage,
+                (int) chapters.getTotalElements(),
+                limit,
+                chapters.getTotalPages());
     }
 
 }
