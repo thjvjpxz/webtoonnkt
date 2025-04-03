@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
