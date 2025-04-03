@@ -54,8 +54,9 @@ public class LevelTypeServiceImpl implements LevelTypeService {
         String name = levelTypeRequest.getName();
         existLevelType(name);
 
-        LevelType levelType = new LevelType();
-        levelType.setName(name);
+        LevelType levelType = LevelType.builder()
+                .name(name)
+                .build();
         levelTypeRepository.save(levelType);
         return BaseResponse.success(levelType);
     }
