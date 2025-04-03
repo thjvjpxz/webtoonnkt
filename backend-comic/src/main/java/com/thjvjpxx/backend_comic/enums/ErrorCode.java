@@ -25,7 +25,7 @@ public enum ErrorCode {
     SLUG_COMIC_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Slug truyện không được trống!"),
 
     // Level Type
-    LEVEL_TYPE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Level không được trống!"),
+    LEVEL_TYPE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Loại level không được trống!"),
     LEVEL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "Loại level không tồn tại!"),
     LEVEL_TYPE_DUPLICATE(HttpStatus.BAD_REQUEST, "Loại level đã tồn tại!"),
 
