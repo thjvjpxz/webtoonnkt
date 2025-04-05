@@ -1,6 +1,7 @@
 import { getCategories } from "@/services/categoryService";
 import { createComicWithCover, deleteComic, getComics, updateComicWithCover } from "@/services/comicService";
-import { CategoryResponse, ComicCreateUpdate, ComicResponse } from "@/types/api";
+import { CategoryResponse } from "@/types/api";
+import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
