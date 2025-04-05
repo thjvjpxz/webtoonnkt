@@ -2,14 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import { CategoryResponse, CategoryCreateUpdate } from "@/types/api";
+import { CategoryCreateUpdate } from "@/types/category";
 import { generateSlug } from "@/utils/string";
+import { CategoryModalProps } from "@/types/category";
 
-type CategoryModalProps = {
-  category: CategoryResponse | null;
-  onClose: () => void;
-  onSave: (category: CategoryCreateUpdate) => void;
-};
+
 
 export default function CategoryModal({
   category,

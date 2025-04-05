@@ -1,12 +1,8 @@
 "use client";
 
 import { FiAlertTriangle } from "react-icons/fi";
+import { DeleteConfirmModalProps } from "@/types/category";
 
-type DeleteConfirmModalProps = {
-  categoryName: string;
-  onClose: () => void;
-  onConfirm: () => void;
-};
 
 export default function DeleteConfirmModal({
   categoryName,
