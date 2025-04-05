@@ -1,8 +1,7 @@
 "use client";
 
 import "@/styles/scrollbar.css";
-import { ComicCreateUpdate } from "@/types/api";
-import { ComicModalProps } from "@/types/comic";
+import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -345,8 +344,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("file")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Tải lên từ máy tính
@@ -355,8 +354,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("url")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Nhập URL ảnh
@@ -374,8 +373,8 @@ export default function ComicModal({
                           />
                           <div
                             className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
-                                ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
-                                : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
+                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
                               }`}
                             onClick={handleOpenFileDialog}
                             onDragOver={handleDragOver}

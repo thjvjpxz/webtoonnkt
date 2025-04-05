@@ -1,5 +1,4 @@
-import { CategoryResponse } from "./api";
-
+import { CategoryResponse } from "./category";
 export type DeleteComicModalProps = {
   comicTitle: string;
   onClose: () => void;
