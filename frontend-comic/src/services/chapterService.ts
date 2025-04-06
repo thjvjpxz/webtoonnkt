@@ -1,75 +1,61 @@
-import { ApiResponse, ChapterCreateUpdate, ChapterResponse } from "@/types/api";
-import { fetchApi, fetchApiWithFormData } from "./api";
+import { ApiResponse } from '@/types/api';
+import { Chapter, ChapterCreateUpdate } from '@/types/chapter'
+import { fetchApi, fetchApiWithFormData } from './api';
 
-// Lấy danh sách chapter của một truyện
-export const getChaptersByComic = async (
-  comicId: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<ApiResponse<ChapterResponse[]>> => {
-  return await fetchApi<ApiResponse<ChapterResponse[]>>(
-    `/comics/${comicId}/chapters?page=${page}&limit=${limit}`
-  );
-};
+export const getChapters = async (
+  page: number,
+  limit: number,
+  search?: string,
+  comicId?: string
+): Promise<ApiResponse<Chapter[]>> => {
+  let endpoint = `/chapters?page=${page}&limit=${limit}`;
 
-// Lấy chi tiết một chapter
-export const getChapter = async (
-  id: string
-): Promise<ApiResponse<ChapterResponse>> => {
-  return await fetchApi<ApiResponse<ChapterResponse>>(`/chapters/${id}`);
-};
+  if (search) {
+    endpoint += `&search=${encodeURIComponent(search)}`;
+  }
 
-// Tạo chapter mới với nhiều ảnh
-export const createChapter = async (
-  data: ChapterCreateUpdate,
-  files: File[]
-): Promise<ApiResponse<ChapterResponse>> => {
-  const formData = new FormData();
-  formData.append(
-    "data",
-    new Blob([JSON.stringify(data)], { type: "application/json" })
-  );
+  if (comicId) {
+    endpoint += `&comicId=${comicId}`;
+  }
 
-  files.forEach((file) => {
-    formData.append("file", file);
+  return await fetchApi<ApiResponse<Chapter[]>>(endpoint);
+}
+
+export const deleteChapter = async (chapterId: string): Promise<ApiResponse<Chapter>> => {
+  return await fetchApi<ApiResponse<Chapter>>(`/chapters/${chapterId}`, {
+    method: "DELETE",
   });
+}
 
-  return await fetchApiWithFormData<ApiResponse<ChapterResponse>>("/chapters", {
+export const createChapter = async (
+  chapterRequest: ChapterCreateUpdate,
+  files: File[]
+): Promise<ApiResponse<Chapter>> => {
+  const formData = new FormData();
+  formData.append("data", new Blob([JSON.stringify(chapterRequest)], { type: "application/json" }));
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
+  return await fetchApiWithFormData<ApiResponse<Chapter>>("/chapters", {
     method: "POST",
     body: formData,
   });
-};
+}
 
-// Cập nhật chapter
 export const updateChapter = async (
-  id: string,
-  data: ChapterCreateUpdate,
-  files?: File[]
-): Promise<ApiResponse<ChapterResponse>> => {
+  chapterId: string,
+  chapterRequest: ChapterCreateUpdate,
+  files: File[]
+): Promise<ApiResponse<Chapter>> => {
+  console.log(chapterRequest);
   const formData = new FormData();
-  formData.append(
-    "data",
-    new Blob([JSON.stringify(data)], { type: "application/json" })
-  );
-
-  if (files && files.length > 0) {
-    files.forEach((file) => {
-      formData.append("file", file);
-    });
-  }
-
-  return await fetchApiWithFormData<ApiResponse<ChapterResponse>>(
-    `/chapters/${id}`,
-    {
-      method: "PUT",
-      body: formData,
-    }
-  );
-};
-
-// Xóa chapter
-export const deleteChapter = async (id: string): Promise<ApiResponse<null>> => {
-  return await fetchApi<ApiResponse<null>>(`/chapters/${id}`, {
-    method: "DELETE",
+  formData.append("data", new Blob([JSON.stringify(chapterRequest)], { type: "application/json" }));
+  files.forEach((file) => {
+    formData.append("files", file);
   });
-}; 
+  return await fetchApiWithFormData<ApiResponse<Chapter>>(`/chapters/${chapterId}`, {
+    method: "PUT",
+    body: formData,
+  });
+}
+

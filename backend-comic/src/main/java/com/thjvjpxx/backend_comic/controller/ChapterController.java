@@ -2,8 +2,12 @@ package com.thjvjpxx.backend_comic.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -30,15 +34,28 @@ public class ChapterController {
     public BaseResponse<?> getAllChapter(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(required = false) String search) {
-        return chapterService.getAllChapters(page, limit, search);
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String comicId) {
+        return chapterService.getAllChapters(page, limit, search, comicId);
     }
 
-    @PostMapping
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public BaseResponse<?> createChapter(
             @Valid @RequestPart("data") ChapterRequest chapterRequest,
-            @RequestPart("file") List<MultipartFile> files) {
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         return chapterService.createChapter(chapterRequest, files);
+    }
+
+    @PutMapping("/{id}")
+    public BaseResponse<?> updateChapter(@PathVariable String id,
+            @Valid @RequestPart("data") ChapterRequest chapterRequest,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        return chapterService.updateChapter(id, chapterRequest, files);
+    }
+
+    @DeleteMapping("/{id}")
+    public BaseResponse<?> deleteChapter(@PathVariable String id) {
+        return chapterService.deleteChapter(id);
     }
 
 }

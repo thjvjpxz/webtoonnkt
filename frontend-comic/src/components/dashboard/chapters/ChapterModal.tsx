@@ -1,571 +1,328 @@
-"use client";
-
-import { ChapterCreateUpdate, ChapterResponse, ComicResponse } from "@/types/api";
-import { FC, useEffect, useRef, useState } from "react";
-import { FiUpload, FiX, FiPlus, FiImage, FiSearch, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { ChapterModalProps } from "@/types/chapter";
+import { FiPlus, FiUpload, FiX, FiSearch } from "react-icons/fi";
+import { IoMdClose } from "react-icons/io";
 import Image from "next/image";
+import { useChapterModal } from "@/hooks/useChapterModal";
+import { ChapterStatus } from "@/types/chapter";
 
-type ChapterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: ChapterCreateUpdate, files: File[]) => void;
-  chapter?: ChapterResponse | null;
-  comics: ComicResponse[];
-};
-
-const ChapterModal: FC<ChapterModalProps> = ({
+export default function ChapterModal({
   isOpen,
   onClose,
   onSubmit,
   chapter,
-  comics,
-}) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const comicDropdownRef = useRef<HTMLDivElement>(null);
+  comicOptions
+}: ChapterModalProps) {
+  const {
+    // States
+    title,
+    chapterNumber,
+    comicId,
+    previewUrls,
+    isUploading,
+    dropTargetIndex,
+    status,
+    isSubmitting,
 
-  const [formData, setFormData] = useState<ChapterCreateUpdate>({
-    title: "",
-    status: "FREE",
-    chapterNumber: 0,
-    comicId: "",
-    detailChapters: [],
-  });
+    // Comic dropdown related
+    comicSearchTerm,
+    isComicDropdownOpen,
+    isLoadingComics,
+    filteredComicOptions,
 
-  const [files, setFiles] = useState<File[]>([]);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
-  const [errors, setErrors] = useState({
-    title: "",
-    comicId: "",
-    chapterNumber: "",
-    images: "",
-  });
+    // Setters
+    setTitle,
+    setChapterNumber,
+    setComicSearchTerm,
+    setIsComicDropdownOpen,
+    setStatus,
 
-  // State cho dropdown chọn truyện
-  const [comicSearchTerm, setComicSearchTerm] = useState("");
-  const [isComicDropdownOpen, setIsComicDropdownOpen] = useState(false);
-  const [selectedComic, setSelectedComic] = useState<ComicResponse | null>(null);
+    // Handlers
+    handleSelectComic,
+    handleImageChange,
+    handleRemoveImage,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnter,
+    handleDragLeave,
+    handleDrop,
+    handleDragEnd,
+    handleSubmit,
+    handleComicDropdownScroll,
 
-  // Lọc danh sách truyện dựa trên từ khóa tìm kiếm
-  const filteredComics = comics.filter((comic) =>
-    comic.name.toLowerCase().includes(comicSearchTerm.toLowerCase())
-  );
-
-  // Reset form khi mở modal
-  useEffect(() => {
-    if (isOpen) {
-      if (!chapter) {
-        // Thêm mới
-        setFormData({
-          title: "",
-          status: "FREE",
-          chapterNumber: 0,
-          comicId: "",
-          detailChapters: [],
-        });
-        setFiles([]);
-        setPreviewImages([]);
-        setSelectedComic(null);
-        setComicSearchTerm("");
-      } else {
-        // Cập nhật
-        setFormData({
-          title: chapter.title,
-          status: chapter.status,
-          chapterNumber: chapter.chapterNumber,
-          comicId: chapter.comicId.toString(),
-          detailChapters: chapter.detailChapters.map((detail) => ({
-            imgUrl: detail.imgUrl,
-            orderNumber: detail.orderNumber,
-          })),
-        });
-        setPreviewImages(chapter.detailChapters.map((detail) => detail.imgUrl));
-        setFiles([]);
-        // Tìm và đặt truyện đã chọn
-        const comic = comics.find((c) => c.id.toString() === chapter.comicId.toString());
-        setSelectedComic(comic || null);
-        setComicSearchTerm("");
-      }
-    }
-  }, [isOpen, chapter, comics]);
-
-  // Đóng dropdown khi click ra ngoài
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (comicDropdownRef.current && !comicDropdownRef.current.contains(event.target as Node)) {
-        setIsComicDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "chapterNumber" ? parseInt(value) || 0 : value,
-    }));
-  };
-
-  const handleSelectComic = (comic: ComicResponse) => {
-    setSelectedComic(comic);
-    setFormData((prev) => ({
-      ...prev,
-      comicId: comic.id.toString(),
-    }));
-    setIsComicDropdownOpen(false);
-    setComicSearchTerm("");
-    // Xóa lỗi nếu có
-    if (errors.comicId) {
-      setErrors((prev) => ({
-        ...prev,
-        comicId: "",
-      }));
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
-
-    const newFiles = Array.from(selectedFiles);
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-
-    // Tạo URL preview cho các file mới
-    const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file));
-    setPreviewImages((prev) => [...prev, ...newPreviewUrls]);
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prevFiles) => {
-      const newFiles = [...prevFiles];
-      newFiles.splice(index, 0);
-      return newFiles;
-    });
-
-    setPreviewImages((prevPreviews) => {
-      const newPreviews = [...prevPreviews];
-      // Trước khi xóa URL, hủy để tránh rò rỉ bộ nhớ
-      URL.revokeObjectURL(newPreviews[index]);
-      newPreviews.splice(index, 1);
-      return newPreviews;
-    });
-  };
-
-  const moveUp = (index: number) => {
-    if (index === 0) return; // Đã ở trên cùng
-
-    // Di chuyển ảnh preview
-    setPreviewImages((prev) => {
-      const newPreviews = [...prev];
-      [newPreviews[index - 1], newPreviews[index]] = [
-        newPreviews[index],
-        newPreviews[index - 1],
-      ];
-      return newPreviews;
-    });
-
-    // Di chuyển files (nếu có)
-    setFiles((prev) => {
-      if (prev.length <= index) return prev;
-      const newFiles = [...prev];
-      [newFiles[index - 1], newFiles[index]] = [
-        newFiles[index],
-        newFiles[index - 1],
-      ];
-      return newFiles;
-    });
-  };
-
-  const moveDown = (index: number) => {
-    if (index === previewImages.length - 1) return; // Đã ở dưới cùng
-
-    // Di chuyển ảnh preview
-    setPreviewImages((prev) => {
-      const newPreviews = [...prev];
-      [newPreviews[index], newPreviews[index + 1]] = [
-        newPreviews[index + 1],
-        newPreviews[index],
-      ];
-      return newPreviews;
-    });
-
-    // Di chuyển files (nếu có)
-    setFiles((prev) => {
-      if (prev.length <= index + 1) return prev;
-      const newFiles = [...prev];
-      [newFiles[index], newFiles[index + 1]] = [
-        newFiles[index + 1],
-        newFiles[index],
-      ];
-      return newFiles;
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate form
-    let valid = true;
-    const newErrors = {
-      title: "",
-      comicId: "",
-      chapterNumber: "",
-      images: "",
-    };
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Vui lòng nhập tiêu đề chapter";
-      valid = false;
-    }
-
-    if (!formData.comicId) {
-      newErrors.comicId = "Vui lòng chọn truyện";
-      valid = false;
-    }
-
-    if (formData.chapterNumber < 0) {
-      newErrors.chapterNumber = "Số chapter không được nhỏ hơn 0";
-      valid = false;
-    }
-
-    if (previewImages.length === 0) {
-      newErrors.images = "Vui lòng tải lên ít nhất một ảnh";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    if (!valid) return;
-
-    // Chuẩn bị dữ liệu chi tiết chapter
-    const detailChapters = previewImages.map((url, index) => ({
-      imgUrl: url,
-      orderNumber: index,
-    }));
-
-    // Gửi dữ liệu
-    const finalFormData: ChapterCreateUpdate = {
-      ...formData,
-      detailChapters,
-    };
-
-    onSubmit(finalFormData, files);
-  };
+    // Utils
+    isEditMode
+  } = useChapterModal(isOpen, chapter || null, comicOptions, onSubmit);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-green-100 dark:border-gray-700 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            {chapter ? "Cập nhật chapter" : "Thêm chapter mới"}
-          </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black/50 p-4">
+      <div className="relative max-w-4xl w-full bg-white rounded-lg shadow-xl dark:bg-gray-800 max-h-[90vh] overflow-y-auto dark:border-gray-700 border custom-scrollbar">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+            {isEditMode ? "Chỉnh sửa chương" : "Thêm chương mới"}
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
           >
-            <FiX size={24} />
+            <IoMdClose size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="mb-4">
-                <label
-                  htmlFor="comicId"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Truyện <span className="text-rose-500">*</span>
+        <form onSubmit={handleSubmit}>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Truyện */}
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Truyện <span className="text-red-500">*</span>
                 </label>
-                <div ref={comicDropdownRef} className="relative">
+                <div className="relative w-full">
                   <div
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white flex justify-between items-center cursor-pointer"
                     onClick={() => setIsComicDropdownOpen(!isComicDropdownOpen)}
-                    className={`flex items-center justify-between w-full px-3 py-2 border ${errors.comicId
-                      ? "border-rose-500"
-                      : "border-gray-300 dark:border-gray-600"
-                      } rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                   >
-                    <span className={selectedComic ? "" : "text-gray-400 dark:text-gray-500"}>
-                      {selectedComic ? selectedComic.name : "Chọn truyện"}
+                    <span className="truncate">
+                      {comicId ? comicOptions.find(c => c.id === comicId)?.name || "Chọn truyện" : "Chọn truyện"}
                     </span>
-                    {isComicDropdownOpen ? <FiChevronUp /> : <FiChevronDown />}
+                    <svg className={`w-5 h-5 transition-transform ${isComicDropdownOpen ? "transform rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                   </div>
 
                   {isComicDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                      <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+                    <div
+                      className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg max-h-60 overflow-auto border border-green-100 dark:border-gray-700 flex flex-col custom-scrollbar"
+                      onScroll={handleComicDropdownScroll}
+                    >
+                      <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 p-2 border-b border-green-100 dark:border-gray-700 shadow-sm">
                         <div className="relative">
                           <input
                             type="text"
                             value={comicSearchTerm}
                             onChange={(e) => setComicSearchTerm(e.target.value)}
-                            placeholder="Tìm kiếm truyện..."
-                            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
+                            placeholder="Tìm truyện..."
+                            className="pl-8 pr-4 py-2 w-full border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                            onClick={(e) => e.stopPropagation()}
                           />
-                          <FiSearch className="absolute left-2.5 top-2 text-gray-400 dark:text-gray-500" size={16} />
+                          <FiSearch className="h-4 w-4 text-green-400 absolute left-2.5 top-3 dark:text-green-500" />
                         </div>
                       </div>
 
-                      {filteredComics.length > 0 ? (
-                        <ul className="py-1">
-                          {filteredComics.map((comic) => (
-                            <li
-                              key={comic.id}
-                              onClick={() => handleSelectComic(comic)}
-                              className="px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-700 cursor-pointer"
-                            >
-                              <div className="flex items-center">
-                                {comic.thumbUrl && (
-                                  <div className="h-8 w-6 flex-shrink-0 mr-2 relative">
-                                    <Image
-                                      src={comic.thumbUrl}
-                                      alt={comic.name}
-                                      fill
-                                      sizes="24px"
-                                      className="object-cover rounded"
-                                    />
-                                  </div>
-                                )}
-                                <span>{comic.name}</span>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
+                      {filteredComicOptions.length > 0 ? (
+                        filteredComicOptions.map((comic) => (
+                          <div
+                            key={comic.id}
+                            className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3"
+                            onClick={() => handleSelectComic(comic.id)}
+                          >
+                            <div className="h-10 w-8 flex-shrink-0 overflow-hidden rounded">
+                              {comic.thumbUrl ? (
+                                <div className="relative h-10 w-8">
+                                  <Image
+                                    src={comic.thumbUrl}
+                                    alt={comic.name}
+                                    fill
+                                    sizes="32px"
+                                    className="object-cover"
+                                    loading="lazy"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="h-10 w-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                                  <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+                            <span className="truncate">{comic.name}</span>
+                          </div>
+                        ))
                       ) : (
-                        <div className="p-3 text-sm text-gray-500 dark:text-gray-400 text-center">
-                          Không tìm thấy truyện
+                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                          Không tìm thấy truyện nào
+                        </div>
+                      )}
+
+                      {isLoadingComics && (
+                        <div className="px-4 py-3 text-center">
+                          <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
+                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">Đang tải...</span>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-                {errors.comicId && (
-                  <p className="mt-1 text-xs text-rose-500">{errors.comicId}</p>
-                )}
               </div>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Tiêu đề chapter <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border ${errors.title
-                    ? "border-rose-500"
-                    : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200`}
-                  placeholder="Nhập tiêu đề chapter"
-                />
-                {errors.title && (
-                  <p className="mt-1 text-xs text-rose-500">{errors.title}</p>
-                )}
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="chapterNumber"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Số chapter <span className="text-rose-500">*</span>
+              {/* Số chương */}
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Số chương <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
-                  id="chapterNumber"
-                  name="chapterNumber"
+                  value={chapterNumber}
+                  onChange={(e) => setChapterNumber(e.target.value)}
+                  required
                   min="0"
-                  value={formData.chapterNumber}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border ${errors.chapterNumber
-                    ? "border-rose-500"
-                    : "border-gray-300 dark:border-gray-600"
-                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200`}
-                  placeholder="Nhập số chapter"
+                  step="0.1"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Nhập số chương (ví dụ: 1, 1.5, 2,...)"
                 />
-                {errors.chapterNumber && (
-                  <p className="mt-1 text-xs text-rose-500">
-                    {errors.chapterNumber}
-                  </p>
-                )}
               </div>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Trạng thái
+              {/* Tiêu đề chương */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tiêu đề chương <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder="Nhập tiêu đề chương"
+                />
+              </div>
+
+              {/* Trạng thái */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Trạng thái <span className="text-red-500">*</span>
                 </label>
                 <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
+                  value={status.toString()}
+                  onChange={(e) => setStatus(Number(e.target.value) as ChapterStatus)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
-                  <option value="FREE">Miễn phí (FREE)</option>
-                  <option value="FEE">Trả phí (FEE)</option>
-                  <option value="VIP">VIP</option>
+                  <option value={ChapterStatus.FREE}>Miễn phí</option>
+                  <option value={ChapterStatus.FEE}>Trả phí</option>
+                  <option value={ChapterStatus.VIP}>VIP</option>
                 </select>
               </div>
-            </div>
 
-            <div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Ảnh chapter <span className="text-rose-500">*</span>
-                </label>
-                <div
-                  className="border-2 border-dashed border-gray-300 dark:border-gray-600 p-4 rounded-md text-center cursor-pointer hover:border-green-500 dark:hover:border-green-400 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <FiUpload className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Nhấp để tải lên ảnh chapter
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
-                    (JPG, PNG, GIF)
-                  </p>
-                </div>
-                {errors.images && (
-                  <p className="mt-1 text-xs text-rose-500">{errors.images}</p>
-                )}
-              </div>
+              {/* Upload ảnh */}
+              <div className="col-span-2">
 
-              <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Danh sách ảnh ({previewImages.length})
-                </p>
-                {previewImages.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-2">
-                    {previewImages.map((src, index) => (
-                      <div
-                        key={index}
-                        className="relative border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden group"
-                      >
-                        <div className="aspect-w-2 aspect-h-3 relative">
-                          <Image
-                            src={src}
-                            alt={`Preview ${index + 1}`}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => moveUp(index)}
-                            disabled={index === 0}
-                            className={`p-1 ${index === 0
-                              ? "bg-gray-400"
-                              : "bg-blue-500 hover:bg-blue-600"
-                              } text-white rounded-full`}
-                            title="Di chuyển lên"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveDown(index)}
-                            disabled={index === previewImages.length - 1}
-                            className={`p-1 ${index === previewImages.length - 1
-                              ? "bg-gray-400"
-                              : "bg-blue-500 hover:bg-blue-600"
-                              } text-white rounded-full`}
-                            title="Di chuyển xuống"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="p-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full"
-                            title="Xóa ảnh"
-                          >
-                            <FiX className="h-5 w-5" />
-                          </button>
-                        </div>
-                        <div className="absolute top-0 left-0 bg-black/60 text-white px-2 py-1 text-xs">
-                          Thứ tự: {index + 1}
-                        </div>
-                      </div>
-                    ))}
+                {previewUrls.length === 0 && (
+                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4">
+                    <div className="flex flex-col items-center justify-center py-6">
+                      <FiUpload className="w-12 h-12 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-1">
+                        Kéo và thả ảnh vào đây hoặc nhấn để chọn
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
+                        Hỗ trợ JPG, PNG, WEBP
+                      </p>
+                      <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageChange}
+                          className="hidden"
+                          disabled={previewUrls.length >= 20}
+                        />
+                        Chọn ảnh
+                      </label>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-md">
-                    <FiImage className="mx-auto h-12 w-12 text-gray-400" />
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                      Chưa có ảnh nào
+                )}
+
+                {/* Preview ảnh đã chọn */}
+                {previewUrls.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Ảnh đã chọn ({previewUrls.length}): <span className="text-xs text-green-500 ml-1">(Kéo thả để sắp xếp)</span>
                     </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {previewUrls.map((url, index) => (
+                        <div
+                          key={index}
+                          className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex
+                            ? 'border-green-400 dark:border-green-500 rounded-md'
+                            : 'border-transparent'
+                            }`}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDragEnter={handleDragEnter}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, index)}
+                          onDragEnd={handleDragEnd}
+                        >
+                          <div className="aspect-w-2 aspect-h-3 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <img
+                              src={url}
+                              alt={`Preview ${index}`}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 shadow-sm"
+                          >
+                            <FiX size={16} />
+                          </button>
+                          <div className="absolute bottom-1 left-1 bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-70">
+                            Ảnh {index + 1}
+                          </div>
+                        </div>
+                      ))}
+                      {/* Nút thêm ảnh */}
+                      {previewUrls.length < 20 && (
+                        <label className="flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md cursor-pointer aspect-w-2 aspect-h-3 hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <div className="flex flex-col items-center p-4">
+                            <FiPlus size={24} className="text-gray-400 mb-2" />
+                            <span className="text-xs text-gray-500">Thêm ảnh</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={handleImageChange}
+                              className="hidden"
+                            />
+                          </div>
+                        </label>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="mt-8 flex justify-end space-x-3">
+          <div className="flex justify-end gap-4 p-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+              disabled={isUploading || isSubmitting || !title || !chapterNumber || !comicId || !status || (previewUrls.length === 0 && !isEditMode)}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
             >
-              {chapter ? "Cập nhật" : "Thêm mới"}
+              {isUploading || isSubmitting ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>{isUploading ? "Đang xử lý..." : isEditMode ? "Đang cập nhật..." : "Đang thêm mới..."}</span>
+                </>
+              ) : (
+                <span>{isEditMode ? "Cập nhật" : "Thêm mới"}</span>
+              )}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-};
-
-export default ChapterModal; 
+} 

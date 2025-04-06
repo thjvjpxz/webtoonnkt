@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
-import com.thjvjpxx.backend_comic.dto.request.DetailChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse.DetailChapterResponse;
 import com.thjvjpxx.backend_comic.model.Chapter;
@@ -17,6 +16,7 @@ import com.thjvjpxx.backend_comic.model.DetailChapter;
 public interface ChapterMapper {
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "comicName", source = "comic.name")
     ChapterResponse toChapterResponse(Chapter chapter);
 
     @Named("localDateTimeToString")
@@ -30,9 +30,7 @@ public interface ChapterMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "comic", ignore = true)
+    @Mapping(target = "detailChapters", ignore = true)
     Chapter toChapter(ChapterRequest chapterRequest);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "chapter", ignore = true)
-    DetailChapter toDetailChapter(DetailChapterRequest detailChapterRequest);
 }

@@ -1,12 +1,7 @@
-import { Chapter, DetailChapter } from "@/types/chapter";
+import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
-
-type ViewChapterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  chapter: Chapter | null;
-};
+import { formatDate } from "@/utils/helpers";
 
 export default function ViewChapterModal({
   isOpen,
@@ -16,7 +11,7 @@ export default function ViewChapterModal({
   if (!isOpen || !chapter) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black/50 bg-opacity-50 p-4">
       <div className="relative max-w-4xl w-full bg-white rounded-lg shadow-xl dark:bg-gray-800 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-medium text-gray-900 dark:text-white">
@@ -47,25 +42,13 @@ export default function ViewChapterModal({
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ngày tạo</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {new Date(chapter.createdAt).toLocaleDateString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDate(chapter.createdAt)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ngày cập nhật</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {new Date(chapter.updatedAt).toLocaleDateString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDate(chapter.updatedAt)}
                 </p>
               </div>
             </div>
@@ -76,19 +59,24 @@ export default function ViewChapterModal({
               Nội dung chương
             </p>
 
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-8">
               {chapter.detailChapters && chapter.detailChapters.length > 0 ? (
                 chapter.detailChapters
                   .sort((a, b) => a.orderNumber - b.orderNumber)
                   .map((detail: DetailChapter) => (
-                    <div key={detail.id} className="mb-4">
-                      <Image
-                        src={detail.imgUrl}
-                        alt={`Trang ${detail.orderNumber}`}
-                        width={800}
-                        height={1200}
-                        className="w-full h-auto rounded-md shadow-sm"
-                      />
+                    <div key={detail.id} className="mb-6">
+                      <div className="relative w-full">
+                        <Image
+                          src={detail.imgUrl}
+                          alt={`Trang ${detail.orderNumber}`}
+                          width={1500}
+                          height={2400}
+                          className="rounded-md shadow-lg w-full h-auto object-contain mx-auto"
+                        />
+                        <div className="absolute bottom-3 right-3 bg-black/70 text-white text-sm px-3 py-1.5 rounded-md">
+                          {detail.orderNumber}
+                        </div>
+                      </div>
                     </div>
                   ))
               ) : (

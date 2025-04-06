@@ -8,6 +8,7 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.CascadeType;
@@ -63,6 +64,10 @@ public class Comic {
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
+
+    @Column(name = "folder_id", columnDefinition = "VARCHAR(50)")
+    @JsonIgnore
+    String folderId;
 
     @Column(name = "created_at")
     @CreationTimestamp

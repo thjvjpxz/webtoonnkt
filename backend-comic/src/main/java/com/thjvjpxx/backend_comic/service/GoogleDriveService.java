@@ -7,10 +7,15 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 public interface GoogleDriveService {
     BaseResponse<?> uploadFile(MultipartFile file, String type, String fileName);
 
-    BaseResponse<?> removeFile(String fileId);
+    BaseResponse<?> uploadFileToFolder(MultipartFile file, String fileName, String folderId);
 
-    BaseResponse<?> createFolder(String folderName, String parentFolderId);
+    BaseResponse<?> remove(String fileId);
+
+    String createFolder(String folderName, String parentFolderId);
+
+    void rename(String folderId, String newName);
 
     BaseResponse<?> getFilesAndFolders(String folderId);
 
+    String getFileId(String fileName, String folderId);
 }

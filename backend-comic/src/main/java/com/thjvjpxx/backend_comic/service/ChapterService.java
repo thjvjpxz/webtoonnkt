@@ -9,7 +9,7 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 
 public interface ChapterService {
 
-    BaseResponse<?> getAllChapters(int page, int limit, String search);
+    BaseResponse<?> getAllChapters(int page, int limit, String search, String comicId);
 
     BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files);
 

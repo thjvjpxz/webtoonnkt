@@ -24,4 +24,5 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
 
     @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
     Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);
+
 }

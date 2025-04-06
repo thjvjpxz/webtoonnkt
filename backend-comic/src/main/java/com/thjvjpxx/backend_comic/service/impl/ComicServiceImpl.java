@@ -90,7 +90,9 @@ public class ComicServiceImpl implements ComicService {
             }
             thumbUrl = response.getMessage();
         }
+        String folderId = googleDriveService.createFolder(comicRequest.getSlug(), GoogleDriveConstants.FOLDER_ID_COMIC);
         Comic comic = comicMapper.toComic(comicRequest);
+        comic.setFolderId(folderId);
         List<String> categories = comicRequest.getCategories();
         comic.addCategories(convertCategories(categories));
         comic.setThumbUrl(thumbUrl);
@@ -135,6 +137,8 @@ public class ComicServiceImpl implements ComicService {
             thumbUrl = response.getMessage();
         }
 
+        googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
+
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
         comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
@@ -168,7 +172,7 @@ public class ComicServiceImpl implements ComicService {
         if (comic.getThumbUrl() != null &&
                 !comic.getThumbUrl().isEmpty() &&
                 comic.getThumbUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.removeFile(StringUtils.getIdFromUrl(comic.getThumbUrl()));
+            googleDriveService.remove(StringUtils.getIdFromUrl(comic.getThumbUrl()));
         }
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
