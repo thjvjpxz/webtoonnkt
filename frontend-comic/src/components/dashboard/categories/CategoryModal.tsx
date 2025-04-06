@@ -6,8 +6,6 @@ import { CategoryCreateUpdate } from "@/types/category";
 import { generateSlug } from "@/utils/string";
 import { CategoryModalProps } from "@/types/category";
 
-
-
 export default function CategoryModal({
   category,
   onClose,
@@ -22,6 +20,7 @@ export default function CategoryModal({
     name: "",
     slug: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
@@ -77,11 +76,18 @@ export default function CategoryModal({
   };
 
   // Xử lý lưu
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      onSave(formData);
+      setIsSubmitting(true);
+      try {
+        await onSave(formData);
+        // onSave sẽ xử lý việc đóng modal sau khi lưu thành công
+      } catch (error) {
+        console.error("Lỗi khi lưu thể loại:", error);
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -164,15 +170,26 @@ export default function CategoryModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              disabled={isSubmitting}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {category ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span className="ml-2">
+                    {category ? "Đang cập nhật..." : "Đang thêm mới..."}
+                  </span>
+                </>
+              ) : (
+                category ? "Cập nhật" : "Thêm mới"
+              )}
             </button>
           </div>
         </form>

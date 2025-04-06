@@ -12,7 +12,7 @@ import CategoryModal from "@/components/dashboard/categories/CategoryModal";
 import DeleteConfirmModal from "@/components/dashboard/categories/DeleteConfirmModal";
 import Pagination from "@/components/dashboard/Pagination";
 import "@/styles/scrollbar.css";
-import { useCategoryManagement } from "@/hooks/useCategoryManagement";
+import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
 
 export default function Categories() {
@@ -38,7 +38,7 @@ export default function Categories() {
     handleUpdateCategory,
     handleDeleteCategory,
     handleSearch,
-  } = useCategoryManagement();
+  } = useCategory();
 
   return (
     <DashboardLayout title="Quản lý thể loại">
