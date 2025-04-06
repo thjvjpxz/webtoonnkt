@@ -142,10 +142,10 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       if (response.status === 200) {
         toast.success("Thêm loại level thành công");
         fetchLevelTypes(); // Tải lại danh sách
+        setIsLevelTypeModalOpen(false);
       } else {
         toast.error(response.message || "Không thể thêm loại level");
       }
-      setIsLevelTypeModalOpen(false);
     } catch (error: any) {
       toast.error(error?.error || "Đã xảy ra lỗi khi thêm loại level");
       setIsLevelTypeModalOpen(false);
@@ -162,10 +162,10 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       if (response.status === 200) {
         toast.success("Cập nhật loại level thành công");
         fetchLevelTypes(); // Tải lại danh sách
+        setIsLevelTypeModalOpen(false);
       } else {
         toast.error(response.message || "Không thể cập nhật loại level");
       }
-      setIsLevelTypeModalOpen(false);
     } catch (error: any) {
       toast.error(error?.error || "Đã xảy ra lỗi khi cập nhật loại level");
       setIsLevelTypeModalOpen(false);
@@ -180,10 +180,10 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       if (response.status === 200) {
         toast.success("Thêm level thành công");
         fetchLevels(); // Tải lại danh sách
+        setIsLevelModalOpen(false);
       } else {
         toast.error(response.message || "Không thể thêm level");
       }
-      setIsLevelModalOpen(false);
     } catch (error: any) {
       toast.error(error?.error || "Đã xảy ra lỗi khi thêm level");
       setIsLevelModalOpen(false);

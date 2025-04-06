@@ -4,29 +4,28 @@
 
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #4ade80;
-  border-radius: 10px;
+  background: #888;
+  border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #38a169;
+  background: #555;
 }
 
 /* dark mode */
 @media (prefers-color-scheme: dark) {
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #1f2937;
+    background: #2d3748;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #065f46;
+    background: #4a5568;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #047857;
+    background: #718096;
   }
 }

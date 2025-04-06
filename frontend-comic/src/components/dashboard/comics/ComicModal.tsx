@@ -104,18 +104,29 @@ export default function ComicModal({
     }));
   };
 
-  // Đóng dropdown khi click ra ngoài
+  // Đóng dropdown khi click ra ngoài hoặc focus vào input khác
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest(".relative") && isCategoryDropdownOpen) {
+      if (!target.closest(".category-dropdown-container") && isCategoryDropdownOpen) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    const handleFocusChange = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      // Nếu focus vào phần tử không phải input tìm kiếm thể loại
+      if (!target.closest(".category-dropdown-container") && isCategoryDropdownOpen) {
         setIsCategoryDropdownOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("focusin", handleFocusChange);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("focusin", handleFocusChange);
     };
   }, [isCategoryDropdownOpen]);
 
@@ -572,7 +583,7 @@ export default function ComicModal({
                   {errors.categories}
                 </p>
               )}
-              <div className="relative">
+              <div className="relative category-dropdown-container">
                 <div
                   className={`w-full border ${errors.categories ? "border-rose-500" : "border-gray-300"
                     } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
@@ -606,7 +617,7 @@ export default function ComicModal({
                           ? "Chọn thể loại..."
                           : ""
                       }
-                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white"
+                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white category-search-input"
                       onFocus={() => setIsCategoryDropdownOpen(true)}
                       onChange={(e) => setCategorySearchTerm(e.target.value)}
                       value={categorySearchTerm}
@@ -616,7 +627,7 @@ export default function ComicModal({
 
                 {/* Dropdown danh sách thể loại */}
                 {isCategoryDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar">
                     {categories
                       .filter(
                         (cat) =>

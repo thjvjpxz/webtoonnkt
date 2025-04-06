@@ -19,7 +19,7 @@ export type ComicModalProps = {
 
 // Định nghĩa kiểu dữ liệu cho truyện
 export type ComicResponse = {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description: string;
