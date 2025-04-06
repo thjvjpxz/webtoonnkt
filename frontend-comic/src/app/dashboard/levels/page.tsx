@@ -10,11 +10,11 @@ import {
 } from "react-icons/fi";
 import "@/styles/scrollbar.css";
 import Pagination from "@/components/dashboard/Pagination";
-import DeleteConfirmModal from "@/components/dashboard/levels/DeleteConfirmModal";
 import LevelModal from "@/components/dashboard/levels/LevelModal";
 import LevelTypeModal from "@/components/dashboard/levels/LevelTypeModal";
 import { formatDate } from "@/utils/helpers";
-import useLevelsManager from "@/hooks/useLevelsManager";
+import { useLevel } from "@/hooks/useLevel";
+import DeleteLevelModal from "@/components/dashboard/levels/DeleteLevelModal";
 
 export default function Levels() {
   const {
@@ -66,7 +66,7 @@ export default function Levels() {
     handleSubmitLevel,
     handleSubmitLevelType,
     handleDelete,
-  } = useLevelsManager();
+  } = useLevel();
 
   return (
     <DashboardLayout title="Quản lý Level và Loại Level">
@@ -405,7 +405,7 @@ export default function Levels() {
 
       {/* Modal xác nhận xóa */}
       {isDeleteModalOpen && (
-        <DeleteConfirmModal
+        <DeleteLevelModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDelete}
