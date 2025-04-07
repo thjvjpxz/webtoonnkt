@@ -6,10 +6,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.model.Comic;
 
 public interface ComicService {
     BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category);
+
+    BaseResponse<List<ChapterResponse>> getAllChapters(int page, int limit, String search, String status,
+            String comicId);
 
     BaseResponse<Comic> getComicById(String id);
 

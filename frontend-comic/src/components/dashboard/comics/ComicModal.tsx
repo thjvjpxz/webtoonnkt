@@ -1,8 +1,7 @@
 "use client";
 
 import "@/styles/scrollbar.css";
-import { ComicCreateUpdate } from "@/types/api";
-import { ComicModalProps } from "@/types/comic";
+import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -105,18 +104,29 @@ export default function ComicModal({
     }));
   };
 
-  // Đóng dropdown khi click ra ngoài
+  // Đóng dropdown khi click ra ngoài hoặc focus vào input khác
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest(".relative") && isCategoryDropdownOpen) {
+      if (!target.closest(".category-dropdown-container") && isCategoryDropdownOpen) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    const handleFocusChange = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      // Nếu focus vào phần tử không phải input tìm kiếm thể loại
+      if (!target.closest(".category-dropdown-container") && isCategoryDropdownOpen) {
         setIsCategoryDropdownOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("focusin", handleFocusChange);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("focusin", handleFocusChange);
     };
   }, [isCategoryDropdownOpen]);
 
@@ -345,8 +355,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("file")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Tải lên từ máy tính
@@ -355,8 +365,8 @@ export default function ComicModal({
                           type="button"
                           onClick={() => setUploadMethod("url")}
                           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                             }`}
                         >
                           Nhập URL ảnh
@@ -374,8 +384,8 @@ export default function ComicModal({
                           />
                           <div
                             className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
-                                ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
-                                : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
+                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
                               }`}
                             onClick={handleOpenFileDialog}
                             onDragOver={handleDragOver}
@@ -573,7 +583,7 @@ export default function ComicModal({
                   {errors.categories}
                 </p>
               )}
-              <div className="relative">
+              <div className="relative category-dropdown-container">
                 <div
                   className={`w-full border ${errors.categories ? "border-rose-500" : "border-gray-300"
                     } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
@@ -607,7 +617,7 @@ export default function ComicModal({
                           ? "Chọn thể loại..."
                           : ""
                       }
-                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white"
+                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white category-search-input"
                       onFocus={() => setIsCategoryDropdownOpen(true)}
                       onChange={(e) => setCategorySearchTerm(e.target.value)}
                       value={categorySearchTerm}
@@ -617,7 +627,7 @@ export default function ComicModal({
 
                 {/* Dropdown danh sách thể loại */}
                 {isCategoryDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar">
                     {categories
                       .filter(
                         (cat) =>

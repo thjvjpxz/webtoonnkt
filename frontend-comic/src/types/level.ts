@@ -29,3 +29,12 @@ export type LevelRequest = {
   levelTypeId: string;
   urlGif: string;
 };
+
+export type DeleteLevelModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  itemType?: "level" | "level-type";
+  itemName: string;
+};
+

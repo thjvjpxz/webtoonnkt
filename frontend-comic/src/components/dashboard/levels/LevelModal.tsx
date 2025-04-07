@@ -95,12 +95,18 @@ export default function LevelModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Kiểm tra validation đơn giản
+    if (!formData.name.trim() || !formData.levelTypeId || formData.levelNumber < 0 || formData.expRequired < 0) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await onSubmit(formData, file || undefined);
+      // onSubmit đã xử lý việc đóng modal
     } catch (error) {
       console.error("Lỗi khi gửi form:", error);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -129,18 +135,6 @@ export default function LevelModal({
         </div>
 
         <form onSubmit={handleSubmit} className="relative">
-          {/* Overlay loading khi đang submit */}
-          {isSubmitting && (
-            <div className="absolute inset-0 bg-gray-900/20 dark:bg-gray-900/40 flex items-center justify-center rounded-xl z-10">
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex items-center space-x-3">
-                <div className="h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  {level ? "Đang cập nhật level..." : "Đang thêm level mới..."}
-                </p>
-              </div>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
               <label
@@ -299,8 +293,8 @@ export default function LevelModal({
             >
               {isSubmitting ? (
                 <>
-                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  {level ? "Đang cập nhật..." : "Đang thêm..."}
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>{level ? "Đang cập nhật..." : "Đang thêm mới..."}</span>
                 </>
               ) : level ? (
                 "Cập nhật"

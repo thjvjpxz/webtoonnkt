@@ -3,7 +3,6 @@ package com.thjvjpxx.backend_comic.dto.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.thjvjpxx.backend_comic.model.Comic;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,8 +22,8 @@ public class ChapterResponse {
     String id;
     String title;
     Integer chapterNumber;
+    String comicName;
     List<DetailChapterResponse> detailChapters;
-    Comic comic;
     String createdAt;
     String updatedAt;
 

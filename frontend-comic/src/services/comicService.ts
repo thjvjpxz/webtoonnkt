@@ -1,4 +1,5 @@
-import { ApiResponse, ComicCreateUpdate, ComicResponse } from "@/types/api";
+import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
+import { ApiResponse } from "@/types/api";
 import { fetchApi, fetchApiWithFormData } from "./api";
 
 // Lấy danh sách truyện có phân trang
@@ -28,13 +29,13 @@ export const getComics = async (
 
 // Lấy chi tiết một truyện
 export const getComic = async (
-  id: number
+  id: string
 ): Promise<ApiResponse<ComicResponse>> => {
   return await fetchApi<ApiResponse<ComicResponse>>(`/comics/${id}`);
 };
 
 // Xóa truyện
-export const deleteComic = async (id: number): Promise<ApiResponse<null>> => {
+export const deleteComic = async (id: string): Promise<ApiResponse<null>> => {
   return await fetchApi<ApiResponse<null>>(`/comics/${id}`, {
     method: "DELETE",
   });
@@ -62,7 +63,7 @@ export const createComicWithCover = async (
 
 // Cập nhật truyện với ảnh bìa
 export const updateComicWithCover = async (
-  id: number,
+  id: string,
   data: ComicCreateUpdate,
   file?: File
 ): Promise<ApiResponse<ComicResponse>> => {

@@ -43,7 +43,9 @@ public enum ErrorCode {
     CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chapter không được trống!"),
     CHAPTER_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Số chapter phải lớn hơn hoặc bằng 0!"),
     CHAPTER_COMIC_ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Truyện không được trống!"),
-    CHAPTER_DETAIL_CHAPTER_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Chapter chi tiết không được trống!"),
+    CHAPTER_REQUEST_NOT_NULL(HttpStatus.BAD_REQUEST, "Chapter request không được trống!"),
+    CHAPTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Chương không tồn tại!"),
+    CHAPTER_NUMBER_EXISTS(HttpStatus.BAD_REQUEST, "Số chương đã tồn tại!"),
 
     // Detail Chapter
     DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh chapter không được trống!"),

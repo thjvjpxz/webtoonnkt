@@ -6,9 +6,9 @@ import {
     updateCategory,
     deleteCategory,
 } from "@/services/categoryService";
-import { CategoryResponse, CategoryCreateUpdate } from "@/types/api";
+import { CategoryResponse, CategoryCreateUpdate } from "@/types/category";
 
-export const useCategoryManagement = (initialPage = 1, pageSize = 5) => {
+export const useCategory = (initialPage = 1, pageSize = 5) => {
     // State cho danh sách thể loại và phân trang
     const [categories, setCategories] = useState<CategoryResponse[]>([]);
     const [currentPage, setCurrentPage] = useState(initialPage);
@@ -59,18 +59,12 @@ export const useCategoryManagement = (initialPage = 1, pageSize = 5) => {
                 toast.success("Thêm thể loại thành công");
                 fetchCategories(); // Tải lại danh sách
                 setIsModalOpen(false);
-                return true;
             } else {
                 toast.error(response.message || "Không thể thêm thể loại");
-                return false;
             }
-        } catch (error: unknown) {
-            const errorMessage =
-                error && typeof error === "object" && "error" in error
-                    ? (error.error as string)
-                    : "Đã xảy ra lỗi";
-            toast.error(errorMessage || "Đã xảy ra lỗi khi thêm thể loại");
-            return false;
+        } catch (error: any) {
+            toast.error(error?.error || "Đã xảy ra lỗi khi thêm thể loại");
+            setIsModalOpen(false);
         }
     };
 
@@ -85,18 +79,12 @@ export const useCategoryManagement = (initialPage = 1, pageSize = 5) => {
                 toast.success("Cập nhật thể loại thành công");
                 fetchCategories(); // Tải lại danh sách
                 setIsModalOpen(false);
-                return true;
             } else {
                 toast.error(response.message || "Không thể cập nhật thể loại");
-                return false;
             }
-        } catch (error: unknown) {
-            const errorMessage =
-                error && typeof error === "object" && "error" in error
-                    ? (error.error as string)
-                    : "Đã xảy ra lỗi";
-            toast.error(errorMessage || "Đã xảy ra lỗi khi cập nhật thể loại");
-            return false;
+        } catch (error: any) {
+            toast.error(error?.error || "Đã xảy ra lỗi khi cập nhật thể loại");
+            setIsModalOpen(false);
         }
     };
 
@@ -111,18 +99,12 @@ export const useCategoryManagement = (initialPage = 1, pageSize = 5) => {
                 toast.success("Xóa thể loại thành công");
                 fetchCategories(); // Tải lại danh sách
                 setIsDeleteModalOpen(false);
-                return true;
             } else {
                 toast.error(response.message || "Không thể xóa thể loại");
-                return false;
             }
-        } catch (error: unknown) {
-            const errorMessage =
-                error && typeof error === "object" && "error" in error
-                    ? (error.error as string)
-                    : "Đã xảy ra lỗi";
-            toast.error(errorMessage || "Đã xảy ra lỗi khi xóa thể loại");
-            return false;
+        } catch (error: any) {
+            toast.error(error?.error || "Đã xảy ra lỗi khi xóa thể loại");
+            setIsDeleteModalOpen(false);
         }
     };
 

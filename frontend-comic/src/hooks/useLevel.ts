@@ -19,7 +19,7 @@ import {
   LevelTypeRequest,
 } from "@/types/level";
 
-export default function useLevelsManager() {
+export const useLevel = (initialPage = 1, pageSize = 5) => {
   // Trạng thái chung
   const [activeTab, setActiveTab] = useState<"level" | "levelType">("level");
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function useLevelsManager() {
 
   // Trạng thái cho Level
   const [levels, setLevels] = useState<LevelResponse[]>([]);
-  const [levelCurrentPage, setLevelCurrentPage] = useState(1);
+  const [levelCurrentPage, setLevelCurrentPage] = useState(initialPage);
   const [levelTotalPages, setLevelTotalPages] = useState(1);
   const [levelSearchTerm, setLevelSearchTerm] = useState("");
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function useLevelsManager() {
     setError(null);
 
     try {
-      const response = await getAllLevels(levelCurrentPage, 10, levelSearchTerm);
+      const response = await getAllLevels(levelCurrentPage, pageSize, levelSearchTerm);
 
       if (response.status === 200 && response.data) {
         setLevels(response.data);
@@ -147,7 +147,8 @@ export default function useLevelsManager() {
         toast.error(response.message || "Không thể thêm loại level");
       }
     } catch (error: any) {
-      toast.error(error?.message || "Đã xảy ra lỗi khi thêm loại level");
+      toast.error(error?.error || "Đã xảy ra lỗi khi thêm loại level");
+      setIsLevelTypeModalOpen(false);
     }
   };
 
@@ -166,7 +167,8 @@ export default function useLevelsManager() {
         toast.error(response.message || "Không thể cập nhật loại level");
       }
     } catch (error: any) {
-      toast.error(error?.message || "Đã xảy ra lỗi khi cập nhật loại level");
+      toast.error(error?.error || "Đã xảy ra lỗi khi cập nhật loại level");
+      setIsLevelTypeModalOpen(false);
     }
   };
 
@@ -183,7 +185,8 @@ export default function useLevelsManager() {
         toast.error(response.message || "Không thể thêm level");
       }
     } catch (error: any) {
-      toast.error(error?.message || "Đã xảy ra lỗi khi thêm level");
+      toast.error(error?.error || "Đã xảy ra lỗi khi thêm level");
+      setIsLevelModalOpen(false);
     }
   };
 
@@ -197,12 +200,13 @@ export default function useLevelsManager() {
       if (response.status === 200) {
         toast.success("Cập nhật level thành công");
         fetchLevels(); // Tải lại danh sách
-        setIsLevelModalOpen(false);
       } else {
         toast.error(response.message || "Không thể cập nhật level");
       }
+      setIsLevelModalOpen(false);
     } catch (error: any) {
-      toast.error(error?.message || "Đã xảy ra lỗi khi cập nhật level");
+      toast.error(error?.error || "Đã xảy ra lỗi khi cập nhật level");
+      setIsLevelModalOpen(false);
     }
   };
 
@@ -224,12 +228,13 @@ export default function useLevelsManager() {
         } else {
           fetchLevelTypes();
         }
-        setIsDeleteModalOpen(false);
       } else {
         toast.error(response.message || `Không thể xóa ${deleteItemType === "level" ? "level" : "loại level"}`);
       }
+      setIsDeleteModalOpen(false);
     } catch (error: any) {
-      toast.error(error?.message || `Đã xảy ra lỗi khi xóa ${deleteItemType === "level" ? "level" : "loại level"}`);
+      toast.error(error?.error || `Đã xảy ra lỗi khi xóa ${deleteItemType === "level" ? "level" : "loại level"}`);
+      setIsDeleteModalOpen(false);
     }
   };
 

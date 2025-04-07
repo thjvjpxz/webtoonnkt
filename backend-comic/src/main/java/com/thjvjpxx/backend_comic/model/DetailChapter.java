@@ -1,6 +1,5 @@
 package com.thjvjpxx.backend_comic.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
@@ -11,12 +10,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "detail_chapters")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DetailChapter {
 

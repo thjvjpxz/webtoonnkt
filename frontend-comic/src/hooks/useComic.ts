@@ -1,15 +1,16 @@
 import { getCategories } from "@/services/categoryService";
 import { createComicWithCover, deleteComic, getComics, updateComicWithCover } from "@/services/comicService";
-import { CategoryResponse, ComicCreateUpdate, ComicResponse } from "@/types/api";
+import { CategoryResponse } from "@/types/category";
+import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export const useComicManagement = (initialPage = 1, pageSize = 5) => {
+export const useComic = (initialPage = 1, pageSize = 5) => {
 
   // State cho danh sách truyện và phân trang
   const [comics, setComics] = useState<ComicResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,7 +53,7 @@ export const useComicManagement = (initialPage = 1, pageSize = 5) => {
     try {
       const response = await getComics(
         currentPage,
-        5,
+        pageSize,
         searchTerm,
         statusFilter || undefined,
         categoryFilter

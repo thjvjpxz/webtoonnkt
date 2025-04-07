@@ -20,6 +20,7 @@ export default function LevelTypeModal({
   const [formData, setFormData] = useState<LevelTypeRequest>({
     name: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (levelType) {
@@ -41,11 +42,20 @@ export default function LevelTypeModal({
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    onSubmit(formData);
-  }
+    if (!formData.name.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(formData);
+      // onSubmit sẽ đóng modal sau khi xử lý xong
+    } catch (error) {
+      console.error("Error submitting level type:", error);
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -64,7 +74,7 @@ export default function LevelTypeModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="relative">
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -88,15 +98,26 @@ export default function LevelTypeModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-700 dark:hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
             >
-              {levelType ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {levelType ? "Đang cập nhật..." : "Đang thêm..."}
+                </>
+              ) : levelType ? (
+                "Cập nhật"
+              ) : (
+                "Thêm mới"
+              )}
             </button>
           </div>
         </form>

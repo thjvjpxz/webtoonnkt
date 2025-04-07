@@ -3,10 +3,21 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [
-      "placehold.co",
-      "img.otruyenapi.com",
-      "dynamic-media-cdn.tripadvisor.com",
-      "lh3.googleusercontent.com"
+      "lh3.googleusercontent.com",
+      "sv1.otruyencdn.com",
+      "img.otruyen.xyz"
+    ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        pathname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "example.com",
+        pathname: "**",
+      },
     ],
     dangerouslyAllowSVG: true,
   },

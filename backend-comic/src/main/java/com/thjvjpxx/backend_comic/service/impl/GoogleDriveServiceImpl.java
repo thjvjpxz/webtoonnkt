@@ -54,10 +54,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
     private String uploadInputStream(InputStream inputStream, String mimeType, String fileName, String folderId)
             throws IOException {
-        var response = checkFileExists(fileName, mimeType, folderId);
-        if (response.getStatus() != HttpStatus.OK.value()) {
-            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
-        } else if ((boolean) response.getData()) {
+        String fileId = getFileId(fileName, folderId);
+        if (fileId != null) {
             throw new BaseException(ErrorCode.FILE_EXISTS);
         }
 
@@ -94,7 +92,12 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public BaseResponse<?> removeFile(String fileId) {
+    public BaseResponse<?> uploadFileToFolder(MultipartFile file, String fileName, String folderId) {
+        return handleUploadFile(file, folderId, fileName);
+    }
+
+    @Override
+    public BaseResponse<?> remove(String fileId) {
         try {
             driveService.files().delete(fileId).execute();
             return BaseResponse.success("Xoá file thành công");
@@ -105,7 +108,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     }
 
     @Override
-    public BaseResponse<?> createFolder(String folderName, String parentFolderId) {
+    public String createFolder(String folderName, String parentFolderId) {
         File fileMetadata = new File();
         fileMetadata.setName(folderName);
         fileMetadata.setParents(Collections.singletonList(parentFolderId));
@@ -120,7 +123,20 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
 
             publicDrive(folder.getId());
 
-            return BaseResponse.success(String.format("Tạo folder thành công: %s", folder.getName()));
+            return folder.getId();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void rename(String id, String newName) {
+        try {
+            File fileMetadata = new File();
+            fileMetadata.setName(newName);
+            driveService.files()
+                    .update(id, fileMetadata)
+                    .execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -168,7 +184,8 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         }
     }
 
-    public BaseResponse<?> checkFileExists(String fileName, String type, String folderId) {
+    @Override
+    public String getFileId(String fileName, String folderId) {
         if (fileName == null || fileName.isEmpty()) {
             throw new BaseException(ErrorCode.INVALID_ARGUMENT);
         }
@@ -182,9 +199,9 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.getData();
         for (Map<String, Object> item : items) {
             if (item.get("name").equals(fileName)) {
-                return BaseResponse.success(true);
+                return item.get("id").toString();
             }
         }
-        return BaseResponse.success(false);
+        return null;
     }
 }

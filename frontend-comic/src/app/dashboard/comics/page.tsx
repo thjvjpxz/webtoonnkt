@@ -5,7 +5,7 @@ import DeleteComicModal from "@/components/dashboard/comics/DeleteComicModal";
 import ViewComic from "@/components/dashboard/comics/ViewComic";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Pagination from "@/components/dashboard/Pagination";
-import { useComicManagement } from "@/hooks/useComicManagement";
+import { useComic } from "@/hooks/useComic";
 import Image from "next/image";
 import {
   FiAlertCircle,
@@ -52,7 +52,7 @@ export default function Comics() {
     handleDeleteComic,
 
 
-  } = useComicManagement();
+  } = useComic();
 
   // Hiển thị trạng thái
   const renderStatus = (status: string) => {

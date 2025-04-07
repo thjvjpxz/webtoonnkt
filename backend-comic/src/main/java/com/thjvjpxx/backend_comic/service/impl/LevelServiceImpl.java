@@ -141,7 +141,7 @@ public class LevelServiceImpl implements LevelService {
         if (level.getUrlGif() != null
                 && !level.getUrlGif().isEmpty()
                 && level.getUrlGif().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.removeFile(StringUtils.getIdFromUrl(level.getUrlGif()));
+            googleDriveService.remove(StringUtils.getIdFromUrl(level.getUrlGif()));
         }
 
         return BaseResponse.success(level);

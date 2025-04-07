@@ -1,9 +1,6 @@
+import { CategoryCreateUpdate, CategoryResponse } from "@/types/category";
+import { ApiResponse } from "@/types/api";
 import { fetchApi } from "./api";
-import {
-  ApiResponse,
-  CategoryResponse,
-  CategoryCreateUpdate,
-} from "@/types/api";
 
 // Lấy danh sách thể loại có phân trang
 export const getCategories = async (
