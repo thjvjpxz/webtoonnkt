@@ -50,7 +50,17 @@ export default function ChapterModal({
     handleComicDropdownScroll,
 
     // Utils
-    isEditMode
+    isEditMode,
+    uploadMethod,
+    imageLink,
+    setUploadMethod,
+    setImageLink,
+    imageLinkList,
+    handleAddImageLink,
+    handleRemoveImageLink,
+    isValidImageUrl,
+    hasValidImageLinks,
+    handleAddMultipleImageLinks
   } = useChapterModal(isOpen, chapter || null, comicOptions, onSubmit);
 
   if (!isOpen) return null;
@@ -208,33 +218,91 @@ export default function ChapterModal({
 
               {/* Upload ảnh */}
               <div className="col-span-2">
+                <div className="flex justify-between items-center mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Thêm hình ảnh <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setUploadMethod('file')}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${uploadMethod === 'file'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                    >
+                      Tải ảnh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUploadMethod('link')}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${uploadMethod === 'link'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                    >
+                      Nhập link
+                    </button>
+                  </div>
+                </div>
 
-                {previewUrls.length === 0 && (
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4">
-                    <div className="flex flex-col items-center justify-center py-6">
-                      <FiUpload className="w-12 h-12 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-1">
-                        Kéo và thả ảnh vào đây hoặc nhấn để chọn
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
-                        Hỗ trợ JPG, PNG, WEBP
-                      </p>
-                      <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleImageChange}
-                          className="hidden"
-                          disabled={previewUrls.length >= 20}
+                {uploadMethod === 'file' ? (
+                  <>
+                    {previewUrls.length === 0 && (
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4">
+                        <div className="flex flex-col items-center justify-center py-6">
+                          <FiUpload className="w-12 h-12 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-1">
+                            Kéo và thả ảnh vào đây hoặc nhấn để chọn
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
+                            Hỗ trợ JPG, PNG, WEBP
+                          </p>
+                          <label className="cursor-pointer bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={handleImageChange}
+                              className="hidden"
+                              disabled={previewUrls.length >= 20}
+                            />
+                            Chọn ảnh
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="mb-4">
+                    <div className="flex flex-col gap-2 mb-3">
+                      <div className="flex-1">
+                        <textarea
+                          value={imageLink}
+                          onChange={(e) => setImageLink(e.target.value)}
+                          placeholder="Nhập link ảnh, mỗi link một dòng (https://...)"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white min-h-[80px]"
+                          rows={3}
                         />
-                        Chọn ảnh
-                      </label>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleAddMultipleImageLinks}
+                          disabled={!hasValidImageLinks(imageLink)}
+                          className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        >
+                          <FiPlus size={16} />
+                          <span>Thêm các link</span>
+                        </button>
+                      </div>
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Hỗ trợ nhập nhiều link ảnh, mỗi link trên một dòng
+                    </p>
                   </div>
                 )}
 
-                {/* Preview ảnh đã chọn */}
                 {previewUrls.length > 0 && (
                   <div className="mt-4">
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -266,7 +334,7 @@ export default function ChapterModal({
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 shadow-sm"
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 shadow-sm cursor-pointer"
                           >
                             <FiX size={16} />
                           </button>

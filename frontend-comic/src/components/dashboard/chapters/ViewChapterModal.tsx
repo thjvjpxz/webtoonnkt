@@ -64,14 +64,14 @@ export default function ViewChapterModal({
                 chapter.detailChapters
                   .sort((a, b) => a.orderNumber - b.orderNumber)
                   .map((detail: DetailChapter) => (
-                    <div key={detail.id} className="mb-6">
+                    <div key={detail.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
                           src={detail.imgUrl}
                           alt={`Trang ${detail.orderNumber}`}
                           width={1500}
                           height={2400}
-                          className="rounded-md shadow-lg w-full h-auto object-contain mx-auto"
+                          className="shadow-lg w-full h-auto object-contain mx-auto"
                         />
                         <div className="absolute bottom-3 right-3 bg-black/70 text-white text-sm px-3 py-1.5 rounded-md">
                           {detail.orderNumber}

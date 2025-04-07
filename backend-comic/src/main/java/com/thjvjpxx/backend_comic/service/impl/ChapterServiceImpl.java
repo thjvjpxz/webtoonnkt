@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.DetailChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -75,6 +76,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         List<ChapterResponse> chapterResponses = chapterList.stream()
                 .map(chapterMapper::toChapterResponse)
+                .sorted((a, b) -> Integer.compare(a.getChapterNumber(), b.getChapterNumber()))
                 .collect(Collectors.toList());
 
         return BaseResponse.success(
@@ -195,9 +197,11 @@ public class ChapterServiceImpl implements ChapterService {
                 // Tìm và xóa file ảnh trên Google Drive nếu cần
                 if (detailRequest.getImgUrl() != null && !detailRequest.getImgUrl().isEmpty()
                         && !detailRequest.getImgUrl().startsWith("blob:")) {
-                    // Xóa file trên Google Drive
-                    String idOld = StringUtils.getIdFromUrl(detailRequest.getImgUrl());
-                    googleDriveService.remove(idOld);
+                    if (detailRequest.getImgUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+                        // Xóa file trên Google Drive
+                        String idOld = StringUtils.getIdFromUrl(detailRequest.getImgUrl());
+                        googleDriveService.remove(idOld);
+                    }
 
                     // Tìm và lấy bản ghi cần xóa
                     DetailChapter detailToRemove = existingDetails.stream()
@@ -220,12 +224,11 @@ public class ChapterServiceImpl implements ChapterService {
             DetailChapter detail;
 
             if (detailRequest.isNewImage()) {
+                detail = new DetailChapter();
+                // Tạo mới chi tiết
+                detail.setChapter(chapter);
                 // 6.1. Đây là ảnh mới, cần tạo mới và upload file
-                if (fileIndex < files.size()) {
-                    // Tạo mới chi tiết
-                    detail = new DetailChapter();
-                    detail.setChapter(chapter);
-
+                if (files != null && fileIndex < files.size()) {
                     // Kiểm tra và lấy folder ID của chapter
                     String folderId = googleDriveService.getFileId(folderName, comic.getFolderId());
                     if (folderId == null) {
@@ -256,8 +259,7 @@ public class ChapterServiceImpl implements ChapterService {
                     detail.setImgUrl(response.getMessage());
                     fileIndex++;
                 } else {
-                    // Nếu không có đủ file, bỏ qua chi tiết này
-                    continue;
+                    detail.setImgUrl(detailRequest.getImgUrl());
                 }
             } else {
                 // 6.2. Đây là ảnh cũ
@@ -304,11 +306,8 @@ public class ChapterServiceImpl implements ChapterService {
                     }
                 }
             }
-
-            // // 6.3. Cập nhật orderNumber cho chi tiết
-            // detail.setOrderNumber(detailRequest.getOrderNumber());
-
             // 6.4. Thêm vào danh sách chi tiết mới
+            detail.setOrderNumber(detailRequest.getOrderNumber());
             newDetails.add(detail);
         }
 
@@ -333,25 +332,16 @@ public class ChapterServiceImpl implements ChapterService {
                 // Duyệt qua và đổi tên file nếu cần
                 for (int i = 0; i < sortedDetails.size(); i++) {
                     DetailChapter detail = sortedDetails.get(i);
-                    int correctOrderNumber = i + 1;
+                    // Tạo tên file theo định dạng "image_[orderNumber]" để tránh trùng lặp
+                    String newFileName = "image_" + detail.getOrderNumber();
 
-                    // Nếu orderNumber không đúng với vị trí, cập nhật lại
-                    if (detail.getOrderNumber() != correctOrderNumber) {
-                        // Lấy ID file từ URL
-                        String fileId = StringUtils.getIdFromUrl(detail.getImgUrl());
-                        if (fileId != null) {
-                            // Đổi tên file trên Google Drive
-                            String newFileName = String.valueOf(correctOrderNumber);
-                            googleDriveService.rename(fileId, newFileName);
-
-                            // Cập nhật orderNumber trong DB
-                            detail.setOrderNumber(correctOrderNumber);
-                        }
+                    // Lấy ID file từ URL
+                    String fileId = StringUtils.getIdFromUrl(detail.getImgUrl());
+                    if (fileId != null) {
+                        // Đổi tên file trên Google Drive
+                        googleDriveService.rename(fileId, newFileName);
                     }
                 }
-
-                // Lưu các chi tiết đã được cập nhật
-                detailChapterRepository.saveAll(sortedDetails);
             }
         }
 

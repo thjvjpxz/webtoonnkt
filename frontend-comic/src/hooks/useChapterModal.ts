@@ -23,6 +23,9 @@ export const useChapterModal = (
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [deletedImageUrls, setDeletedImageUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'link'>('file');
+  const [imageLink, setImageLink] = useState<string>('');
+  const [imageLinkList, setImageLinkList] = useState<string[]>([]);
 
   // Tái sử dụng hook
   const {
@@ -195,6 +198,61 @@ export const useChapterModal = (
     setDropTargetIndex(null);
   };
 
+  // Function kiểm tra URL hợp lệ
+  const isValidImageUrl = (url: string): boolean => {
+    return url.trim() !== '' &&
+      (url.startsWith('http://') || url.startsWith('https://')) &&
+      /\.(jpg|jpeg|png|webp|gif|bmp)(\?.*)?$/i.test(url);
+  };
+
+  // Xử lý thêm link ảnh
+  const handleAddImageLink = () => {
+    if (!imageLink || !isValidImageUrl(imageLink)) return;
+
+    setImageLinkList(prev => [...prev, imageLink]);
+    setPreviewUrls(prev => [...prev, imageLink]);
+    setImageLink('');
+  };
+
+  // Xử lý xóa link ảnh
+  const handleRemoveImageLink = (index: number) => {
+    // Tìm vị trí tương ứng trong previewUrls
+    const linkToRemove = imageLinkList[index];
+    const previewIndex = previewUrls.findIndex(url => url === linkToRemove);
+
+    // Xóa khỏi cả hai danh sách
+    setImageLinkList(prev => prev.filter((_, i) => i !== index));
+
+    if (previewIndex !== -1) {
+      handleRemoveImage(previewIndex);
+    }
+  };
+
+  // Thêm hàm kiểm tra các link hợp lệ
+  const hasValidImageLinks = (text: string): boolean => {
+    if (!text.trim()) return false;
+
+    const links = text.split('\n').filter(link => link.trim() !== '');
+    return links.some(link => isValidImageUrl(link.trim()));
+  };
+
+  // Xử lý thêm nhiều link ảnh
+  const handleAddMultipleImageLinks = () => {
+    if (!imageLink.trim()) return;
+
+    const links = imageLink
+      .split('\n')
+      .map(link => link.trim())
+      .filter(link => link !== '' && isValidImageUrl(link));
+
+    if (links.length === 0) return;
+
+    // Thêm các link hợp lệ vào danh sách
+    setImageLinkList(prev => [...prev, ...links]);
+    setPreviewUrls(prev => [...prev, ...links]);
+    setImageLink(''); // Xóa textarea sau khi thêm
+  };
+
   // Submit form
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -329,6 +387,18 @@ export const useChapterModal = (
     handleComicDropdownScroll,
 
     // Utils
-    isEditMode
+    isEditMode,
+
+    // New states
+    uploadMethod,
+    setUploadMethod,
+    imageLink,
+    setImageLink,
+    imageLinkList,
+    handleAddImageLink,
+    handleRemoveImageLink,
+    isValidImageUrl,
+    hasValidImageLinks,
+    handleAddMultipleImageLinks
   };
 }; 
