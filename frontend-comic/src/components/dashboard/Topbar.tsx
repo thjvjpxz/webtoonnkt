@@ -1,36 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
-import { FiBell } from "react-icons/fi";
+import { FiBell, FiSun, FiMoon } from "react-icons/fi";
 import { TopbarProps } from "@/types/dashboard";
 
 export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
-  const [mounted, setMounted] = useState(false);
-
-  // Đảm bảo component đã được mount trước khi render nội dung phụ thuộc vào client
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Render nội dung cơ bản trong quá trình SSR
-  if (!mounted) {
-    return (
-      <header className="bg-white shadow-sm z-10 border-b border-green-100 dark:bg-gray-800 dark:border-gray-700">
-        <div className="px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-          </div>
-          <div className="flex items-center space-x-4">
-            {/* Placeholder cho các nút */}
-          </div>
-        </div>
-      </header>
-    );
-  }
 
   return (
-    <header className="bg-white shadow-sm z-10 border-b border-green-100 dark:bg-gray-800 dark:border-gray-700">
+    <header className={`bg-white shadow-sm z-10 border-b border-green-100 dark:bg-gray-800 dark:border-gray-700`}>
       <div className="px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
