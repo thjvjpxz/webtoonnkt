@@ -16,5 +16,6 @@ public interface ComicMapper {
     @Mapping(target = "followersCount", ignore = true)
     @Mapping(target = "viewsCount", ignore = true)
     @Mapping(target = "rating", ignore = true)
+    @Mapping(target = "folderId", ignore = true)
     Comic toComic(ComicRequest comicRequest);
 }

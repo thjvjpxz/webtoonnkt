@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
     domains: [
       "lh3.googleusercontent.com",
       "sv1.otruyencdn.com",
-      "img.otruyen.xyz"
+      "img.otruyen.xyz",
+      "img.otruyenapi.com"
     ],
     remotePatterns: [
       {
