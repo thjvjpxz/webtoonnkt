@@ -77,7 +77,7 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, statusFilter, categoryFilter]);
+  }, [currentPage, searchTerm, statusFilter, categoryFilter, pageSize]);
 
 
   // Gọi API khi thay đổi trang hoặc tìm kiếm
