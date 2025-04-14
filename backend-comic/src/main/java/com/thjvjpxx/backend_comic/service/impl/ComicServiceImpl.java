@@ -14,6 +14,7 @@ import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
@@ -148,7 +149,7 @@ public class ComicServiceImpl implements ComicService {
         comic.setName(comicRequest.getName());
         comic.setDescription(comicRequest.getDescription());
         comic.setAuthor(comicRequest.getAuthor());
-        comic.setStatus(comicRequest.getStatus());
+        comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
         comic.setThumbUrl(thumbUrl);
         comic.setOriginName(comicRequest.getOriginName());
 

@@ -10,10 +10,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.thjvjpxx.backend_comic.enums.ComicStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -51,7 +54,8 @@ public class Comic {
     String author;
 
     @Column(name = "status")
-    String status;
+    @Enumerated(EnumType.STRING)
+    ComicStatus status;
 
     @Column(name = "followers_count")
     int followersCount;
