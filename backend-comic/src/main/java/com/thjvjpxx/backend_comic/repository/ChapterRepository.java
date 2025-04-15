@@ -28,7 +28,14 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
         Page<Chapter> findByTitleContainingAndComicId(@Param("title") String title, @Param("comicId") String comicId,
                         Pageable pageable);
 
+        @Query("SELECT c FROM chapters c WHERE c.comic.id = :comicId AND c.chapterNumber = :chapterNumber")
+        Optional<Chapter> findByComicIdAndChapterNumber(@Param("comicId") String comicId,
+                        @Param("chapterNumber") double chapterNumber);
+
         @Query("SELECT c FROM chapters c JOIN c.comic com WHERE com.id = :comicId AND c.chapterNumber = :chapterNumber AND c.id != :id")
-        Optional<Chapter> findByChapterNumberAndComicId(@Param("chapterNumber") int chapterNumber,
+        Optional<Chapter> findByChapterNumberAndComicId(@Param("chapterNumber") double chapterNumber,
                         @Param("comicId") String comicId, @Param("id") String oldChapterId);
+
+        @Query("SELECT MAX(c.chapterNumber) FROM chapters c WHERE c.comic.id = :comicId")
+        Double findMaxChapterNumberByComicId(@Param("comicId") String comicId);
 }

@@ -1,5 +1,7 @@
 package com.thjvjpxx.backend_comic.dto.otruyen;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OTruyenResponse {
-    private String status;
-    private String message;
     private OTruyenData data;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OTruyenData {
+        private List<OTruyenComic> items;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OTruyenComic {
+        private String slug;
+    }
 }
