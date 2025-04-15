@@ -212,11 +212,22 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Transactional
     private void processChapter(OTruyenComicDetail comicDetail, Comic comic, RestTemplate restTemplate,
             boolean isExistingComic) {
-        List<OTruyenChapter> chapters = comicDetail.getData()
-                .getItem()
-                .getChapters()
-                .get(0)
-                .getServer_data();
+        // Kiểm tra danh sách chapters có tồn tại và không rỗng
+        List<OTruyenChapter> chapters = new ArrayList<>();
+        if (comicDetail.getData().getItem().getChapters() != null &&
+                !comicDetail.getData().getItem().getChapters().isEmpty()) {
+            // Kiểm tra tiếp server_data có tồn tại không
+            if (comicDetail.getData().getItem().getChapters().get(0) != null &&
+                    comicDetail.getData().getItem().getChapters().get(0).getServer_data() != null) {
+                chapters = comicDetail.getData().getItem().getChapters().get(0).getServer_data();
+            } else {
+                log.warn("Không có server_data cho truyện: {}", comic.getName());
+                return;
+            }
+        } else {
+            log.warn("Không có chapter nào cho truyện: {}", comic.getName());
+            return;
+        }
 
         // Nếu truyện đã tồn tại, tìm chapter có số lớn nhất
         Double latestChapterNumber = null;
