@@ -80,7 +80,11 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Transactional
     public BaseResponse<?> crawlComic(CrawlerComicRequest request) {
         try {
-            List<Map<String, Object>> allResults = new ArrayList<>();
+            Map<String, Object> crawlingResult = new HashMap<>();
+            List<Map<String, Object>> errorResults = new ArrayList<>();
+            int totalComicProcessed = 0;
+            int totalSuccessfulComics = 0;
+
             RestTemplate restTemplate = new RestTemplate();
             int comicProcessed = 0;
 
@@ -122,13 +126,22 @@ public class CrawlerServiceImpl implements CrawlerService {
                         if (comicDetailResponse.getStatusCode() != HttpStatus.OK
                                 || comicDetailResponse.getBody() == null) {
                             log.error("Không thể lấy chi tiết cho truyện: {}", slug);
+                            Map<String, Object> errorResult = new HashMap<>();
+                            errorResult.put("comicSlug", slug);
+                            errorResult.put("error", "Không thể lấy chi tiết cho truyện");
+                            errorResults.add(errorResult);
                             continue;
                         }
 
                         OTruyenComicDetail comicDetail = comicDetailResponse.getBody();
-                        processComicWithChapters(comicDetail, request.isSaveDrive(), restTemplate);
+                        boolean success = processComicWithChapters(comicDetail, request.isSaveDrive(), restTemplate);
+
+                        if (success) {
+                            totalSuccessfulComics++;
+                        }
 
                         comicProcessed++;
+                        totalComicProcessed++;
 
                         if (comicProcessed % batchSize == 0) {
                             log.info("Đã xử lý {} truyện, đang tạm nghỉ...", comicProcessed);
@@ -139,14 +152,19 @@ public class CrawlerServiceImpl implements CrawlerService {
                         Map<String, Object> errorResult = new HashMap<>();
                         errorResult.put("comicSlug", comicSummary.getSlug());
                         errorResult.put("error", e.getMessage());
-                        allResults.add(errorResult);
+                        errorResults.add(errorResult);
                     }
                 }
 
                 log.info("Hoàn thành crawl trang {} với {} truyện", currentPage, comics.size());
             }
 
-            return BaseResponse.success(allResults);
+            crawlingResult.put("totalProcessed", totalComicProcessed);
+            crawlingResult.put("totalSuccess", totalSuccessfulComics);
+            crawlingResult.put("totalErrors", errorResults.size());
+            crawlingResult.put("errors", errorResults);
+
+            return BaseResponse.success(crawlingResult);
         } catch (InterruptedException e) {
             log.error("Quá trình crawl bị gián đoạn", e);
             Thread.currentThread().interrupt();
@@ -158,76 +176,88 @@ public class CrawlerServiceImpl implements CrawlerService {
     }
 
     @Transactional
-    private void processComicWithChapters(OTruyenComicDetail comicDetail, boolean isSaveDrive,
+    private boolean processComicWithChapters(OTruyenComicDetail comicDetail, boolean isSaveDrive,
             RestTemplate restTemplate) throws InterruptedException {
-        ComicItem oTruyenComic = comicDetail.getData().getItem();
+        try {
+            ComicItem oTruyenComic = comicDetail.getData().getItem();
 
-        String slug = StringUtils.generateSlug(oTruyenComic.getName());
-        Optional<Comic> existingComicOptional = comicRepository.findBySlug(slug);
+            String slug = StringUtils.generateSlug(oTruyenComic.getName());
+            Optional<Comic> existingComicOptional = comicRepository.findBySlug(slug);
 
-        Comic comic;
-        boolean isExistingComic = existingComicOptional.isPresent();
+            Comic comic;
+            boolean isExistingComic = existingComicOptional.isPresent();
 
-        if (isExistingComic) {
-            comic = existingComicOptional.get();
-            log.info("Truyện đã tồn tại: {}, ID: {}", comic.getName(), comic.getId());
-        } else {
-            comic = new Comic();
-
-            comic.setName(oTruyenComic.getName());
-            comic.setSlug(slug);
-            comic.setOriginName(String.join(", ", oTruyenComic.getOrigin_name()));
-
-            if ("ongoing".equals(oTruyenComic.getStatus())) {
-                comic.setStatus(ComicStatus.ONGOING);
-            } else if ("completed".equals(oTruyenComic.getStatus())) {
-                comic.setStatus(ComicStatus.COMPLETED);
+            if (isExistingComic) {
+                comic = existingComicOptional.get();
+                log.info("Truyện đã tồn tại: {}, ID: {}", comic.getName(), comic.getId());
             } else {
-                comic.setStatus(ComicStatus.COMING_SOON);
-            }
+                comic = new Comic();
 
-            if (oTruyenComic.getThumb_url() != null && !oTruyenComic.getThumb_url().isEmpty()) {
-                String thumbnailUrl = OTRUYEN_IMAGE_CDN + "/uploads/comics/" + oTruyenComic.getThumb_url();
-                comic.setThumbUrl(thumbnailUrl);
+                comic.setName(oTruyenComic.getName());
+                comic.setSlug(slug);
+                comic.setOriginName(String.join(", ", oTruyenComic.getOrigin_name()));
 
-                if (isSaveDrive) {
-                    String folderId = googleDriveService.createFolder(slug, null);
-                    comic.setFolderId(folderId);
+                if ("ongoing".equals(oTruyenComic.getStatus())) {
+                    comic.setStatus(ComicStatus.ONGOING);
+                } else if ("completed".equals(oTruyenComic.getStatus())) {
+                    comic.setStatus(ComicStatus.COMPLETED);
+                } else {
+                    comic.setStatus(ComicStatus.COMING_SOON);
                 }
-            }
 
-            if (oTruyenComic.getCategory() != null && !oTruyenComic.getCategory().isEmpty()) {
-                Set<Category> categories = new HashSet<>();
-                List<String> categoryNames = new ArrayList<>();
+                if (oTruyenComic.getThumb_url() != null && !oTruyenComic.getThumb_url().isEmpty()) {
+                    String thumbnailUrl = OTRUYEN_IMAGE_CDN + "/uploads/comics/" + oTruyenComic.getThumb_url();
+                    comic.setThumbUrl(thumbnailUrl);
 
-                for (var oTruyenCategory : oTruyenComic.getCategory()) {
-                    categoryNames.add(oTruyenCategory.getName());
-
-                    String categorySlug = StringUtils.generateSlug(oTruyenCategory.getName());
-                    Optional<Category> existingCategory = categoryRepository.findBySlug(categorySlug);
-
-                    if (existingCategory.isPresent()) {
-                        categories.add(existingCategory.get());
-                    } else {
-                        Category newCategory = new Category();
-                        newCategory.setName(oTruyenCategory.getName());
-                        newCategory.setSlug(categorySlug);
-                        categoryRepository.save(newCategory);
-                        categories.add(newCategory);
+                    if (isSaveDrive) {
+                        String folderId = googleDriveService.createFolder(slug, null);
+                        comic.setFolderId(folderId);
                     }
                 }
 
-                comic.setCategories(categories);
+                if (oTruyenComic.getCategory() != null && !oTruyenComic.getCategory().isEmpty()) {
+                    Set<Category> categories = new HashSet<>();
+                    List<String> categoryNames = new ArrayList<>();
+
+                    for (var oTruyenCategory : oTruyenComic.getCategory()) {
+                        categoryNames.add(oTruyenCategory.getName());
+
+                        String categorySlug = StringUtils.generateSlug(oTruyenCategory.getName());
+                        Optional<Category> existingCategory = categoryRepository.findBySlug(categorySlug);
+
+                        if (existingCategory.isPresent()) {
+                            categories.add(existingCategory.get());
+                        } else {
+                            Category newCategory = new Category();
+                            newCategory.setName(oTruyenCategory.getName());
+                            newCategory.setSlug(categorySlug);
+                            categoryRepository.save(newCategory);
+                            categories.add(newCategory);
+                        }
+                    }
+
+                    comic.setCategories(categories);
+                }
+
+                comic.setDescription(oTruyenComic.getContent() != null ? oTruyenComic.getContent() : "Đang cập nhật");
+
+                comic = comicRepository.save(comic);
+                log.info("Đã thêm truyện mới: {}, ID: {}", comic.getName(), comic.getId());
             }
 
-            comic.setDescription(oTruyenComic.getContent() != null ? oTruyenComic.getContent() : "Đang cập nhật");
+            Thread.sleep(requestDelayMs);
 
-            comic = comicRepository.save(comic);
-            log.info("Đã thêm truyện mới: {}, ID: {}", comic.getName(), comic.getId());
+            try {
+                processChapters(comicDetail, comic, restTemplate, isExistingComic);
+                return true;
+            } catch (Exception e) {
+                log.error("Lỗi khi xử lý chapters cho truyện {}: {}", comic.getName(), e.getMessage());
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Lỗi khi xử lý truyện: {}", e.getMessage());
+            throw e;
         }
-
-        Thread.sleep(requestDelayMs);
-        processChapters(comicDetail, comic, restTemplate, isExistingComic);
     }
 
     @Transactional
