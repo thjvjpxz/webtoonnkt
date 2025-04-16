@@ -57,13 +57,13 @@ export default function Comics() {
   // Hiển thị trạng thái
   const renderStatus = (status: string) => {
     switch (status) {
-      case "completed":
+      case "COMPLETED":
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
             Đã hoàn thành
           </span>
         );
-      case "ongoing":
+      case "ONGOING":
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
             Đang cập nhật
@@ -226,10 +226,10 @@ export default function Comics() {
                           />
                         </div>
                         <div className="ml-1">
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-200 max-w-[150px] truncate">
                             {comic.name}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 max-w-[150px] truncate">
                             {comic.slug}
                           </div>
                         </div>
@@ -237,7 +237,7 @@ export default function Comics() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
-                        {comic.author}
+                        {comic.author || <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Đang cập nhật</span>}
                       </div>
                     </td>
                     <td className="px-6 py-4">

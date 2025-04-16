@@ -47,7 +47,7 @@ export default function Sidebar({
     {
       path: "/dashboard/chapters",
       icon: <FiFileText size={20} />,
-      label: "Quản lý chapter",
+      label: "Quản lý chương",
     },
     {
       path: "/dashboard/users",

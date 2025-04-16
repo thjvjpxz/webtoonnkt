@@ -111,7 +111,7 @@ export default function Chapters() {
                   </div>
                 </div>
 
-                <div className="overflow-y-auto custom-scrollbar" onScroll={handleComicDropdownScroll}>
+                <div className="overflow-y-auto custom-scrollbar text-white" onScroll={handleComicDropdownScroll}>
                   <div
                     className="px-4 py-2 hover:bg-green-50 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => handleSelectComic("")}
@@ -250,7 +250,7 @@ export default function Chapters() {
                 ) : (chapters.map((chapter) => (
                   <tr key={chapter.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap text-sm align-middle">
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-center">
                         <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
                           {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
                             <Image
@@ -272,7 +272,7 @@ export default function Chapters() {
                         </div>
 
                         <div className="ml-4">
-                          <div className="font-medium text-gray-900 dark:text-gray-200">
+                          <div className="font-medium text-gray-900 dark:text-gray-200 max-w-[150px] truncate">
                             {chapter.comicName}
                           </div>
                         </div>
