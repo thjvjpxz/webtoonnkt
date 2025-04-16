@@ -55,10 +55,6 @@ export default function ChapterModal({
     imageLink,
     setUploadMethod,
     setImageLink,
-    imageLinkList,
-    handleAddImageLink,
-    handleRemoveImageLink,
-    isValidImageUrl,
     hasValidImageLinks,
     handleAddMultipleImageLinks
   } = useChapterModal(isOpen, chapter || null, comicOptions, onSubmit);
@@ -325,9 +321,11 @@ export default function ChapterModal({
                           onDragEnd={handleDragEnd}
                         >
                           <div className="aspect-w-2 aspect-h-3 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
-                            <img
+                            <Image
                               src={url}
                               alt={`Preview ${index}`}
+                              fill
+                              sizes="100%"
                               className="object-cover w-full h-full"
                             />
                           </div>

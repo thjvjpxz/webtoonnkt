@@ -1,7 +1,7 @@
 import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
-import { formatDate } from "@/utils/helpers";
+import { formatDate, constructImageUrl } from "@/utils/helpers";
 
 export default function ViewChapterModal({
   isOpen,
@@ -67,7 +67,7 @@ export default function ViewChapterModal({
                     <div key={detail.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
-                          src={detail.imgUrl}
+                          src={constructImageUrl(chapter, detail.imgUrl)}
                           alt={`Trang ${detail.orderNumber}`}
                           width={1500}
                           height={2400}

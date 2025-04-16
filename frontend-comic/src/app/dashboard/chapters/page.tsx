@@ -5,13 +5,14 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import Pagination from "@/components/dashboard/Pagination";
 import { useChapter } from "@/hooks/useChapter";
 import Image from "next/image";
-import { formatDate } from "@/utils/helpers";
+import { formatDate, constructImageUrl } from "@/utils/helpers";
 import "@/styles/scrollbar.css";
 import ViewChapterModal from "@/components/dashboard/chapters/ViewChapterModal";
 import DeleteChapterModal from "@/components/dashboard/chapters/DeleteChapterModal";
 import ChapterModal from "@/components/dashboard/chapters/ChapterModal";
 
 export default function Chapters() {
+
   const {
     chapters,
     currentPage,
@@ -207,9 +208,9 @@ export default function Chapters() {
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
                     Truyện
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
+                  {/* <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
                     Tên chương
-                  </th>
+                  </th> */}
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
                     Chương
                   </th>
@@ -253,7 +254,7 @@ export default function Chapters() {
                         <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
                           {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
                             <Image
-                              src={chapter.detailChapters[0].imgUrl}
+                              src={constructImageUrl(chapter, chapter.detailChapters[0].imgUrl)}
                               alt={`Ảnh bìa ${chapter.comicName}`}
                               fill
                               sizes="100px"
@@ -277,9 +278,9 @@ export default function Chapters() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                    {/* <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {chapter.title}
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {chapter.chapterNumber}
                     </td>

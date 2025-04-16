@@ -6,6 +6,8 @@ export type Chapter = {
   chapterNumber: number;
   comicName: string;
   status: ChapterStatus;
+  domainCdn: string;
+  chapterPath: string;
   detailChapters: DetailChapter[];
   createdAt: string;
   updatedAt: string;
