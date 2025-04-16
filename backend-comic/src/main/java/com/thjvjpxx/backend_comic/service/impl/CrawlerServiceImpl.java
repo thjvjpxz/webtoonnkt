@@ -57,14 +57,23 @@ public class CrawlerServiceImpl implements CrawlerService {
     final GoogleDriveService googleDriveService;
     final DetailChapterRepository detailChapterRepository;
 
-    @Value("${crawler.otruyen-api-url}")
+    @Value("${crawler.otruyen.api-url}")
     String OTRUYEN_API_URL;
 
-    @Value("${crawler.otruyen-api-comic-detail}")
+    @Value("${crawler.otruyen.api-comic-detail}")
     String OTRUYEN_API_COMIC_DETAIL;
 
-    @Value("${crawler.otruyen-image-cdn}")
+    @Value("${crawler.otruyen.image-cdn}")
     String OTRUYEN_IMAGE_CDN;
+
+    @Value("${crawler.request.delay-ms:1000}")
+    int requestDelayMs;
+
+    @Value("${crawler.batch.size:5}")
+    int batchSize;
+
+    @Value("${crawler.batch.delay-ms:5000}")
+    int batchDelayMs;
 
     @Override
     @Transactional
@@ -72,9 +81,14 @@ public class CrawlerServiceImpl implements CrawlerService {
         try {
             List<Map<String, Object>> allResults = new ArrayList<>();
             RestTemplate restTemplate = new RestTemplate();
+            int comicProcessed = 0;
 
             for (int currentPage = request.getStartPage(); currentPage <= request.getEndPage(); currentPage++) {
                 log.info("Crawling page {} of {}", currentPage, request.getEndPage());
+
+                if (currentPage > request.getStartPage()) {
+                    Thread.sleep(batchDelayMs);
+                }
 
                 ResponseEntity<OTruyenResponse> responseEntity = restTemplate.getForEntity(
                         OTRUYEN_API_URL + currentPage, OTruyenResponse.class);
@@ -92,15 +106,15 @@ public class CrawlerServiceImpl implements CrawlerService {
                     continue;
                 }
 
-                // Chỉ lấy slug từ danh sách truyện
                 for (OTruyenComic comicSummary : comics) {
                     try {
+                        Thread.sleep(requestDelayMs);
+
                         String slug = comicSummary.getSlug();
                         if (slug == null || slug.isEmpty()) {
                             continue;
                         }
 
-                        // Gọi API chi tiết truyện trực tiếp với URL đầy đủ
                         ResponseEntity<OTruyenComicDetail> comicDetailResponse = restTemplate
                                 .getForEntity(OTRUYEN_API_COMIC_DETAIL + slug, OTruyenComicDetail.class);
 
@@ -112,6 +126,13 @@ public class CrawlerServiceImpl implements CrawlerService {
 
                         OTruyenComicDetail comicDetail = comicDetailResponse.getBody();
                         processComicWithChapters(comicDetail, request.isSaveDrive(), restTemplate);
+
+                        comicProcessed++;
+
+                        if (comicProcessed % batchSize == 0) {
+                            log.info("Processed {} comics, taking a break...", comicProcessed);
+                            Thread.sleep(batchDelayMs);
+                        }
                     } catch (Exception e) {
                         log.error("Failed to process comic with slug: " + comicSummary.getSlug(), e);
                         Map<String, Object> errorResult = new HashMap<>();
@@ -125,6 +146,10 @@ public class CrawlerServiceImpl implements CrawlerService {
             }
 
             return BaseResponse.success(allResults);
+        } catch (InterruptedException e) {
+            log.error("Crawling process was interrupted", e);
+            Thread.currentThread().interrupt();
+            throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             log.error("Failed to crawl comics", e);
             throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -133,10 +158,9 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     @Transactional
     private void processComicWithChapters(OTruyenComicDetail comicDetail, boolean isSaveDrive,
-            RestTemplate restTemplate) {
+            RestTemplate restTemplate) throws InterruptedException {
         ComicItem oTruyenComic = comicDetail.getData().getItem();
 
-        // Kiểm tra xem truyện đã tồn tại chưa
         String slug = StringUtils.generateSlug(oTruyenComic.getName());
         Optional<Comic> existingComicOptional = comicRepository.findBySlug(slug);
 
@@ -153,7 +177,6 @@ public class CrawlerServiceImpl implements CrawlerService {
             comic.setSlug(slug);
             comic.setOriginName(String.join(", ", oTruyenComic.getOrigin_name()));
 
-            // Xử lý status
             if ("ongoing".equals(oTruyenComic.getStatus())) {
                 comic.setStatus(ComicStatus.ONGOING);
             } else if ("completed".equals(oTruyenComic.getStatus())) {
@@ -162,19 +185,16 @@ public class CrawlerServiceImpl implements CrawlerService {
                 comic.setStatus(ComicStatus.COMING_SOON);
             }
 
-            // Xử lý thumbnail
             if (oTruyenComic.getThumb_url() != null && !oTruyenComic.getThumb_url().isEmpty()) {
                 String thumbnailUrl = OTRUYEN_IMAGE_CDN + "/uploads/comics/" + oTruyenComic.getThumb_url();
                 comic.setThumbUrl(thumbnailUrl);
 
-                // Chỉ tạo folder trên Google Drive nếu isSaveDrive là true
                 if (isSaveDrive) {
                     String folderId = googleDriveService.createFolder(slug, null);
                     comic.setFolderId(folderId);
                 }
             }
 
-            // Xử lý thể loại
             if (oTruyenComic.getCategory() != null && !oTruyenComic.getCategory().isEmpty()) {
                 Set<Category> categories = new HashSet<>();
                 List<String> categoryNames = new ArrayList<>();
@@ -182,7 +202,6 @@ public class CrawlerServiceImpl implements CrawlerService {
                 for (var oTruyenCategory : oTruyenComic.getCategory()) {
                     categoryNames.add(oTruyenCategory.getName());
 
-                    // Tìm category trong DB hoặc tạo mới
                     String categorySlug = StringUtils.generateSlug(oTruyenCategory.getName());
                     Optional<Category> existingCategory = categoryRepository.findBySlug(categorySlug);
 
@@ -206,17 +225,16 @@ public class CrawlerServiceImpl implements CrawlerService {
             log.info("Đã thêm truyện mới: {}, ID: {}", comic.getName(), comic.getId());
         }
 
-        processChapter(comicDetail, comic, restTemplate, isExistingComic);
+        Thread.sleep(requestDelayMs);
+        processChapters(comicDetail, comic, restTemplate, isExistingComic);
     }
 
     @Transactional
-    private void processChapter(OTruyenComicDetail comicDetail, Comic comic, RestTemplate restTemplate,
-            boolean isExistingComic) {
-        // Kiểm tra danh sách chapters có tồn tại và không rỗng
+    private void processChapters(OTruyenComicDetail comicDetail, Comic comic, RestTemplate restTemplate,
+            boolean isExistingComic) throws InterruptedException {
         List<OTruyenChapter> chapters = new ArrayList<>();
         if (comicDetail.getData().getItem().getChapters() != null &&
                 !comicDetail.getData().getItem().getChapters().isEmpty()) {
-            // Kiểm tra tiếp server_data có tồn tại không
             if (comicDetail.getData().getItem().getChapters().get(0) != null &&
                     comicDetail.getData().getItem().getChapters().get(0).getServer_data() != null) {
                 chapters = comicDetail.getData().getItem().getChapters().get(0).getServer_data();
@@ -229,7 +247,6 @@ public class CrawlerServiceImpl implements CrawlerService {
             return;
         }
 
-        // Nếu truyện đã tồn tại, tìm chapter có số lớn nhất
         Double latestChapterNumber = null;
         if (isExistingComic) {
             latestChapterNumber = chapterRepository.findMaxChapterNumberByComicId(comic.getId());
@@ -237,26 +254,17 @@ public class CrawlerServiceImpl implements CrawlerService {
                     latestChapterNumber != null ? latestChapterNumber : "Chưa có chapter");
         }
 
+        int chapterProcessed = 0;
         for (OTruyenChapter chapter : chapters) {
+            Thread.sleep(requestDelayMs);
+
             double chapterNumber;
             try {
-                // Chuyển đổi chapterName thành số thập phân
                 String chapterName = chapter.getChapter_name();
-                // Chuẩn hóa chuỗi số: thay thế dấu phẩy bằng dấu chấm nếu có
                 chapterName = chapterName.replace(',', '.');
                 chapterNumber = Double.parseDouble(chapterName);
 
-                // Nếu truyện đã tồn tại và chapter này nhỏ hơn hoặc bằng chapter mới nhất, bỏ
-                // qua
                 if (isExistingComic && latestChapterNumber != null && chapterNumber <= latestChapterNumber) {
-                    log.debug("Bỏ qua chapter {} vì đã tồn tại", chapterNumber);
-                    continue;
-                }
-
-                // Kiểm tra xem chapter đã tồn tại chưa để tránh trùng lặp
-                Optional<Chapter> existingChapter = chapterRepository.findByComicIdAndChapterNumber(comic.getId(),
-                        chapterNumber);
-                if (existingChapter.isPresent()) {
                     log.debug("Bỏ qua chapter {} vì đã tồn tại", chapterNumber);
                     continue;
                 }
@@ -265,37 +273,96 @@ public class CrawlerServiceImpl implements CrawlerService {
                 continue;
             }
 
-            String chapterApiData = chapter.getChapter_api_data();
+            processChapter(chapter, comic, restTemplate, latestChapterNumber, isExistingComic);
+
+            chapterProcessed++;
+
+            if (chapterProcessed % batchSize == 0) {
+                log.info("Processed {} chapters for comic {}, taking a break...",
+                        chapterProcessed, comic.getName());
+                Thread.sleep(batchDelayMs);
+            }
+        }
+    }
+
+    @Transactional
+    private void processChapter(OTruyenChapter chapter, Comic comic, RestTemplate restTemplate,
+            Double latestChapterNumber, boolean isExistingComic) throws InterruptedException {
+        double chapterNumber;
+        try {
+            String chapterName = chapter.getChapter_name();
+            chapterName = chapterName.replace(',', '.');
+            chapterNumber = Double.parseDouble(chapterName);
+
+            if (shouldSkipChapter(comic.getId(), chapterNumber, latestChapterNumber, isExistingComic)) {
+                return;
+            }
+        } catch (NumberFormatException e) {
+            log.error("Failed to parse chapter number: " + chapter.getChapter_name(), e);
+            return;
+        }
+
+        OTruyenChapterDetail chapterDetail = fetchChapterDetail(chapter.getChapter_api_data(), restTemplate);
+        if (chapterDetail == null) {
+            return;
+        }
+
+        Chapter chapterNew = saveNewChapter(chapter, chapterNumber, comic, chapterDetail);
+
+        List<ChapterImage> chapterImages = chapterDetail.getData().getItem().getChapter_image();
+        processChapterDetail(chapterImages, chapterNew);
+    }
+
+    private boolean shouldSkipChapter(String comicId, double chapterNumber,
+            Double latestChapterNumber, boolean isExistingComic) {
+        if (isExistingComic && latestChapterNumber != null && chapterNumber <= latestChapterNumber) {
+            log.debug("Bỏ qua chapter {} vì nhỏ hơn chương mới nhất", chapterNumber);
+            return true;
+        }
+
+        Optional<Chapter> existingChapter = chapterRepository.findByComicIdAndChapterNumber(comicId, chapterNumber);
+        if (existingChapter.isPresent()) {
+            log.debug("Bỏ qua chapter {} vì đã tồn tại", chapterNumber);
+            return true;
+        }
+
+        return false;
+    }
+
+    private OTruyenChapterDetail fetchChapterDetail(String chapterApiData, RestTemplate restTemplate) {
+        try {
             ResponseEntity<OTruyenChapterDetail> chapterDetailResponse = restTemplate
                     .getForEntity(chapterApiData, OTruyenChapterDetail.class);
 
             if (chapterDetailResponse.getStatusCode() != HttpStatus.OK || chapterDetailResponse.getBody() == null) {
                 log.error("Failed to fetch detail for chapter: {}", chapterApiData);
-                continue;
+                return null;
             }
 
-            String domainCdn = chapterDetailResponse.getBody().getData().getDomain_cdn();
-            String chapterPath = chapterDetailResponse.getBody().getData().getItem().getChapter_path();
-
-            Chapter chapterNew = Chapter.builder()
-                    .chapterNumber(chapterNumber)
-                    .title(chapter.getFilename())
-                    .status(ChapterStatus.FREE)
-                    .comic(comic)
-                    .domainCdn(domainCdn)
-                    .chapterPath(chapterPath)
-                    .build();
-            chapterRepository.save(chapterNew);
-            log.info("Đã thêm chapter mới: {} cho truyện: {}", chapterNumber, comic.getName());
-
-            List<ChapterImage> chapterImage = chapterDetailResponse
-                    .getBody()
-                    .getData()
-                    .getItem()
-                    .getChapter_image();
-
-            processChapterDetail(chapterImage, chapterNew);
+            return chapterDetailResponse.getBody();
+        } catch (Exception e) {
+            log.error("Error fetching chapter detail: {}", chapterApiData, e);
+            return null;
         }
+    }
+
+    private Chapter saveNewChapter(OTruyenChapter chapter, double chapterNumber, Comic comic,
+            OTruyenChapterDetail chapterDetail) {
+        String domainCdn = chapterDetail.getData().getDomain_cdn();
+        String chapterPath = chapterDetail.getData().getItem().getChapter_path();
+
+        Chapter chapterNew = Chapter.builder()
+                .chapterNumber(chapterNumber)
+                .title(chapter.getFilename())
+                .status(ChapterStatus.FREE)
+                .comic(comic)
+                .domainCdn(domainCdn)
+                .chapterPath(chapterPath)
+                .build();
+        chapterRepository.save(chapterNew);
+        log.info("Đã thêm chapter mới: {} cho truyện: {}", chapterNumber, comic.getName());
+
+        return chapterNew;
     }
 
     @Transactional
