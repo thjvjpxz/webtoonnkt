@@ -3,6 +3,7 @@ import { useChapter } from "@/hooks/useChapter";
 import { Chapter, ChapterCreateUpdate, ChapterStatus, DetailChapterCreateUpdate } from "@/types/chapter";
 import { ComicResponse } from "@/types/comic";
 import { toast } from "react-hot-toast";
+import { constructImageUrl } from "@/utils/helpers";
 
 export const useChapterModal = (
   isOpen: boolean,
@@ -58,10 +59,21 @@ export const useChapterModal = (
         // Load chapter images if in edit mode and chapter has images
         if (chapter.detailChapters && chapter.detailChapters.length > 0) {
           const sortedDetails = [...chapter.detailChapters].sort((a, b) => a.orderNumber - b.orderNumber);
-          const urls = sortedDetails.map(detail => detail.imgUrl);
+          const urls = sortedDetails.map(detail => {
+            // Đảm bảo URL là hợp lệ trước khi thêm vào danh sách
+            try {
+              const url = constructImageUrl(chapter, detail.imgUrl);
+              new URL(url); // Kiểm tra URL hợp lệ
+              return url;
+            } catch (error) {
+              console.error("URL không hợp lệ từ database:", detail.imgUrl);
+              console.error(error);
+              return null;
+            }
+          }).filter(url => url !== null) as string[];
+
           setPreviewUrls(urls);
-          setExistingImageUrls(urls); // Lưu lại URLs của ảnh đã có
-          // Không set images vì chúng ta không có file, chỉ có URL
+          setExistingImageUrls(urls);
         }
         setDeletedImageUrls([]);
       } else {
@@ -200,9 +212,20 @@ export const useChapterModal = (
 
   // Function kiểm tra URL hợp lệ
   const isValidImageUrl = (url: string): boolean => {
-    return url.trim() !== '' &&
-      (url.startsWith('http://') || url.startsWith('https://')) &&
-      /\.(jpg|jpeg|png|webp|gif|bmp)(\?.*)?$/i.test(url);
+    try {
+      // Thử tạo đối tượng URL để kiểm tra tính hợp lệ
+      new URL(url);
+
+      // Kiểm tra định dạng ảnh nếu URL hợp lệ
+      return url.trim() !== '' &&
+        (url.startsWith('http://') || url.startsWith('https://')) &&
+        /\.(jpg|jpeg|png|webp|gif|bmp)(\?.*)?$/i.test(url);
+    } catch (error) {
+      // URL không hợp lệ
+      console.error("URL không hợp lệ:", url);
+      console.error(error);
+      return false;
+    }
   };
 
   // Xử lý thêm link ảnh
@@ -240,17 +263,37 @@ export const useChapterModal = (
   const handleAddMultipleImageLinks = () => {
     if (!imageLink.trim()) return;
 
-    const links = imageLink
-      .split('\n')
-      .map(link => link.trim())
-      .filter(link => link !== '' && isValidImageUrl(link));
+    try {
+      const links = imageLink
+        .split('\n')
+        .map(link => link.trim())
+        .filter(link => {
+          try {
+            // Kiểm tra URL có hợp lệ
+            if (link === '') return false;
+            new URL(link);
+            return isValidImageUrl(link);
+          } catch (error) {
+            console.error("URL không hợp lệ trong danh sách:", link);
+            console.error(error);
+            return false;
+          }
+        });
 
-    if (links.length === 0) return;
+      if (links.length === 0) {
+        toast.error("Không có URL hợp lệ nào được thêm");
+        return;
+      }
 
-    // Thêm các link hợp lệ vào danh sách
-    setImageLinkList(prev => [...prev, ...links]);
-    setPreviewUrls(prev => [...prev, ...links]);
-    setImageLink(''); // Xóa textarea sau khi thêm
+      // Thêm các link hợp lệ vào danh sách
+      setImageLinkList(prev => [...prev, ...links]);
+      setPreviewUrls(prev => [...prev, ...links]);
+      setImageLink(''); // Xóa textarea sau khi thêm
+      toast.success(`Đã thêm ${links.length} hình ảnh`);
+    } catch (error) {
+      console.error("Lỗi khi xử lý URL hình ảnh:", error);
+      toast.error("Có lỗi xảy ra khi xử lý URL hình ảnh");
+    }
   };
 
   // Submit form

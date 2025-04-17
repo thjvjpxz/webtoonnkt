@@ -308,9 +308,7 @@ export default function ChapterModal({
                       {previewUrls.map((url, index) => (
                         <div
                           key={index}
-                          className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex
-                            ? 'border-green-400 dark:border-green-500 rounded-md'
-                            : 'border-transparent'
+                          className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex ? 'border-green-400 dark:border-green-500 rounded-md' : 'border-transparent'
                             }`}
                           draggable
                           onDragStart={(e) => handleDragStart(e, index)}
@@ -320,13 +318,13 @@ export default function ChapterModal({
                           onDrop={(e) => handleDrop(e, index)}
                           onDragEnd={handleDragEnd}
                         >
-                          <div className="aspect-w-2 aspect-h-3 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
+                          <div className="relative w-full pt-[150%] rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                             <Image
                               src={url}
                               alt={`Preview ${index}`}
                               fill
                               sizes="100%"
-                              className="object-cover w-full h-full"
+                              className="object-cover absolute inset-0"
                             />
                           </div>
                           <button

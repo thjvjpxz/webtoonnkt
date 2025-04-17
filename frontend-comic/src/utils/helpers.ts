@@ -10,7 +10,6 @@ export const formatDate = (date: string) => {
   });
 };
 
-// Helper function to construct chapter image URL based on available data
 export const constructImageUrl = (chapter: Chapter, imgUrl: string) => {
   if (!chapter.domainCdn || !chapter.chapterPath) {
     return imgUrl;
