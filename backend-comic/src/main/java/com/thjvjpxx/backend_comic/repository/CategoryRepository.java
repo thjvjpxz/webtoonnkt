@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -18,4 +19,6 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
     Optional<Category> findBySlug(String slug);
 
     Optional<Category> findByName(String name);
+
+    List<Category> findAllBySlugIn(List<String> slugs);
 }

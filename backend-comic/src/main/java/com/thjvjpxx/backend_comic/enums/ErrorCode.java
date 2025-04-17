@@ -51,6 +51,9 @@ public enum ErrorCode {
     DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh chapter không được trống!"),
     DETAIL_CHAPTER_IMAGE_URL_NOT_EMPTY(HttpStatus.BAD_REQUEST, "URL ảnh chapter không được trống!"),
 
+    // Crawler
+    CRAWLER_NOT_FOUND(HttpStatus.NOT_FOUND, "Tiến trình crawl không tồn tại!"),
+
     // Handle File
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "File không tồn tại!"),
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST, "Tham số không hợp lệ!"),

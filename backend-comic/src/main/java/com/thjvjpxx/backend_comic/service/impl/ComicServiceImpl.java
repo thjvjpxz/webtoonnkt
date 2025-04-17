@@ -124,6 +124,9 @@ public class ComicServiceImpl implements ComicService {
         if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
                 && !comicRequest.getSlug().equals(comic.getSlug())) {
             validateComicRequest(comicRequest);
+            if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
+                googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
+            }
         }
 
         String thumbUrl = comic.getThumbUrl();
@@ -137,8 +140,6 @@ public class ComicServiceImpl implements ComicService {
             }
             thumbUrl = response.getMessage();
         }
-
-        googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
 
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
