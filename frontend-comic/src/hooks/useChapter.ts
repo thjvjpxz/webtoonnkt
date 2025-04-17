@@ -47,7 +47,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, comicFilter]);
+  }, [currentPage, searchTerm, comicFilter, pageSize]);
 
   // Fetch comic options
   const fetchComicOptions = useCallback(async (
@@ -71,7 +71,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
         }
         toast.error(response.message || "Không thể tải danh sách truyện");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
       toast.error(errorMessage || "Đã xảy ra lỗi khi tải danh sách truyện");
       if (page === 1) {
@@ -138,7 +138,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
           toast.error("Thêm chương thất bại! " + response.message);
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
       toast.error(chapterRequest.id ? "Cập nhật chương thất bại! " : "Thêm chương thất bại! " + errorMessage);
     }

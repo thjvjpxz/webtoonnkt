@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,14 +55,17 @@ public class ChapterServiceImpl implements ChapterService {
         int originalPage = page;
 
         Page<Chapter> chapters = null;
+        Sort sort = Sort.by(Sort.Direction.ASC, "chapterNumber");
+        PageRequest pageWithSort = PageRequest.of(pageForQuery.getPageNumber(), pageForQuery.getPageSize(), sort);
+
         if (search != null && !search.isEmpty() && comicId != null && !comicId.isEmpty()) {
-            chapters = chapterRepository.findByTitleContainingAndComicId(search, comicId, pageForQuery);
+            chapters = chapterRepository.findByTitleContainingAndComicId(search, comicId, pageWithSort);
         } else if (search != null && !search.isEmpty()) {
-            chapters = chapterRepository.findByTitleContaining(search, pageForQuery);
+            chapters = chapterRepository.findByTitleContaining(search, pageWithSort);
         } else if (comicId != null && !comicId.isEmpty()) {
-            chapters = chapterRepository.findByComicId(comicId, pageForQuery);
+            chapters = chapterRepository.findByComicId(comicId, pageWithSort);
         } else {
-            chapters = chapterRepository.findAll(pageForQuery);
+            chapters = chapterRepository.findAll(pageWithSort);
         }
 
         List<Chapter> chapterList = chapters.getContent();
@@ -355,7 +360,8 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
 
-        if (chapter.getDetailChapters().size() > 0) {
+        if (chapter.getDetailChapters().size() > 0
+                && (chapter.getDomainCdn() == null || chapter.getChapterPath() == null)) {
             String folderName = String.format("chapter-%s", chapter.getChapterNumber());
             String folderId = googleDriveService.getFileId(folderName, chapter.getComic().getFolderId());
             if (folderId != null) {

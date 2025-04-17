@@ -21,12 +21,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "chapters")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Chapter {
 
@@ -37,8 +43,14 @@ public class Chapter {
 
     String title;
 
+    @Column(name = "domain_cdn")
+    String domainCdn;
+
+    @Column(name = "chapter_path")
+    String chapterPath;
+
     @Column(name = "chapter_number")
-    int chapterNumber;
+    double chapterNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

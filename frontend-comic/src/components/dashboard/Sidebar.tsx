@@ -14,6 +14,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiAward,
+  FiDownload,
 } from "react-icons/fi";
 import { SidebarProps } from "@/types/dashboard";
 
@@ -47,7 +48,7 @@ export default function Sidebar({
     {
       path: "/dashboard/chapters",
       icon: <FiFileText size={20} />,
-      label: "Quản lý chapter",
+      label: "Quản lý chương",
     },
     {
       path: "/dashboard/users",
@@ -58,6 +59,11 @@ export default function Sidebar({
       path: "/dashboard/comments",
       icon: <FiMessageSquare size={20} />,
       label: "Bình luận",
+    },
+    {
+      path: "/dashboard/crawler",
+      icon: <FiDownload size={20} />,
+      label: "Crawler Truyện",
     },
     {
       path: "/dashboard/settings",
@@ -94,7 +100,7 @@ export default function Sidebar({
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar">
         <ul className="space-y-2 px-3">
           {navItems.map((item) => (
             <li key={item.path}>

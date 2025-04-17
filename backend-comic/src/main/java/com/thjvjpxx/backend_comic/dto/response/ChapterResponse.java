@@ -23,6 +23,8 @@ public class ChapterResponse {
     String title;
     Integer chapterNumber;
     String comicName;
+    String domainCdn;
+    String chapterPath;
     List<DetailChapterResponse> detailChapters;
     String createdAt;
     String updatedAt;

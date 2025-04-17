@@ -62,8 +62,12 @@ export const useCategory = (initialPage = 1, pageSize = 5) => {
             } else {
                 toast.error(response.message || "Không thể thêm thể loại");
             }
-        } catch (error: any) {
-            toast.error(error?.error || "Đã xảy ra lỗi khi thêm thể loại");
+        } catch (error: unknown) {
+            const errorMessage =
+                error && typeof error === "object" && "error" in error
+                    ? (error.error as string)
+                    : "Đã xảy ra lỗi";
+            toast.error(errorMessage || "Đã xảy ra lỗi khi thêm thể loại");
             setIsModalOpen(false);
         }
     };
@@ -82,8 +86,12 @@ export const useCategory = (initialPage = 1, pageSize = 5) => {
             } else {
                 toast.error(response.message || "Không thể cập nhật thể loại");
             }
-        } catch (error: any) {
-            toast.error(error?.error || "Đã xảy ra lỗi khi cập nhật thể loại");
+        } catch (error: unknown) {
+            const errorMessage =
+                error && typeof error === "object" && "error" in error
+                    ? (error.error as string)
+                    : "Đã xảy ra lỗi";
+            toast.error(errorMessage || "Đã xảy ra lỗi khi cập nhật thể loại");
             setIsModalOpen(false);
         }
     };
@@ -102,8 +110,12 @@ export const useCategory = (initialPage = 1, pageSize = 5) => {
             } else {
                 toast.error(response.message || "Không thể xóa thể loại");
             }
-        } catch (error: any) {
-            toast.error(error?.error || "Đã xảy ra lỗi khi xóa thể loại");
+        } catch (error: unknown) {
+            const errorMessage =
+                error && typeof error === "object" && "error" in error
+                    ? (error.error as string)
+                    : "Đã xảy ra lỗi";
+            toast.error(errorMessage || "Đã xảy ra lỗi khi xóa thể loại");
             setIsDeleteModalOpen(false);
         }
     };

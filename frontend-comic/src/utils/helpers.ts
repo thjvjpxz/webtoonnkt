@@ -1,3 +1,4 @@
+import { Chapter } from "@/types/chapter";
 
 export const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("vi-VN", {
@@ -7,4 +8,12 @@ export const formatDate = (date: string) => {
     hour: "2-digit",
     minute: "2-digit"
   });
+};
+
+// Helper function to construct chapter image URL based on available data
+export const constructImageUrl = (chapter: Chapter, imgUrl: string) => {
+  if (!chapter.domainCdn || !chapter.chapterPath) {
+    return imgUrl;
+  }
+  return `${chapter.domainCdn}/${chapter.chapterPath}/${imgUrl}`;
 };

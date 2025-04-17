@@ -14,6 +14,7 @@ import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
@@ -123,6 +124,9 @@ public class ComicServiceImpl implements ComicService {
         if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
                 && !comicRequest.getSlug().equals(comic.getSlug())) {
             validateComicRequest(comicRequest);
+            if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
+                googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
+            }
         }
 
         String thumbUrl = comic.getThumbUrl();
@@ -137,8 +141,6 @@ public class ComicServiceImpl implements ComicService {
             thumbUrl = response.getMessage();
         }
 
-        googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
-
         List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
 
         comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
@@ -148,7 +150,7 @@ public class ComicServiceImpl implements ComicService {
         comic.setName(comicRequest.getName());
         comic.setDescription(comicRequest.getDescription());
         comic.setAuthor(comicRequest.getAuthor());
-        comic.setStatus(comicRequest.getStatus());
+        comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
         comic.setThumbUrl(thumbUrl);
         comic.setOriginName(comicRequest.getOriginName());
 

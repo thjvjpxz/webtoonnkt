@@ -25,6 +25,17 @@ app:
   cors:
     allowed-origins: http://localhost:3000
 
+crawler:
+  otruyen:
+    api-url: https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=
+    api-comic-detail: https://otruyenapi.com/v1/api/truyen-tranh/
+    image-cdn: https://img.otruyenapi.com
+  request:
+    delay-ms: 0
+  batch:
+    size: 5
+    delay-ms: 0
+
 google-drive:
   folder-id: 1H89l7BIVVNR3byETuuqZp2OXJpbSsT2R
 

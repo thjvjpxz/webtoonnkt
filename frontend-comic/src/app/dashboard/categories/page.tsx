@@ -42,155 +42,153 @@ export default function Categories() {
 
   return (
     <DashboardLayout title="Quản lý thể loại">
-      <div className="bg-white rounded-lg shadow-sm p-6 dark:bg-gray-800">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <form onSubmit={handleSearch} className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm thể loại..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-            />
-            <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
-            <button type="submit" className="hidden">
-              Tìm kiếm
-            </button>
-          </form>
-
-          <button
-            onClick={handleOpenAddModal}
-            className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
-          >
-            <FiPlus size={18} />
-            <span>Thêm thể loại mới</span>
-          </button>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 border-b border-green-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              Danh sách thể loại
-            </h2>
-          </div>
-
-          {isLoading ? (
-            <div className="p-8 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-            </div>
-          ) : error ? (
-            <div className="p-8 text-center text-rose-500 flex flex-col items-center">
-              <FiAlertCircle size={40} className="mb-2" />
-              <p>{error}</p>
-              <button
-                onClick={handleSearch}
-                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
-              >
-                Thử lại
-              </button>
-            </div>
-          ) : categories.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-              Không tìm thấy thể loại nào
-            </div>
-          ) : (
-            <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full">
-                <thead className="bg-green-50 dark:bg-green-900/30">
-                  <tr>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                      Tên thể loại
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                      Mô tả
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                      Ngày tạo
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                      Ngày sửa
-                    </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                      Thao tác
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-green-100 dark:divide-gray-700">
-                  {categories.map((category) => (
-                    <tr
-                      key={category.id}
-                      className="hover:bg-green-50/50 dark:hover:bg-green-900/10"
-                    >
-                      <td className="text-center px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-800 dark:text-gray-200">
-                          {category.name}
-                        </div>
-                      </td>
-                      <td className="text-center px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
-                        {category.description}
-                      </td>
-                      <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                        {formatDate(category.createdAt)}
-                      </td>
-                      <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                        {formatDate(category.updatedAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex justify-center space-x-2">
-                          <button
-                            onClick={() => handleOpenEditModal(category)}
-                            className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
-                            aria-label="Sửa thể loại"
-                            title="Sửa"
-                          >
-                            <FiEdit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleOpenDeleteModal(category)}
-                            className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
-                            aria-label="Xoá thể loại"
-                            title="Xóa"
-                          >
-                            <FiTrash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {!isLoading && !error && categories.length > 0 && (
-            <div className="p-4 border-t border-green-100 dark:border-gray-700">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Modal thêm/sửa thể loại */}
-        {isModalOpen && (
-          <CategoryModal
-            category={currentCategory}
-            onClose={handleCloseModal}
-            onSave={currentCategory ? handleUpdateCategory : handleAddCategory}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <form onSubmit={handleSearch} className="relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm thể loại..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
           />
+          <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
+          <button type="submit" className="hidden">
+            Tìm kiếm
+          </button>
+        </form>
+
+        <button
+          onClick={handleOpenAddModal}
+          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+        >
+          <FiPlus size={18} />
+          <span>Thêm thể loại mới</span>
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 border-b border-green-100 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Danh sách thể loại
+          </h2>
+        </div>
+
+        {isLoading ? (
+          <div className="p-8 flex justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center text-rose-500 flex flex-col items-center">
+            <FiAlertCircle size={40} className="mb-2" />
+            <p>{error}</p>
+            <button
+              onClick={handleSearch}
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
+            >
+              Thử lại
+            </button>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+            Không tìm thấy thể loại nào
+          </div>
+        ) : (
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full">
+              <thead className="bg-green-50 dark:bg-green-900/30">
+                <tr>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
+                    Tên thể loại
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
+                    Mô tả
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
+                    Ngày tạo
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
+                    Ngày sửa
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-green-100 dark:divide-gray-700">
+                {categories.map((category) => (
+                  <tr
+                    key={category.id}
+                    className="hover:bg-green-50/50 dark:hover:bg-green-900/10"
+                  >
+                    <td className="text-center px-6 py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-800 dark:text-gray-200">
+                        {category.name}
+                      </div>
+                    </td>
+                    <td className="text-center px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
+                      {category.description}
+                    </td>
+                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {formatDate(category.createdAt)}
+                    </td>
+                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {formatDate(category.updatedAt)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleOpenEditModal(category)}
+                          className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
+                          aria-label="Sửa thể loại"
+                          title="Sửa"
+                        >
+                          <FiEdit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleOpenDeleteModal(category)}
+                          className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
+                          aria-label="Xoá thể loại"
+                          title="Xóa"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
-        {/* Modal xác nhận xóa */}
-        {isDeleteModalOpen && currentCategory && (
-          <DeleteConfirmModal
-            categoryName={currentCategory.name}
-            onClose={handleCloseDeleteModal}
-            onConfirm={handleDeleteCategory}
-          />
+        {!isLoading && !error && categories.length > 0 && (
+          <div className="p-4 border-t border-green-100 dark:border-gray-700">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
+
+      {/* Modal thêm/sửa thể loại */}
+      {isModalOpen && (
+        <CategoryModal
+          category={currentCategory}
+          onClose={handleCloseModal}
+          onSave={currentCategory ? handleUpdateCategory : handleAddCategory}
+        />
+      )}
+
+      {/* Modal xác nhận xóa */}
+      {isDeleteModalOpen && currentCategory && (
+        <DeleteConfirmModal
+          categoryName={currentCategory.name}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleDeleteCategory}
+        />
+      )}
     </DashboardLayout>
   );
 }

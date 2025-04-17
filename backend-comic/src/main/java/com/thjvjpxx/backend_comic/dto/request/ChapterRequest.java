@@ -22,7 +22,7 @@ public class ChapterRequest {
     ChapterStatus status;
 
     @Min(value = 0, message = "CHAPTER_NUMBER_NOT_MIN")
-    int chapterNumber;
+    double chapterNumber;
 
     @NotBlank(message = "CHAPTER_COMIC_ID_NOT_EMPTY")
     String comicId;

@@ -46,16 +46,16 @@ export default function ComicModal({
   useEffect(() => {
     if (comic) {
       setFormData({
-        name: comic.name,
-        slug: comic.slug,
-        description: comic.description,
-        author: comic.author,
-        thumbUrl: comic.thumbUrl,
-        status: comic.status,
-        originName: comic.originName ? comic.originName : "",
-        categories: comic.categories.map((cat) => cat.id),
+        name: comic.name || "",
+        slug: comic.slug || "",
+        description: comic.description || "",
+        author: comic.author || "",
+        thumbUrl: comic.thumbUrl || "",
+        status: comic.status || "ongoing",
+        originName: comic.originName || "",
+        categories: comic.categories?.map((cat) => cat.id) || [],
       });
-      setPreviewImage(comic.thumbUrl);
+      setPreviewImage(comic.thumbUrl || "");
 
       // Nếu có thumbUrl, đặt phương thức tải lên là URL
       if (comic.thumbUrl) {
@@ -627,7 +627,7 @@ export default function ComicModal({
 
                 {/* Dropdown danh sách thể loại */}
                 {isCategoryDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar">
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar text-white">
                     {categories
                       .filter(
                         (cat) =>
