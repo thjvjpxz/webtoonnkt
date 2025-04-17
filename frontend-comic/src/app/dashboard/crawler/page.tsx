@@ -56,7 +56,7 @@ export default function CrawlerPage() {
     };
 
     return (
-        <DashboardLayout title="Crawler">
+        <DashboardLayout title="Crawler truyện từ nguồn Otruyen">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="bg-green-50 dark:bg-gray-800 p-4 rounded-lg border border-green-200 dark:border-gray-600">
                     <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">
