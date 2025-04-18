@@ -1,4 +1,6 @@
+import Button from "@/components/ui/Button";
 import { ViewComicModalProps } from "@/types/comic";
+import { formatDate } from "@/utils/helpers";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 
@@ -105,26 +107,14 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
               <div className="mb-3">
                 <span className="font-medium text-gray-700 dark:text-gray-300">Ngày tạo:</span>{" "}
                 <span className="text-gray-600 dark:text-gray-400">
-                  {new Date(comic.createdAt).toLocaleDateString("vi-VN", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDate(comic.createdAt)}
                 </span>
               </div>
 
               <div className="mb-3">
                 <span className="font-medium text-gray-700 dark:text-gray-300">Cập nhật:</span>{" "}
                 <span className="text-gray-600 dark:text-gray-400">
-                  {new Date(comic.updatedAt).toLocaleDateString("vi-VN", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatDate(comic.updatedAt)}
                 </span>
               </div>
             </div>
@@ -143,12 +133,13 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
         </div>
 
         <div className="flex justify-end p-6 border-t border-green-100 dark:border-gray-700">
-          <button
+          <Button
             onClick={onClose}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+            variant="secondary"
+            size="md"
           >
             Đóng
-          </button>
+          </Button>
         </div>
       </div>
     </div>

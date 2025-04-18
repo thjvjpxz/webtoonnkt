@@ -25,6 +25,8 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [currentComic, setCurrentComic] = useState<ComicResponse | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   // Lấy danh sách thể loại
   const fetchCategories = useCallback(async () => {
@@ -144,7 +146,7 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
   // Xử lý xóa truyện
   const handleDeleteComic = async () => {
     if (!currentComic) return;
-
+    setIsDeleting(true);
     try {
       const response = await deleteComic(currentComic.id);
 
@@ -161,6 +163,8 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
           ? (error.error as string)
           : "Đã xảy ra lỗi";
       toast.error(errorMessage || "Đã xảy ra lỗi khi xóa truyện");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -213,6 +217,7 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     categoryFilter,
     totalPages,
     isViewModalOpen,
+    isDeleting,
 
     // Actions
     setCurrentPage,

@@ -3,6 +3,7 @@
 import { FiAlertTriangle } from "react-icons/fi";
 import { DeleteConfirmModalProps } from "@/types/category";
 import { useState } from "react";
+import Button from "@/components/ui/Button";
 
 
 export default function DeleteConfirmModal({
@@ -41,27 +42,23 @@ export default function DeleteConfirmModal({
           </p>
 
           <div className="flex justify-center space-x-3">
-            <button
+            <Button
+              variant="secondary"
               onClick={onClose}
               disabled={isDeleting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="md"
             >
               Hủy
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="danger"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              size="md"
+              isLoading={isDeleting}
             >
-              {isDeleting ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  <span className="ml-2">Đang xóa...</span>
-                </>
-              ) : (
-                "Xóa"
-              )}
-            </button>
+              Xoá
+            </Button>
           </div>
         </div>
       </div>

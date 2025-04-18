@@ -14,6 +14,7 @@ import Pagination from "@/components/dashboard/Pagination";
 import "@/styles/scrollbar.css";
 import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
+import Button from "@/components/ui/Button";
 
 export default function Categories() {
   const {
@@ -57,13 +58,16 @@ export default function Categories() {
           </button>
         </form>
 
-        <button
+        <Button
+          variant="success"
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+          aria-label="Thêm thể loại mới"
+          title="Thêm thể loại mới"
+          icon={<FiPlus size={18} />}
+          size="md"
         >
-          <FiPlus size={18} />
           <span>Thêm thể loại mới</span>
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
@@ -81,12 +85,13 @@ export default function Categories() {
           <div className="p-8 text-center text-rose-500 flex flex-col items-center">
             <FiAlertCircle size={40} className="mb-2" />
             <p>{error}</p>
-            <button
+            <Button
+              variant="success"
               onClick={handleSearch}
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
+              className="mt-4"
             >
               Thử lại
-            </button>
+            </Button>
           </div>
         ) : categories.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -136,22 +141,22 @@ export default function Categories() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex justify-center space-x-2">
-                        <button
+                        <Button
+                          variant="edit"
                           onClick={() => handleOpenEditModal(category)}
-                          className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
                           aria-label="Sửa thể loại"
                           title="Sửa"
-                        >
-                          <FiEdit size={16} />
-                        </button>
-                        <button
+                          icon={<FiEdit size={18} />}
+                          size="xs"
+                        />
+                        <Button
+                          variant="delete"
                           onClick={() => handleOpenDeleteModal(category)}
-                          className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
                           aria-label="Xoá thể loại"
                           title="Xóa"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
+                          icon={<FiTrash2 size={18} />}
+                          size="xs"
+                        />
                       </div>
                     </td>
                   </tr>

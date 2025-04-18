@@ -1,6 +1,7 @@
 import { FiAlertTriangle } from "react-icons/fi";
 import { DeleteChapterModalProps } from "@/types/chapter";
 import { useState } from "react";
+import Button from "@/components/ui/Button";
 
 export default function DeleteChapterModal({
   isOpen,
@@ -44,27 +45,23 @@ export default function DeleteChapterModal({
         </div>
 
         <div className="flex justify-center p-4 gap-4">
-          <button
+          <Button
+            variant="secondary"
             onClick={onClose}
             disabled={isDeleting}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            size="md"
           >
             Hủy
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+            size="md"
+            isLoading={isDeleting}
           >
-            {isDeleting ? (
-              <>
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                <span>Đang xóa...</span>
-              </>
-            ) : (
-              <span>Xóa</span>
-            )}
-          </button>
+            Xoá
+          </Button>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { FiX } from "react-icons/fi";
 import { CategoryCreateUpdate } from "@/types/category";
 import { generateSlug } from "@/utils/string";
 import { CategoryModalProps } from "@/types/category";
+import Button from "@/components/ui/Button";
 
 export default function CategoryModal({
   category,
@@ -167,30 +168,24 @@ export default function CategoryModal({
           </div>
 
           <div className="flex justify-end space-x-3">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="md"
             >
               Hủy
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              variant="success"
+              size="md"
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  <span className="ml-2">
-                    {category ? "Đang cập nhật..." : "Đang thêm mới..."}
-                  </span>
-                </>
-              ) : (
-                category ? "Cập nhật" : "Thêm mới"
-              )}
-            </button>
+              {category ? "Cập nhật" : "Thêm mới"}
+            </Button>
           </div>
         </form>
       </div>
