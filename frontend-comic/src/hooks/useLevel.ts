@@ -37,12 +37,17 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
   const [levelTypes, setLevelTypes] = useState<LevelTypeResponse[]>([]);
   const [levelTypeSearchTerm, setLevelTypeSearchTerm] = useState("");
   const [isLevelTypeModalOpen, setIsLevelTypeModalOpen] = useState(false);
-  const [currentLevelType, setCurrentLevelType] = useState<LevelTypeResponse | null>(null);
-  const [filteredLevelTypes, setFilteredLevelTypes] = useState<LevelTypeResponse[]>([]);
+  const [currentLevelType, setCurrentLevelType] =
+    useState<LevelTypeResponse | null>(null);
+  const [filteredLevelTypes, setFilteredLevelTypes] = useState<
+    LevelTypeResponse[]
+  >([]);
 
   // Trạng thái modal xóa
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteItemType, setDeleteItemType] = useState<"level" | "level-type">("level");
+  const [deleteItemType, setDeleteItemType] = useState<"level" | "level-type">(
+    "level"
+  );
   const [deleteItemName, setDeleteItemName] = useState("");
   const [deleteItemId, setDeleteItemId] = useState("");
 
@@ -54,7 +59,11 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
     setError(null);
 
     try {
-      const response = await getAllLevels(levelCurrentPage, pageSize, levelSearchTerm);
+      const response = await getAllLevels(
+        levelCurrentPage,
+        pageSize,
+        levelSearchTerm
+      );
 
       if (response.status === 200 && response.data) {
         setLevels(response.data);
@@ -65,7 +74,10 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
         toast.error(response.message || "Không thể tải danh sách level");
       }
     } catch (error: unknown) {
-      const errorMessage = error && typeof error === "object" && "message" in error ? (error.message as string) : "Đã xảy ra lỗi khi tải danh sách level";
+      const errorMessage =
+        error && typeof error === "object" && "message" in error
+          ? (error.message as string)
+          : "Đã xảy ra lỗi khi tải danh sách level";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -96,7 +108,10 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       }
     } catch (error: unknown) {
       if (activeTab === "levelType") {
-        const errorMessage = error && typeof error === "object" && "message" in error ? (error.message as string) : "Đã xảy ra lỗi khi tải danh sách loại level";
+        const errorMessage =
+          error && typeof error === "object" && "message" in error
+            ? (error.message as string)
+            : "Đã xảy ra lỗi khi tải danh sách loại level";
         setError(errorMessage);
         toast.error(errorMessage);
       }
@@ -147,7 +162,11 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
         toast.error(response.message || "Không thể thêm loại level");
       }
     } catch (error: unknown) {
-      toast.error(error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi khi thêm loại level");
+      toast.error(
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi khi thêm loại level"
+      );
       setIsLevelTypeModalOpen(false);
     }
   };
@@ -167,7 +186,11 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
         toast.error(response.message || "Không thể cập nhật loại level");
       }
     } catch (error: unknown) {
-      toast.error(error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi khi cập nhật loại level");
+      toast.error(
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi khi cập nhật loại level"
+      );
       setIsLevelTypeModalOpen(false);
     }
   };
@@ -185,7 +208,11 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
         toast.error(response.message || "Không thể thêm level");
       }
     } catch (error: unknown) {
-      toast.error(error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi khi thêm level");
+      toast.error(
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi khi thêm level"
+      );
       setIsLevelModalOpen(false);
     }
   };
@@ -205,7 +232,11 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       }
       setIsLevelModalOpen(false);
     } catch (error: unknown) {
-      toast.error(error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi khi cập nhật level");
+      toast.error(
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi khi cập nhật level"
+      );
       setIsLevelModalOpen(false);
     }
   };
@@ -222,18 +253,33 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
       }
 
       if (response.status === 200) {
-        toast.success(`Xóa ${deleteItemType === "level" ? "level" : "loại level"} thành công`);
+        toast.success(
+          `Xóa ${
+            deleteItemType === "level" ? "level" : "loại level"
+          } thành công`
+        );
         if (deleteItemType === "level") {
           fetchLevels();
         } else {
           fetchLevelTypes();
         }
       } else {
-        toast.error(response.message || `Không thể xóa ${deleteItemType === "level" ? "level" : "loại level"}`);
+        toast.error(
+          response.message ||
+            `Không thể xóa ${
+              deleteItemType === "level" ? "level" : "loại level"
+            }`
+        );
       }
       setIsDeleteModalOpen(false);
     } catch (error: unknown) {
-      toast.error(error && typeof error === "object" && "error" in error ? (error.error as string) : `Đã xảy ra lỗi khi xóa ${deleteItemType === "level" ? "level" : "loại level"}`);
+      toast.error(
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : `Đã xảy ra lỗi khi xóa ${
+              deleteItemType === "level" ? "level" : "loại level"
+            }`
+      );
       setIsDeleteModalOpen(false);
     }
   };
@@ -357,4 +403,4 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
     handleSubmitLevelType,
     handleDelete,
   };
-} 
+};
