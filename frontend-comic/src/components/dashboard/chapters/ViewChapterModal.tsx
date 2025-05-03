@@ -2,6 +2,7 @@ import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
+import Button from "@/components/ui/Button";
 
 export default function ViewChapterModal({
   isOpen,
@@ -89,12 +90,13 @@ export default function ViewChapterModal({
         </div>
 
         <div className="flex justify-end p-4 border-t border-gray-200 dark:border-gray-700">
-          <button
+          <Button
+            variant="secondary"
             onClick={onClose}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+            size="md"
           >
             Đóng
-          </button>
+          </Button>
         </div>
       </div>
     </div>

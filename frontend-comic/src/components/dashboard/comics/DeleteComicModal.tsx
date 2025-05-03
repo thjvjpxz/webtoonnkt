@@ -2,12 +2,13 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 import { DeleteComicModalProps } from "@/types/comic";
-
+import Button from "@/components/ui/Button";
 
 export default function DeleteComicModal({
   comicTitle,
   onClose,
   onConfirm,
+  isDeleting,
 }: DeleteComicModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -28,18 +29,21 @@ export default function DeleteComicModal({
           </p>
 
           <div className="flex justify-center space-x-3">
-            <button
+            <Button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+              variant="secondary"
+              size="md"
             >
               Hủy
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={onConfirm}
-              className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600 cursor-pointer"
+              variant="danger"
+              size="md"
+              isLoading={isDeleting}
             >
               Xóa
-            </button>
+            </Button>
           </div>
         </div>
       </div>

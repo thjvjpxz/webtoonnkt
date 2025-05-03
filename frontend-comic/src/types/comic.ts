@@ -3,6 +3,7 @@ export type DeleteComicModalProps = {
   comicTitle: string;
   onClose: () => void;
   onConfirm: () => void;
+  isDeleting: boolean;
 };
 
 export type ViewComicModalProps = {

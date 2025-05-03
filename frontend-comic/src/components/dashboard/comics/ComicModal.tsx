@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/ui/Button";
 import "@/styles/scrollbar.css";
 import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
@@ -436,24 +437,18 @@ export default function ComicModal({
                               </button>
                             )}
                           </div>
-                          <button
+                          <Button
                             type="button"
+                            variant="success"
                             onClick={handleImageUrlSubmit}
                             disabled={!imageUrl.trim() || isUploading}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-green-700 dark:hover:bg-green-600 transition-colors cursor-pointer"
+                            size="md"
+                            className="w-full"
+                            isLoading={isUploading}
                           >
-                            {isUploading ? (
-                              <>
-                                <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Đang xử lý...
-                              </>
-                            ) : (
-                              <>
-                                <FiCheck className="mr-2" size={16} />
-                                Sử dụng URL này
-                              </>
-                            )}
-                          </button>
+                            <FiCheck className="mr-2" size={16} />
+                            Sử dụng URL này
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -663,30 +658,24 @@ export default function ComicModal({
           </div>
 
           <div className="flex justify-end space-x-3 mt-6">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              size="md"
             >
               Hủy
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              variant="success"
+              size="md"
+              isLoading={isSubmitting}
             >
-              {isSubmitting ? (
-                <>
-                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  {comic ? "Đang cập nhật..." : "Đang thêm..."}
-                </>
-              ) : comic ? (
-                "Cập nhật"
-              ) : (
-                "Thêm mới"
-              )}
-            </button>
+              {comic ? "Cập nhật" : "Thêm mới"}
+            </Button>
           </div>
         </form>
       </div>

@@ -15,6 +15,7 @@ import LevelTypeModal from "@/components/dashboard/levels/LevelTypeModal";
 import { formatDate } from "@/utils/helpers";
 import { useLevel } from "@/hooks/useLevel";
 import DeleteLevelModal from "@/components/dashboard/levels/DeleteLevelModal";
+import Button from "@/components/ui/Button";
 
 export default function Levels() {
   const {
@@ -111,13 +112,16 @@ export default function Levels() {
               </button>
             </form>
 
-            <button
+            <Button
+              variant="success"
               onClick={handleOpenAddLevelModal}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+              aria-label="Thêm level mới"
+              title="Thêm level mới"
+              icon={<FiPlus size={18} />}
+              size="md"
             >
-              <FiPlus size={18} />
               <span>Thêm level mới</span>
-            </button>
+            </Button>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
@@ -135,12 +139,13 @@ export default function Levels() {
               <div className="p-8 text-center text-rose-500 flex flex-col items-center">
                 <FiAlertCircle size={40} className="mb-2" />
                 <p>{error}</p>
-                <button
+                <Button
                   onClick={fetchLevels}
-                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
+                  variant="success"
+                  className="mt-4"
                 >
                   Thử lại
-                </button>
+                </Button>
               </div>
             ) : levels.length === 0 ? (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -224,20 +229,20 @@ export default function Levels() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="flex justify-center space-x-2">
-                            <button
+                            <Button
+                              variant="edit"
+                              size="xs"
+                              icon={<FiEdit size={18} />}
                               onClick={() => handleOpenEditLevelModal(level)}
-                              className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
                               title="Sửa"
-                            >
-                              <FiEdit size={16} />
-                            </button>
-                            <button
+                            />
+                            <Button
+                              variant="delete"
+                              size="xs"
+                              icon={<FiTrash2 size={18} />}
                               onClick={() => handleOpenDeleteLevelModal(level)}
-                              className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
                               title="Xóa"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
+                            />
                           </div>
                         </td>
                       </tr>
@@ -279,13 +284,16 @@ export default function Levels() {
               </button>
             </form>
 
-            <button
+            <Button
+              variant="success"
               onClick={handleOpenAddLevelTypeModal}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+              aria-label="Thêm loại level mới"
+              title="Thêm loại level mới"
+              icon={<FiPlus size={18} />}
+              size="md"
             >
-              <FiPlus size={18} />
               <span>Thêm loại level mới</span>
-            </button>
+            </Button>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
@@ -303,12 +311,13 @@ export default function Levels() {
               <div className="p-8 text-center text-rose-500 flex flex-col items-center">
                 <FiAlertCircle size={40} className="mb-2" />
                 <p>{error}</p>
-                <button
+                <Button
+                  variant="success"
                   onClick={fetchLevelTypes}
-                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
+                  className="mt-4"
                 >
                   Thử lại
-                </button>
+                </Button>
               </div>
             ) : filteredLevelTypes.length === 0 ? (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -356,20 +365,20 @@ export default function Levels() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="flex justify-center space-x-2">
-                            <button
+                            <Button
+                              variant="edit"
+                              size="xs"
+                              icon={<FiEdit size={18} />}
                               onClick={() => handleOpenEditLevelTypeModal(levelType)}
-                              className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
                               title="Sửa"
-                            >
-                              <FiEdit size={16} />
-                            </button>
-                            <button
+                            />
+                            <Button
+                              variant="delete"
+                              size="xs"
+                              icon={<FiTrash2 size={18} />}
                               onClick={() => handleOpenDeleteLevelTypeModal(levelType)}
-                              className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
                               title="Xóa"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
+                            />
                           </div>
                         </td>
                       </tr>

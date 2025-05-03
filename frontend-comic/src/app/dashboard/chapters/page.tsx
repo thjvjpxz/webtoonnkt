@@ -10,6 +10,7 @@ import "@/styles/scrollbar.css";
 import ViewChapterModal from "@/components/dashboard/chapters/ViewChapterModal";
 import DeleteChapterModal from "@/components/dashboard/chapters/DeleteChapterModal";
 import ChapterModal from "@/components/dashboard/chapters/ChapterModal";
+import Button from "@/components/ui/Button";
 
 export default function Chapters() {
 
@@ -169,13 +170,14 @@ export default function Chapters() {
           {/* End Comic Filter */}
         </div>
 
-        <button
+        <Button
+          variant="success"
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
+          icon={<FiPlus size={18} />}
+          size="md"
         >
-          <FiPlus size={18} />
           <span>Thêm chương mới</span>
-        </button>
+        </Button>
       </div>
 
       {chapters.length === 0 ? (
@@ -292,28 +294,30 @@ export default function Chapters() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       <div className="flex justify-center space-x-2">
-                        <button
+                        <Button
+                          variant="info"
                           onClick={() => handleOpenViewModal(chapter)}
-                          className="p-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-500 dark:hover:bg-blue-900/50 cursor-pointer"
                           aria-label="Xem chi tiết"
                           title="Xem chi tiết"
-                        >
-                          <FiEye size={18} />
-                        </button>
-                        <button
+                          icon={<FiEye size={18} />}
+                          size="xs"
+                        />
+                        <Button
+                          variant="edit"
                           onClick={() => handleOpenEditModal(chapter)}
-                          className="p-1.5 bg-amber-50 text-amber-600 rounded-md hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-500 dark:hover:bg-amber-900/50 cursor-pointer"
+                          aria-label="Sửa"
                           title="Sửa"
-                        >
-                          <FiEdit size={18} />
-                        </button>
-                        <button
+                          icon={<FiEdit size={18} />}
+                          size="xs"
+                        />
+                        <Button
+                          variant="delete"
                           onClick={() => handleOpenDeleteModal(chapter)}
-                          className="p-1.5 bg-rose-50 text-rose-600 rounded-md hover:bg-rose-100 dark:bg-rose-900/30 dark:text-rose-500 dark:hover:bg-rose-900/50 cursor-pointer"
+                          aria-label="Xóa"
                           title="Xóa"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
+                          icon={<FiTrash2 size={18} />}
+                          size="xs"
+                        />
                       </div>
                     </td>
                   </tr>

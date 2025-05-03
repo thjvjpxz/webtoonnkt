@@ -4,6 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import Image from "next/image";
 import { useChapterModal } from "@/hooks/useChapterModal";
 import { ChapterStatus } from "@/types/chapter";
+import Button from "@/components/ui/Button";
 
 export default function ChapterModal({
   isOpen,
@@ -219,26 +220,22 @@ export default function ChapterModal({
                     Thêm hình ảnh <span className="text-red-500">*</span>
                   </label>
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
                       type="button"
+                      variant={uploadMethod === 'file' ? 'success' : 'secondary'}
                       onClick={() => setUploadMethod('file')}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${uploadMethod === 'file'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }`}
+                      size="sm"
                     >
                       Tải ảnh
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant={uploadMethod === 'link' ? 'success' : 'secondary'}
                       onClick={() => setUploadMethod('link')}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${uploadMethod === 'link'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }`}
+                      size="sm"
                     >
                       Nhập link
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -282,15 +279,16 @@ export default function ChapterModal({
                         />
                       </div>
                       <div className="flex justify-end">
-                        <button
+                        <Button
                           type="button"
+                          variant="success"
                           onClick={handleAddMultipleImageLinks}
                           disabled={!hasValidImageLinks(imageLink)}
-                          className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                          size="md"
                         >
                           <FiPlus size={16} />
                           <span>Thêm các link</span>
-                        </button>
+                        </Button>
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
@@ -308,9 +306,7 @@ export default function ChapterModal({
                       {previewUrls.map((url, index) => (
                         <div
                           key={index}
-                          className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex
-                            ? 'border-green-400 dark:border-green-500 rounded-md'
-                            : 'border-transparent'
+                          className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex ? 'border-green-400 dark:border-green-500 rounded-md' : 'border-transparent'
                             }`}
                           draggable
                           onDragStart={(e) => handleDragStart(e, index)}
@@ -320,13 +316,13 @@ export default function ChapterModal({
                           onDrop={(e) => handleDrop(e, index)}
                           onDragEnd={handleDragEnd}
                         >
-                          <div className="aspect-w-2 aspect-h-3 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
+                          <div className="relative w-full pt-[150%] rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                             <Image
                               src={url}
                               alt={`Preview ${index}`}
                               fill
                               sizes="100%"
-                              className="object-cover w-full h-full"
+                              className="object-cover absolute inset-0"
                             />
                           </div>
                           <button
@@ -365,27 +361,23 @@ export default function ChapterModal({
           </div>
 
           <div className="flex justify-end gap-4 p-4 border-t border-gray-200 dark:border-gray-700">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 cursor-pointer"
+              size="md"
             >
               Hủy
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isUploading || isSubmitting || !title || !chapterNumber || !comicId || !status || (previewUrls.length === 0 && !isEditMode)}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+              variant="success"
+              size="md"
+              isLoading={isUploading || isSubmitting}
             >
-              {isUploading || isSubmitting ? (
-                <>
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                  <span>{isUploading ? "Đang xử lý..." : isEditMode ? "Đang cập nhật..." : "Đang thêm mới..."}</span>
-                </>
-              ) : (
-                <span>{isEditMode ? "Cập nhật" : "Thêm mới"}</span>
-              )}
-            </button>
+              {isEditMode ? "Cập nhật" : "Thêm mới"}
+            </Button>
           </div>
         </form>
       </div>
