@@ -5,15 +5,13 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,42 +19,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-@Entity(name = "levels")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity(name = "roles")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Level {
-
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
+    @JsonIgnore
     String id;
 
-    @Column(name = "level_number")
-    int levelNumber;
-
+    @Column(name = "name", nullable = false, unique = true)
     String name;
 
-    String color;
-
-    @Column(name = "exp_required")
-    double expRequired;
-
-    @Column(name = "url_gif")
-    String urlGif;
+    @Column(name = "description")
+    String description;
 
     @Column(name = "created_at")
+    @JsonIgnore
     @CreationTimestamp
     LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @JsonIgnore
     @UpdateTimestamp
     LocalDateTime updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "level_type_id")
-    LevelType levelType;
 }
