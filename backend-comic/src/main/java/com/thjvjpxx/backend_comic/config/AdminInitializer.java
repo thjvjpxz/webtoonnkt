@@ -64,14 +64,14 @@ public class AdminInitializer implements CommandLineRunner {
 
         List<String> urlGifs = Arrays.asList(
                 "#0a86db",
-                "static/gif/2.gif",
-                "static/gif/3.gif",
-                "static/gif/4.gif",
-                "static/gif/5.gif",
-                "static/gif/6.gif",
-                "static/gif/7.gif",
-                "static/gif/8.gif",
-                "static/gif/9.gif");
+                "/gif/2.gif",
+                "/gif/3.gif",
+                "/gif/4.gif",
+                "/gif/5.gif",
+                "/gif/6.gif",
+                "/gif/7.gif",
+                "/gif/8.gif",
+                "/gif/9.gif");
 
         // Không chọn
         LevelType noSelect = createLevelType("Không chọn");
