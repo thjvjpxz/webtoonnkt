@@ -15,6 +15,7 @@ import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.repository.RoleRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
+import com.thjvjpxx.backend_comic.service.LevelService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class AdminInitializer implements CommandLineRunner {
     BCryptPasswordEncoder passwordEncoder;
     LevelTypeRepository levelTypeRepository;
     LevelRepository levelRepository;
+    LevelService levelService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -38,7 +40,8 @@ public class AdminInitializer implements CommandLineRunner {
         createFullRole();
 
         Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> createRole("ADMIN", "Quản trị viên"));
-        createUser("admin", "admin@admin.com", "admin123", adminRole);
+        Level level = levelService.getLevelDefaultUser();
+        createUser("admin", "admin@admin.com", "admin123", adminRole, level);
 
     }
 
@@ -122,7 +125,7 @@ public class AdminInitializer implements CommandLineRunner {
         createLevel("Ma Vương", urlGifs.get(8), colors.get(8), 2209000, 9, maVuong);
     }
 
-    private Level createLevel(String name, String urlGif, String color, double expRequired, int levelNumber,
+    private Level createLevel(String name, String urlGif, String color, int expRequired, int levelNumber,
             LevelType levelType) {
         return levelRepository.findByName(name).orElseGet(() -> {
             Level level = new Level();
@@ -137,7 +140,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     }
 
-    private User createUser(String username, String email, String password, Role role) {
+    private User createUser(String username, String email, String password, Role role, Level level) {
         return userRepository.findByUsername(username).orElseGet(() -> {
             return userRepository.findByEmail(email).orElseGet(() -> {
                 User user = new User();
@@ -146,6 +149,7 @@ public class AdminInitializer implements CommandLineRunner {
                 user.setPassword(passwordEncoder.encode(password));
                 user.setRole(role);
                 user.setActive(true);
+                user.setLevel(level);
                 return userRepository.save(user);
             });
         });

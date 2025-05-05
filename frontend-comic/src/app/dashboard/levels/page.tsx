@@ -16,6 +16,7 @@ import { formatDate } from "@/utils/helpers";
 import { useLevel } from "@/hooks/useLevel";
 import DeleteLevelModal from "@/components/dashboard/levels/DeleteLevelModal";
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 
 export default function Levels() {
   const {
@@ -224,10 +225,13 @@ export default function Levels() {
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="flex justify-center">
                             {level.urlGif && level.levelNumber !== 1 ? (
-                              <img
+                              <Image
                                 src={level.urlGif}
                                 alt={level.name}
-                                className="w-10 h-10 object-cover rounded"
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                className="object-cover rounded !h-10"
                               />
                             ) : level.levelNumber === 1 ? (
                               <div

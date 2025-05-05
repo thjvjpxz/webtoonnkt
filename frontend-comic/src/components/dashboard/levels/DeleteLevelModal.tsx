@@ -19,6 +19,7 @@ export default function DeleteLevelModal({
     try {
       await onConfirm();
     } catch (error) {
+      console.error("Lỗi khi xóa level:", error);
       setIsDeleting(false);
       onClose();
     }
@@ -37,7 +38,7 @@ export default function DeleteLevelModal({
             Xác nhận xóa
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-center">
-            Bạn có chắc chắn muốn xóa {itemTypeText} "{itemName}"?
+            Bạn có chắc chắn muốn xóa {itemTypeText} &quot;{itemName}&quot;?
           </p>
           <p className="text-gray-600 dark:text-gray-300 text-center mt-2">
             Hành động này không thể hoàn tác.

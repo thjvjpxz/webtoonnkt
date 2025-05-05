@@ -53,4 +53,9 @@ public class LevelController {
     public BaseResponse<?> deleteLevel(@PathVariable String id) {
         return levelService.deleteLevel(id);
     }
+
+    @GetMapping("/by-type")
+    public BaseResponse<?> getLevelByType(@RequestParam String levelTypeId) {
+        return levelService.getLevelByType(levelTypeId);
+    }
 }

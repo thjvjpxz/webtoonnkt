@@ -36,6 +36,12 @@ public class LevelTypeServiceImpl implements LevelTypeService {
     }
 
     @Override
+    public LevelType getLevelTypeByName(String name) {
+        return levelTypeRepository.findByName(name)
+                .orElse(null);
+    }
+
+    @Override
     public BaseResponse<?> getAllLevelType() {
         List<LevelType> levelTypes = levelTypeRepository.findAll();
         return BaseResponse.success(levelTypes);

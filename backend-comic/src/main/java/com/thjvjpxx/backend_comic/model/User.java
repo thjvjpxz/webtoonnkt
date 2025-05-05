@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity(name = "users")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -34,16 +36,16 @@ public class User {
     String email;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     String password;
 
-    @Column(name = "img_url")
     String imgUrl;
 
-    @Column(name = "vip")
-    Boolean vip = false;
+    Boolean vip;
 
-    @Column(name = "active")
-    Boolean active = false;
+    Boolean active;
+
+    Boolean blocked = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
@@ -55,14 +57,12 @@ public class User {
     @Column(name = "last_topup")
     Timestamp lastTopup;
 
-    @Column(name = "current_level")
-    Integer currentLevel = 1;
+    @ManyToOne
+    @JoinColumn(name = "level_id")
+    Level level;
 
     @Column(name = "current_exp", nullable = false)
-    Double currentExp = 0.0;
-
-    @Column(name = "level_type_id")
-    String levelTypeId;
+    Integer currentExp = 1000;
 
     @Column(name = "created_at")
     @CreationTimestamp

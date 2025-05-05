@@ -29,7 +29,6 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "VARCHAR(36)")
-    @JsonIgnore
     String id;
 
     @Column(name = "name", nullable = false, unique = true)

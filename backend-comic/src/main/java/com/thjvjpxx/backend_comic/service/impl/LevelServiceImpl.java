@@ -147,4 +147,27 @@ public class LevelServiceImpl implements LevelService {
         return BaseResponse.success(level);
     }
 
+    @Override
+    public Level getLevelDefaultUser() {
+        int levelNumber = 1;
+        LevelType levelType = levelTypeRepository.findByName("Không chọn")
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
+        return levelRepository.findByLevelNumberAndLevelType(levelNumber, levelType)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+    }
+
+    @Override
+    public Level getLevelById(String id) {
+        return levelRepository.findById(id)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+    }
+
+    @Override
+    public BaseResponse<?> getLevelByType(String levelTypeId) {
+        LevelType levelType = levelTypeRepository.findById(levelTypeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
+        List<Level> levels = levelRepository.findByLevelTypeOrderByLevelNumberAsc(levelType)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+        return BaseResponse.success(levels);
+    }
 }

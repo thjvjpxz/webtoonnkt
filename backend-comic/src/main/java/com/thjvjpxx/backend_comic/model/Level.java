@@ -43,7 +43,7 @@ public class Level {
     String color;
 
     @Column(name = "exp_required")
-    double expRequired;
+    Integer expRequired;
 
     @Column(name = "url_gif")
     String urlGif;

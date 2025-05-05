@@ -8,6 +8,7 @@ import {
 } from "@/types/level";
 import { FiX, FiUpload } from "react-icons/fi";
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 
 interface LevelModalProps {
   isOpen: boolean;
@@ -256,10 +257,13 @@ export default function LevelModal({
                   />
                   {previewUrl ? (
                     <div>
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="Preview"
-                        className="mx-auto h-32 w-32 object-cover"
+                        fill
+                        sizes="32px"
+                        className="object-cover"
+                        loading="lazy"
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         Nhấp để thay đổi hình ảnh
