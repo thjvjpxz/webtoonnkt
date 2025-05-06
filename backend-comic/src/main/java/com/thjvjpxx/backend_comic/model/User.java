@@ -41,9 +41,9 @@ public class User {
 
     String imgUrl;
 
-    Boolean vip;
+    Boolean vip = false;
 
-    Boolean active;
+    Boolean active = false;
 
     Boolean blocked = false;
 

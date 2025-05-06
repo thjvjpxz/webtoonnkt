@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { UserCreateUpdate, UserModalProps } from "@/types/user";
 import { LevelTypeResponse, LevelResponse } from "@/types/level";
-import { FiX, FiUpload, FiCheck, FiImage, FiLoader } from "react-icons/fi";
+import { FiX, FiImage, FiLoader } from "react-icons/fi";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 

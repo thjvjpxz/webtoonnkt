@@ -124,7 +124,7 @@ export default function Users() {
                 setRoleFilter(e.target.value);
                 setCurrentPage(1); // Reset lại trang khi đổi bộ lọc
               }}
-              className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 appearance-none"
+              className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 appearance-none cursor-pointer"
             >
               <option value="">Tất cả vai trò</option>
               {roles.map((role) => (
@@ -135,8 +135,18 @@ export default function Users() {
             </select>
             <FiUsers className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                ></path>
               </svg>
             </div>
           </div>
@@ -169,8 +179,12 @@ export default function Users() {
         <div className="bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col items-center justify-center py-12">
             <FiUser className="w-16 h-16 text-gray-300 mb-4 dark:text-gray-600" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-300">Không có người dùng nào</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Chưa có người dùng nào được thêm vào hệ thống.</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-300">
+              Không có người dùng nào
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              Chưa có người dùng nào được thêm vào hệ thống.
+            </p>
             <button
               onClick={handleOpenAddModal}
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors duration-200 dark:bg-green-700 dark:hover:bg-green-600 cursor-pointer"
@@ -242,13 +256,30 @@ export default function Users() {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            <span style={{
-                              color: user.level?.levelNumber === 1 ? user.level?.urlGif : "transparent",
-                              backgroundImage: user.level?.levelNumber !== 1 ? `url(${user.level?.urlGif})` : "none",
-                              backgroundSize: user.level?.levelNumber !== 1 ? "auto" : "none",
-                              backgroundPosition: user.level?.levelNumber !== 1 ? "center" : "none",
-                              WebkitBackgroundClip: user.level?.levelNumber !== 1 ? "text" : "none",
-                            }}>
+                            <span
+                              style={{
+                                color:
+                                  user.level?.levelNumber === 1
+                                    ? user.level?.urlGif
+                                    : "transparent",
+                                backgroundImage:
+                                  user.level?.levelNumber !== 1
+                                    ? `url(${user.level?.urlGif})`
+                                    : "none",
+                                backgroundSize:
+                                  user.level?.levelNumber !== 1
+                                    ? "auto"
+                                    : "none",
+                                backgroundPosition:
+                                  user.level?.levelNumber !== 1
+                                    ? "center"
+                                    : "none",
+                                WebkitBackgroundClip:
+                                  user.level?.levelNumber !== 1
+                                    ? "text"
+                                    : "none",
+                              }}
+                            >
                               {user.username}
                             </span>
                           </div>
@@ -341,4 +372,4 @@ export default function Users() {
       )}
     </DashboardLayout>
   );
-} 
+}

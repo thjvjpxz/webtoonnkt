@@ -12,11 +12,13 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.LoginResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
+import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.Role;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.RoleRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.AuthService;
+import com.thjvjpxx.backend_comic.service.LevelService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     RoleRepository roleRepository;
     JwtConfig jwtConfig;
     BCryptPasswordEncoder passwordEncoder;
+    LevelService levelService;
 
     @Override
     public BaseResponse<?> login(LoginRequest loginRequest) {
@@ -156,13 +159,16 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Role role = roleRepository.findByName("READER").orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
+        Level level = levelService.getLevelDefaultUser();
 
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(role);
+        user.setLevel(level);
         user.setVip(false);
+        user.setActive(false);
 
         userRepository.save(user);
 

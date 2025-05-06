@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thjvjpxx.backend_comic.dto.request.LoginRequest;
+import com.thjvjpxx.backend_comic.dto.request.RegisterRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.service.AuthService;
 
@@ -35,5 +36,10 @@ public class AuthController {
     @PostMapping("/validate-token")
     public BaseResponse<?> validateToken(@RequestBody String token) {
         return authService.validateToken(token);
+    }
+
+    @PostMapping("/register")
+    public BaseResponse<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        return authService.register(registerRequest);
     }
 }
