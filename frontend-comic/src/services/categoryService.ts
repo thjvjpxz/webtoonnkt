@@ -30,7 +30,7 @@ export const createCategory = async (
 ): Promise<ApiResponse<CategoryResponse>> => {
   return await fetchApi<ApiResponse<CategoryResponse>>("/categories", {
     method: "POST",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 
@@ -41,7 +41,7 @@ export const updateCategory = async (
 ): Promise<ApiResponse<CategoryResponse>> => {
   return await fetchApi<ApiResponse<CategoryResponse>>(`/categories/${id}`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 

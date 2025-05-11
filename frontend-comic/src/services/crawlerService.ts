@@ -1,5 +1,6 @@
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
+import axios from "axios";
 import {
   CrawlerOptions,
   CrawlerProgress,
@@ -84,15 +85,8 @@ class CrawlerService {
   // Bắt đầu quá trình crawl
   async startCrawling(options: CrawlerOptions): Promise<CrawlerResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/crawler/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(options),
-      });
-
-      const result = await response.json();
+      const response = await axios.post(`${this.baseUrl}/crawler/start`, options);
+      const result = response.data;
 
       if (result.status === 200 || result.code === "SUCCESS") {
         this.sessionId = result.data?.sessionId;
@@ -123,14 +117,8 @@ class CrawlerService {
     }
 
     try {
-      const response = await fetch(
-        `${this.baseUrl}/crawler/stop/${sessionId}`,
-        {
-          method: "POST",
-        }
-      );
-
-      return await response.json();
+      const response = await axios.post(`${this.baseUrl}/crawler/stop/${sessionId}`);
+      return response.data;
     } catch (error: unknown) {
       console.error("Lỗi khi dừng crawl:", error);
       const errorMessage =
@@ -153,8 +141,8 @@ class CrawlerService {
   //     }
 
   //     try {
-  //         const response = await fetch(`${this.baseUrl}/crawler/status/${sessionId}`);
-  //         const result = await response.json();
+  //         const response = await axios.get(`${this.baseUrl}/crawler/status/${sessionId}`);
+  //         const result = response.data;
 
   //         if (result.status === 200 || result.code === 'SUCCESS') {
   //             return {

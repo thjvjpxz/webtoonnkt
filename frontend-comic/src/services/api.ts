@@ -1,105 +1,95 @@
 // Service cơ bản để gọi API
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Tạo instance axios
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 // Hàm xử lý lỗi chung
 const handleError = (error: unknown) => {
   console.error("API Error:", error);
 
-  if (error && typeof error === "object" && "response" in error) {
-    // Lỗi từ server với response
-    const errorResponse = error.response as { data?: { message?: string } };
-    return {
-      success: false,
-      data: null,
-      error: errorResponse.data?.message || "Lỗi từ server",
-    };
-  } else if (error && typeof error === "object" && "request" in error) {
-    // Lỗi không nhận được response
-    return {
-      success: false,
-      data: null,
-      error: "Không thể kết nối đến server",
-    };
-  } else {
-    // Lỗi khác
-    const errorMessage =
-      error && typeof error === "object" && "message" in error
-        ? (error.message as string)
-        : "Đã xảy ra lỗi";
-    return {
-      success: false,
-      data: null,
-      error: errorMessage,
-    };
+  if (error instanceof AxiosError) {
+    if (error.response) {
+      // Lỗi từ server với response
+      return {
+        success: false,
+        data: null,
+        error: error.response.data?.message || "Lỗi từ server",
+      };
+    } else if (error.request) {
+      // Lỗi không nhận được response
+      return {
+        success: false,
+        data: null,
+        error: "Không thể kết nối đến server",
+      };
+    }
   }
+
+  // Lỗi khác
+  const errorMessage = error instanceof Error ? error.message : "Đã xảy ra lỗi";
+  return {
+    success: false,
+    data: null,
+    error: errorMessage,
+  };
 };
 
-// Hàm fetch API chung
+// Hàm fetch API chung với axios
 export const fetchApi = async <T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: AxiosRequestConfig = {}
 ): Promise<T> => {
   try {
-    const url = `${API_URL}${endpoint}`;
-
-    // Thiết lập headers mặc định
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers,
-    };
-
-    const response = await fetch(url, {
+    const response = await axiosInstance({
+      url: endpoint,
       ...options,
-      headers,
     });
 
-    // Kiểm tra nếu response không ok
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw {
-        response: {
-          status: response.status,
-          data: errorData,
-        },
-      };
-    }
-
-    return await response.json();
+    return response.data;
   } catch (error) {
     throw handleError(error);
   }
 };
 
+// Hàm fetch API với FormData
 export const fetchApiWithFormData = async <T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: AxiosRequestConfig = {}
 ): Promise<T> => {
   try {
-    const url = `${API_URL}${endpoint}`;
-
-    // Thiết lập headers mặc định
-    const headers = {
-      ...options.headers,
+    const config: AxiosRequestConfig = {
+      url: endpoint,
+      ...options,
+      headers: {
+        ...options.headers,
+        'Content-Type': 'multipart/form-data',
+      },
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    // Kiểm tra nếu response không ok
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw {
-        response: {
-          status: response.status,
-          data: errorData,
-        },
-      };
-    }
-
-    return await response.json();
+    const response = await axiosInstance(config);
+    return response.data;
   } catch (error) {
     throw handleError(error);
   }
 };
+
+// Thêm interceptor để xử lý token nếu cần
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Có thể thêm token vào header ở đây nếu cần
+    // const token = localStorage.getItem('token');
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);

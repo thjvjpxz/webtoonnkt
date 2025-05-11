@@ -35,7 +35,7 @@ export const createLevel = async (
 
   return await fetchApiWithFormData<ApiResponse<LevelResponse>>(endpoint, {
     method: "POST",
-    body: formData,
+    data: formData,
   });
 };
 
@@ -57,7 +57,7 @@ export const updateLevel = async (
 
   return await fetchApiWithFormData<ApiResponse<LevelResponse>>(`${endpoint}/${id}`, {
     method: "PUT",
-    body: formData,
+    data: formData,
   });
 };
 

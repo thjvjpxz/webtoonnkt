@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       "lh3.googleusercontent.com",
       "sv1.otruyencdn.com",
       "img.otruyen.xyz",
-      "img.otruyenapi.com"
+      "img.otruyenapi.com",
+      "cdn.kimthi1708.id.vn"
     ],
     remotePatterns: [
       {

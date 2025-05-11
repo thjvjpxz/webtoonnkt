@@ -38,7 +38,7 @@ export const createUser = async (
 ): Promise<ApiResponse<UserResponse>> => {
   return await fetchApi<ApiResponse<UserResponse>>(endpoint, {
     method: "POST",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 
@@ -60,7 +60,7 @@ export const createUserWithAvatar = async (
 
   return await fetchApiWithFormData<ApiResponse<UserResponse>>(endpoint, {
     method: "POST",
-    body: formData,
+    data: formData,
   });
 };
 
@@ -71,7 +71,7 @@ export const updateUser = async (
 ): Promise<ApiResponse<UserResponse>> => {
   return await fetchApi<ApiResponse<UserResponse>>(`${endpoint}/${id}`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 
@@ -94,7 +94,7 @@ export const updateUserWithAvatar = async (
 
   return await fetchApiWithFormData<ApiResponse<UserResponse>>(`${endpoint}/${id}`, {
     method: "PUT",
-    body: formData,
+    data: formData,
   });
 };
 
