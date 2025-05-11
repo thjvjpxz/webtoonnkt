@@ -1,8 +1,14 @@
 "use client";
 
 import { FiAlertTriangle } from "react-icons/fi";
-import { DeleteComicModalProps } from "@/types/comic";
 import Button from "@/components/ui/Button";
+
+interface DeleteComicModalProps {
+  comicTitle: string;
+  onClose: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+}
 
 export default function DeleteComicModal({
   comicTitle,

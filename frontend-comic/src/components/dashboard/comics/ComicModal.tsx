@@ -2,12 +2,20 @@
 
 import Button from "@/components/ui/Button";
 import "@/styles/scrollbar.css";
-import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
+import { CategoryResponse } from "@/types/category";
+import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FiCheck, FiImage, FiUpload, FiX } from "react-icons/fi";
+
+interface ComicModalProps {
+  comic: ComicResponse | null;
+  categories: CategoryResponse[];
+  onClose: () => void;
+  onSave: (comic: ComicCreateUpdate, file?: File) => Promise<void>;
+}
 
 export default function ComicModal({
   comic,

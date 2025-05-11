@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
-import { DashboardLayoutProps } from "@/types/dashboard";
+import { ReactNode } from "react";
+
+export interface DashboardLayoutProps {
+  children: ReactNode;
+  title: string;
+}
 
 export default function DashboardLayout({
   children,

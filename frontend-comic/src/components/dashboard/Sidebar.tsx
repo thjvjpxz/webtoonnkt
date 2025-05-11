@@ -16,7 +16,11 @@ import {
   FiAward,
   FiDownload,
 } from "react-icons/fi";
-import { SidebarProps } from "@/types/dashboard";
+
+export interface SidebarProps {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+}
 
 export default function Sidebar({
   isSidebarOpen,

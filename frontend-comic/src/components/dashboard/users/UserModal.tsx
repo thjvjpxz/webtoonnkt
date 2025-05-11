@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { UserCreateUpdate, UserModalProps } from "@/types/user";
+import { Role, UserCreateUpdate, UserResponse } from "@/types/user";
 import { LevelTypeResponse, LevelResponse } from "@/types/level";
 import { FiX, FiImage, FiLoader } from "react-icons/fi";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 
-interface ExtendedUserModalProps extends UserModalProps {
+interface UserModalProps {
+  user: UserResponse | null;
+  roles: Role[];
   levelTypes: LevelTypeResponse[];
   levels: LevelResponse[];
-  fetchLevelsByType: (levelTypeId: string) => Promise<void>;
   isLoadingLevels: boolean;
+  onClose: () => void;
+  fetchLevelsByType: (levelTypeId: string) => Promise<void>;
+  onSave: (userData: UserCreateUpdate, file?: File) => Promise<void>;
 }
 
 export default function UserModal({
@@ -23,7 +27,7 @@ export default function UserModal({
   onSave,
   fetchLevelsByType,
   isLoadingLevels,
-}: ExtendedUserModalProps) {
+}: UserModalProps) {
   const [formData, setFormData] = useState<UserCreateUpdate>({
     username: "",
     email: "",

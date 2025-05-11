@@ -1,7 +1,12 @@
 "use client";
 
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { PaginationProps } from "@/types/dashboard";
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 
 export default function Pagination({
   currentPage,

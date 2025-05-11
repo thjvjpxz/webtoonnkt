@@ -1,16 +1,21 @@
 "use client";
 
 import { FiAlertTriangle } from "react-icons/fi";
-import { DeleteConfirmModalProps } from "@/types/category";
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 
 
-export default function DeleteConfirmModal({
+interface DeleteCategoryModalProps {
+  categoryName: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+export default function DeleteCategoryModal({
   categoryName,
   onClose,
   onConfirm,
-}: DeleteConfirmModalProps) {
+}: DeleteCategoryModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {

@@ -1,5 +1,4 @@
-import { Chapter } from "@/types/chapter";
-
+import { ChapterDetailResponse } from "@/types/chapter";
 export const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("vi-VN", {
     day: "2-digit",
@@ -10,7 +9,7 @@ export const formatDate = (date: string) => {
   });
 };
 
-export const constructImageUrl = (chapter: Chapter, imgUrl: string) => {
+export const constructImageUrl = (chapter: ChapterDetailResponse, imgUrl: string) => {
   if (!chapter.domainCdn || !chapter.chapterPath) {
     return imgUrl;
   }

@@ -1,12 +1,12 @@
 import { LevelResponse } from "./level";
 
-export type Role = {
+export interface Role {
   id: string;
   name: string;
   description: string;
 }
 
-export type UserCreateUpdate = {
+export interface UserCreateUpdate {
   username: string;
   email: string;
   password?: string;
@@ -18,7 +18,7 @@ export type UserCreateUpdate = {
   balance?: number;
 }
 
-export type UserResponse = {
+export interface UserResponse {
   id: string;
   username: string;
   email: string;
@@ -35,16 +35,5 @@ export type UserResponse = {
   updatedAt: string;
 }
 
-export type UserModalProps = {
-  user: UserResponse | null;
-  roles: Role[];
-  onClose: () => void;
-  onSave: (userData: UserCreateUpdate, file?: File) => Promise<void>;
-};
 
-export type DeleteUserModalProps = {
-  username: string;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
-  isDeleting: boolean;
-};
+
