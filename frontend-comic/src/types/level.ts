@@ -1,15 +1,15 @@
-export type LevelTypeResponse = {
+export interface LevelTypeResponse {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-export type LevelTypeRequest = {
+export interface LevelTypeRequest {
   name: string;
-};
+}
 
-export type LevelResponse = {
+export interface LevelResponse {
   id: string;
   levelNumber: number;
   name: string;
@@ -19,22 +19,15 @@ export type LevelResponse = {
   levelType: LevelTypeResponse;
   createdAt: string;
   updatedAt: string;
-};
+}
 
-export type LevelRequest = {
+export interface LevelRequest {
   name: string;
   levelNumber: number;
   color: string;
   expRequired: number;
   levelTypeId: string;
   urlGif: string;
-};
+}
 
-export type DeleteLevelModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => Promise<void>;
-  itemType?: "level" | "level-type";
-  itemName: string;
-};
 

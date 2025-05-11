@@ -1,5 +1,12 @@
 import React from "react";
-import { StatCardProps } from "@/types/dashboard";
+
+export interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  change?: string;
+  isPositive?: boolean;
+}
 
 const StatCard = ({
   title,
@@ -20,9 +27,8 @@ const StatCard = ({
           </p>
           {change && (
             <p
-              className={`text-xs mt-2 ${
-                isPositive ? "text-green-600" : "text-rose-500"
-              }`}
+              className={`text-xs mt-2 ${isPositive ? "text-green-600" : "text-rose-500"
+                }`}
             >
               {isPositive ? "↑" : "↓"} {change} so với tháng trước
             </p>

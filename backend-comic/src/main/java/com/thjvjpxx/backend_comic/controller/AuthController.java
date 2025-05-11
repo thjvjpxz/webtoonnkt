@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.controller;
 
+import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,12 +30,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public BaseResponse<?> refreshToken(@RequestBody String refreshToken) {
+    public BaseResponse<?> refreshToken(@RequestBody Map<String, String> payload) {
+        String refreshToken = payload.get("refreshToken");
         return authService.refreshToken(refreshToken);
     }
 
     @PostMapping("/validate-token")
-    public BaseResponse<?> validateToken(@RequestBody String token) {
+    public BaseResponse<?> validateToken(@RequestBody Map<String, String> payload) {
+        String token = payload.get("token");
         return authService.validateToken(token);
     }
 

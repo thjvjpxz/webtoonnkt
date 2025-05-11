@@ -1,8 +1,14 @@
-import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
+import { DetailChapter, ChapterDetailResponse, ChapterImage } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import Button from "@/components/ui/Button";
+
+interface ViewChapterModalProps {
+  isOpen: boolean;
+  chapter: ChapterDetailResponse;
+  onClose: () => void;
+}
 
 export default function ViewChapterModal({
   isOpen,
@@ -34,7 +40,7 @@ export default function ViewChapterModal({
             <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Tên truyện</p>
-                <p className="font-medium text-gray-900 dark:text-white">{chapter.comicName}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{chapter.comic.name}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Chương số</p>
@@ -61,21 +67,21 @@ export default function ViewChapterModal({
             </p>
 
             <div className="mt-4 space-y-8">
-              {chapter.detailChapters && chapter.detailChapters.length > 0 ? (
-                chapter.detailChapters
-                  .sort((a, b) => a.orderNumber - b.orderNumber)
-                  .map((detail: DetailChapter) => (
-                    <div key={detail.id} className="mb-0">
+              {chapter.images && chapter.images.length > 0 ? (
+                chapter.images
+                  .sort((a, b) => a.page - b.page)
+                  .map((image: ChapterImage) => (
+                    <div key={image.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
-                          src={constructImageUrl(chapter, detail.imgUrl)}
-                          alt={`Trang ${detail.orderNumber}`}
+                          src={constructImageUrl(chapter, image.url)}
+                          alt={`Trang ${image.page}`}
                           width={1500}
                           height={2400}
                           className="shadow-lg w-full h-auto object-contain mx-auto"
                         />
                         <div className="absolute bottom-3 right-3 bg-black/70 text-white text-sm px-3 py-1.5 rounded-md">
-                          {detail.orderNumber}
+                          {image.page}
                         </div>
                       </div>
                     </div>

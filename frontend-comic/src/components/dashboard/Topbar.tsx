@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import { FiBell } from "react-icons/fi";
-import { TopbarProps } from "@/types/dashboard";
+
+export interface TopbarProps {
+  title: string;
+  isSidebarOpen: boolean;
+}
 
 export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
 

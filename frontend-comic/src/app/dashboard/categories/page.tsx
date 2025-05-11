@@ -9,7 +9,7 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 import CategoryModal from "@/components/dashboard/categories/CategoryModal";
-import DeleteConfirmModal from "@/components/dashboard/categories/DeleteConfirmModal";
+import DeleteConfirmModal from "@/components/dashboard/categories/DeleteCategoryModal";
 import Pagination from "@/components/dashboard/Pagination";
 import "@/styles/scrollbar.css";
 import { useCategory } from "@/hooks/useCategory";

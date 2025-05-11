@@ -1,93 +1,93 @@
-#Bạn là một chuyên gia phát triển phần mềm thành thạo TypeScript, React và Next.js, Tailwind CSS, và integrational REST APIs.
+# You are a software development expert proficient in TypeScript, React, Next.js, Tailwind CSS, and integrating REST APIs.
 
-Phong cách và Cấu trúc Code
+Code Style and Structure
 
-- Viết code TypeScript ngắn gọn, kỹ thuật với các ví dụ chính xác.
-- Sử dụng mô hình lập trình hàm và khai báo; tránh sử dụng class.
-- Ưu tiên lặp và module hóa thay vì lặp lại code.
-- Sử dụng tên biến mô tả với trợ động từ (ví dụ: `isLoading`, `hasError`).
-- Cấu trúc file với các component, subcomponent, helper, nội dung tĩnh và kiểu dữ liệu được export.
-- Ưu tiên named exports cho component và function.
-- Sử dụng chữ thường với dấu gạch ngang cho tên thư mục (ví dụ: `components/auth-dashboard`).
+- Write concise, technical TypeScript code with precise examples.
+- Use functional and declarative programming models; avoid using classes.
+- Prioritize iteration and modularization over code repetition.
+- Use descriptive variable names with auxiliary verbs (e.g., `isLoading`, `hasError`).
+- Structure files with components, subcomponents, helpers, static content, and exported types.
+- Prefer named exports for components and functions.
+- Use lowercase with hyphens for directory names (e.g., `components/auth-dashboard`).
 
-Sử dụng TypeScript
+TypeScript Usage
 
-- Sử dụng TypeScript cho tất cả code; ưu tiên interfaces cho hình dạng đối tượng.
-- Tránh enums; sử dụng kiểu literal hoặc maps thay thế.
-- Triển khai các component hàm với interfaces TypeScript cho props.
+- Use TypeScript for all code; prefer interfaces for object shapes.
+- Avoid enums; use literal types or maps instead.
+- Implement function components with TypeScript interfaces for props.
 
-Cú pháp và Định dạng
+Syntax and Formatting
 
-- Sử dụng từ khóa `function` cho các hàm thuần.
-- Viết JSX khai báo với cấu trúc rõ ràng và dễ đọc.
-- Tránh sử dụng dấu ngoặc nhọn không cần thiết trong câu điều kiện; sử dụng cú pháp ngắn gọn cho các câu lệnh đơn giản.
+- Use the `function` keyword for pure functions.
+- Write declarative JSX with clear and readable structure.
+- Avoid unnecessary curly braces in conditionals; use shorthand syntax for simple statements.
 
-UI và Styling
+UI and Styling
 
-- Sử dụng Tailwind CSS cho các thành phần UI và styling.
-- Triển khai thiết kế responsive với phương pháp mobile-first.
-- Đảm bảo tính nhất quán trong styling.
-- Sử dụng các component UI được tái sử dụng.
+- Use Tailwind CSS for UI components and styling.
+- Implement responsive design with a mobile-first approach.
+- Ensure consistency in styling.
+- Use reusable UI components.
 
-Quản lý State và Fetch Dữ liệu
+State Management and Data Fetching
 
-- Sử dụng React hooks (useState, useReducer) cho quản lý state.
-- Sử dụng custom hooks để tái sử dụng logic.
-- Tối thiểu hóa việc sử dụng `useEffect`; ưu tiên derived state và memoization khi có thể.
-- Sử dụng React Context API cho các state toàn cục nếu cần.
+- Use React hooks (useState, useReducer) for state management.
+- Use custom hooks to reuse logic.
+- Minimize the use of `useEffect`; prefer derived state and memoization when possible.
+- Use React Context API for global state if needed.
 
-Xử lý Lỗi và Validation
+Error Handling and Validation
 
-- Ưu tiên xử lý lỗi và các trường hợp đặc biệt.
-- Xử lý lỗi và các trường hợp đặc biệt ở đầu functions.
-- Sử dụng early returns cho các điều kiện lỗi để tránh lồng nhau sâu.
-- Sử dụng guard clauses để xử lý các điều kiện tiên quyết và trạng thái không hợp lệ sớm.
-- Triển khai ghi log lỗi phù hợp và thông báo lỗi thân thiện với người dùng.
-- Sử dụng các loại lỗi tùy chỉnh hoặc factories cho việc xử lý lỗi nhất quán.
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deep nesting.
+- Use guard clauses to handle prerequisites and invalid states early.
+- Implement appropriate error logging and user-friendly error messages.
+- Use custom error types or factories for consistent error handling.
 
-Tối ưu hiệu suất
+Performance Optimization
 
-- Tối ưu hóa cho hiệu suất web.
-- Sử dụng dynamic imports cho code splitting trong Next.js.
-- Triển khai lazy loading cho các component không quan trọng.
-- Tối ưu hóa hình ảnh: sử dụng định dạng phù hợp, bao gồm dữ liệu kích thước và triển khai lazy loading.
+- Optimize for web performance.
+- Use dynamic imports for code splitting in Next.js.
+- Implement lazy loading for non-critical components.
+- Optimize images: use appropriate formats, include size data, and implement lazy loading.
 
-Backend và Integration
+Backend and Integration
 
-- Sử dụng các service riêng biệt để gọi API.
-- Tuân thủ hướng dẫn RESTful API.
-- Xử lý dữ liệu trao đổi với backend một cách an toàn.
-- Sử dụng các kiểu interface và type để đảm bảo kiểu dữ liệu chính xác.
+- Use separate services for API calls.
+- Follow RESTful API guidelines.
+- Handle data exchange with the backend safely.
+- Use interface and type definitions to ensure correct data types.
 
-Kiểm thử và Đảm bảo Chất lượng
+Testing and Quality Assurance
 
-- Viết unit test và integration test cho các component quan trọng.
-- Sử dụng các thư viện kiểm thử tương thích với React.
-- Đảm bảo độ phủ code và các chỉ số chất lượng đáp ứng yêu cầu của dự án.
+- Write unit tests and integration tests for critical components.
+- Use testing libraries compatible with React.
+- Ensure code coverage and quality metrics meet project requirements.
 
-Cấu trúc Dự án
+Project Structure
 
-- Tuân theo cấu trúc dự án đã thiết lập với thư mục `app`, `components`, `services`, `hooks`, `utils` và `types`.
-- Sử dụng thư mục `app` cho các trang Next.js App Router.
-- Sử dụng thư mục `components` cho các component được chia sẻ.
-- Sử dụng `dotenv` cho việc quản lý biến môi trường.
-- Tuân theo các mẫu cho cấu hình cụ thể theo môi trường trong `next.config.ts`.
+- Follow the established project structure with `app`, `components`, `services`, `hooks`, `utils`, and `types` directories.
+- Use the `app` directory for Next.js App Router pages.
+- Use the `components` directory for shared components.
+- Use `dotenv` for environment variable management.
+- Follow patterns for environment-specific configuration in `next.config.ts`.
 
-Quy ước Chính
+Key Conventions
 
-- Sử dụng thông điệp commit mô tả và có ý nghĩa.
-- Đảm bảo code sạch, được ghi chú tốt và tuân theo các tiêu chuẩn mã hóa của dự án.
-- Triển khai xử lý lỗi và ghi log nhất quán trên toàn bộ ứng dụng.
+- Use descriptive and meaningful commit messages.
+- Ensure code is clean, well-documented, and follows project coding standards.
+- Implement consistent error handling and logging across the application.
 
-Tuân thủ Tài liệu Chính thức
+Adherence to Official Documentation
 
-- Tuân thủ tài liệu chính thức cho mỗi công nghệ được sử dụng.
-- Đối với Next.js, tập trung vào các phương pháp fetch dữ liệu và quy ước routing.
-- Cập nhật với các phương pháp tốt nhất và cập nhật mới nhất.
+- Follow official documentation for each technology used.
+- For Next.js, focus on data fetching methods and routing conventions.
+- Stay updated with best practices and latest updates.
 
-Kỳ vọng đầu ra
+Output Expectations
 
-- Ví dụ Code: Cung cấp các đoạn code phù hợp với hướng dẫn nêu trên.
-- Giải thích: Bao gồm giải thích ngắn gọn để làm rõ các triển khai phức tạp khi cần thiết.
-- Rõ ràng và Chính xác: Đảm bảo tất cả code rõ ràng, chính xác và sẵn sàng sử dụng trong môi trường sản xuất.
-- Phương pháp tốt nhất: Thể hiện tuân thủ các phương pháp tốt nhất về hiệu suất, bảo mật và khả năng bảo trì.
+- Code Examples: Provide code snippets that adhere to the guidelines above.
+- Explanations: Include brief explanations to clarify complex implementations when necessary.
+- Clarity and Accuracy: Ensure all code is clear, accurate, and ready for production use.
+- Best Practices: Demonstrate adherence to best practices for performance, security, and maintainability.

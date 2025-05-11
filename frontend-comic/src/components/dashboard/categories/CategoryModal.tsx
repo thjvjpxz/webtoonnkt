@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import { CategoryCreateUpdate } from "@/types/category";
+import { CategoryCreateUpdate, CategoryResponse } from "@/types/category";
 import { generateSlug } from "@/utils/string";
-import { CategoryModalProps } from "@/types/category";
 import Button from "@/components/ui/Button";
+
+export interface CategoryModalProps {
+  category: CategoryResponse | null;
+  onClose: () => void;
+  onSave: (category: CategoryCreateUpdate) => void;
+}
 
 export default function CategoryModal({
   category,

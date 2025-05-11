@@ -2,7 +2,13 @@
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
 import Button from "@/components/ui/Button";
-import { DeleteUserModalProps } from "@/types/user";
+
+interface DeleteUserModalProps {
+  username: string;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  isDeleting: boolean;
+}
 
 export default function DeleteUserModal({
   username,
