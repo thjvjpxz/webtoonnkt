@@ -70,6 +70,9 @@ public class Comic {
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
+    @Column(name = "last_chapter_id", columnDefinition = "VARCHAR(36)")
+    String lastChapterId;
+
     @Column(name = "folder_id", columnDefinition = "VARCHAR(50)")
     @JsonIgnore
     String folderId;

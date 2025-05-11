@@ -19,9 +19,4 @@ public class GoogleDriveConstants {
     public static final String FOLDER_ID_LEVEL = "1yaNeA0eT8pIZcD3yixG9MbZZu_qDfVuJ";
     public static final String FOLDER_ID_AVATAR = "1ChKIDTxtTszdg7SX9JpJ3WjS3fRT924r";
 
-    // Type
-    public static final String TYPE_THUMBNAIL = "thumbnail";
-    public static final String TYPE_COMIC = "comic";
-    public static final String TYPE_LEVEL = "level";
-    public static final String TYPE_AVATAR = "avatar";
 }

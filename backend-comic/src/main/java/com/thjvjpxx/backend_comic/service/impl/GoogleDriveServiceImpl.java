@@ -17,6 +17,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.Permission;
+import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
@@ -78,13 +79,13 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     @Override
     public BaseResponse<?> uploadFile(MultipartFile file, String type, String fileName) {
         switch (type) {
-            case GoogleDriveConstants.TYPE_THUMBNAIL:
+            case GlobalConstants.TYPE_THUMBNAIL:
                 return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_THUMBNAIL, fileName);
-            case GoogleDriveConstants.TYPE_COMIC:
+            case GlobalConstants.TYPE_COMIC:
                 return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_COMIC, fileName);
-            case GoogleDriveConstants.TYPE_LEVEL:
+            case GlobalConstants.TYPE_LEVEL:
                 return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_LEVEL, fileName);
-            case GoogleDriveConstants.TYPE_AVATAR:
+            case GlobalConstants.TYPE_AVATAR:
                 return handleUploadFile(file, GoogleDriveConstants.FOLDER_ID_AVATAR, fileName);
             default:
                 throw new BaseException(ErrorCode.TYPE_NOT_FOUND);

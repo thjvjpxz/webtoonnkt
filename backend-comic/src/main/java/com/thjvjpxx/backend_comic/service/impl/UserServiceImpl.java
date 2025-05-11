@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
+import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.UserRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -19,8 +21,8 @@ import com.thjvjpxx.backend_comic.model.Role;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.RoleRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
-import com.thjvjpxx.backend_comic.service.GoogleDriveService;
 import com.thjvjpxx.backend_comic.service.LevelService;
+import com.thjvjpxx.backend_comic.service.StorageFactory;
 import com.thjvjpxx.backend_comic.service.UserService;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
@@ -38,7 +40,7 @@ public class UserServiceImpl implements UserService {
     LevelService levelService;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
-    GoogleDriveService googleDriveService;
+    StorageFactory storageFactory;
 
     @Override
     public BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId) {
@@ -90,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
         String imgUrl = null;
         if (avatar != null) {
-            var response = googleDriveService.uploadFile(avatar, GoogleDriveConstants.TYPE_AVATAR,
+            var response = storageFactory.getStorageService().uploadFile(avatar, GlobalConstants.TYPE_AVATAR,
                     request.getUsername());
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -126,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
         String imgUrl = user.getImgUrl();
         if (avatar != null) {
-            var response = googleDriveService.uploadFile(avatar, GoogleDriveConstants.TYPE_AVATAR,
+            var response = storageFactory.getStorageService().uploadFile(avatar, GlobalConstants.TYPE_AVATAR,
                     request.getUsername());
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -186,9 +188,12 @@ public class UserServiceImpl implements UserService {
     public BaseResponse<User> deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
-        if (user.getImgUrl() != null && !user.getImgUrl().isEmpty()
-                && user.getImgUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.remove(StringUtils.getIdFromUrl(user.getImgUrl()));
+        String imgUrl = user.getImgUrl();
+        if (imgUrl != null && !imgUrl.isEmpty()
+                && imgUrl.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(imgUrl));
+        } else if (imgUrl != null && !imgUrl.isEmpty() && imgUrl.startsWith(B2Constants.URL_PREFIX)) {
+            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(imgUrl));
         }
         userRepository.delete(user);
         return BaseResponse.success(user);
