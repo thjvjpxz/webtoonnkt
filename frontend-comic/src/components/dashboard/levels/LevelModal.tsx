@@ -8,6 +8,7 @@ import {
 } from "@/types/level";
 import { FiX, FiUpload } from "react-icons/fi";
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 
 interface LevelModalProps {
   isOpen: boolean;
@@ -244,9 +245,9 @@ export default function LevelModal({
               </label>
               <div
                 onClick={openFileInput}
-                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-green-500 dark:border-gray-600 dark:hover:border-green-500"
+                className="mt-1 flex justify-center px-6 py-4 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-green-500 dark:border-gray-600 dark:hover:border-green-500 transition-colors duration-200 bg-gray-50 dark:bg-gray-700/30"
               >
-                <div className="space-y-1 text-center">
+                <div className="space-y-2 text-center">
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -255,21 +256,32 @@ export default function LevelModal({
                     className="hidden"
                   />
                   {previewUrl ? (
-                    <div>
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="mx-auto h-32 w-32 object-cover"
-                      />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    <div className="flex flex-col items-center">
+                      <div className="relative h-40 w-40 mb-3 overflow-hidden rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+                        <Image
+                          src={previewUrl}
+                          alt="Preview"
+                          width={160}
+                          height={160}
+                          className="object-cover h-full w-full"
+                          loading="lazy"
+                        />
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <FiUpload className="h-4 w-4" />
                         Nhấp để thay đổi hình ảnh
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
-                      <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Nhấp để tải lên hình ảnh (PNG, JPG, GIF tối đa 10MB)
+                      <div className="p-4 rounded-full bg-green-50 dark:bg-green-900/20 mb-3">
+                        <FiUpload className="mx-auto h-10 w-10 text-green-500 dark:text-green-400" />
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                        Kéo thả hoặc nhấp để tải lên
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        PNG, JPG, GIF (tối đa 10MB)
                       </p>
                     </div>
                   )}

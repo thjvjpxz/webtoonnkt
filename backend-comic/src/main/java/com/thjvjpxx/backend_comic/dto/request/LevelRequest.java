@@ -21,7 +21,7 @@ public class LevelRequest {
 
     @NotNull(message = "LEVEL_EXP_REQUIRED_NOT_EMPTY")
     @Min(value = 0, message = "LEVEL_EXP_REQUIRED_NOT_MIN")
-    double expRequired;
+    Integer expRequired;
 
     String urlGif;
 

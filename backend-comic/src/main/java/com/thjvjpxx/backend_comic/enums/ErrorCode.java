@@ -51,6 +51,27 @@ public enum ErrorCode {
     DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh chapter không được trống!"),
     DETAIL_CHAPTER_IMAGE_URL_NOT_EMPTY(HttpStatus.BAD_REQUEST, "URL ảnh chapter không được trống!"),
 
+    // User và Authentication
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Người dùng không tồn tại!"),
+    USERNAME_EXISTS(HttpStatus.BAD_REQUEST, "Tên đăng nhập đã tồn tại!"),
+    USERNAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên đăng nhập không được trống!"),
+    EMAIL_EXISTS(HttpStatus.BAD_REQUEST, "Email đã tồn tại!"),
+    EMAIL_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Email không được trống!"),
+    EMAIL_INVALID(HttpStatus.BAD_REQUEST, "Email không hợp lệ!"),
+    PASSWORD_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Mật khẩu không được trống!"),
+    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "Mật khẩu không đúng!"),
+    CONFIRM_PASSWORD_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Mật khẩu xác nhận không được trống!"),
+    USER_INACTIVE(HttpStatus.FORBIDDEN, "Tài khoản chưa được kích hoạt!"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Thông tin đăng nhập không hợp lệ!"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token không hợp lệ hoặc đã hết hạn!"),
+    TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "Yêu cầu token!"),
+    PERMISSION_DENIED(HttpStatus.FORBIDDEN, "Không có quyền truy cập!"),
+    REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh token không hợp lệ hoặc đã hết hạn!"),
+    REFRESH_TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "Yêu cầu refresh token!"),
+
+    // Role
+    ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại!"),
+
     // Crawler
     CRAWLER_NOT_FOUND(HttpStatus.NOT_FOUND, "Tiến trình crawl không tồn tại!"),
 

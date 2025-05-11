@@ -37,7 +37,7 @@ export default function DeleteChapterModal({
             Xác nhận xóa
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-center">
-            Bạn có chắc chắn muốn xóa chương "{chapterTitle}" - Chương {chapterNumber} của truyện "{comicName}"?
+            Bạn có chắc chắn muốn xóa chương &quot;{chapterTitle}&quot; - Chương {chapterNumber} của truyện &quot;{comicName}&quot;?
           </p>
           <p className="text-gray-600 dark:text-gray-300 text-center mt-2">
             Hành động này không thể hoàn tác.

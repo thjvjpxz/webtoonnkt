@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
         hostname: "example.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "sv1.otruyencdn.com",
+        pathname: "**",
+      },
     ],
     dangerouslyAllowSVG: true,
   },

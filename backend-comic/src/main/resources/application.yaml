@@ -6,7 +6,7 @@ spring:
   application:
     name: backend-comic
   datasource:
-    url: jdbc:mysql://localhost:3306/webtoon
+    url: jdbc:mysql://localhost:3307/webtoon
     username: webtoon
     password: 12345Webtoon
   jpa:
@@ -36,6 +36,19 @@ crawler:
     size: 5
     delay-ms: 0
 
+storage:
+  provider: b2 # nhập 'b2' hoặc 'google'
+
 google-drive:
   folder-id: 1H89l7BIVVNR3byETuuqZp2OXJpbSsT2R
 
+jwt:
+  expiration: 3600000 # 1 giờ
+  refresh-expiration: 604800000 # 7 ngày
+
+b2:
+  accessKeyId: 00578cb19b5269e0000000002
+  secretKey: K005p7EbGqGkvr3NSYf5JApC8gQdc9U
+  endpoint: https://s3.us-east-005.backblazeb2.com
+  region: us-east-005
+  bucketName: webtoon-thjvjpxx

@@ -10,11 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
+import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
-import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
@@ -26,7 +27,7 @@ import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
-import com.thjvjpxx.backend_comic.service.GoogleDriveService;
+import com.thjvjpxx.backend_comic.service.StorageFactory;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -42,7 +43,7 @@ public class ComicServiceImpl implements ComicService {
     ComicRepository comicRepository;
     ComicMapper comicMapper;
     CategoryRepository categoryRepository;
-    GoogleDriveService googleDriveService;
+    StorageFactory storageFactory;
     ChapterRepository chapterRepository;
     ChapterMapper chapterMapper;
 
@@ -82,16 +83,22 @@ public class ComicServiceImpl implements ComicService {
         validateComicRequest(comicRequest);
         String thumbUrl = null;
         if (cover != null) {
-            var response = googleDriveService.uploadFile(
+            var response = storageFactory.getStorageService().uploadFile(
                     cover,
-                    GoogleDriveConstants.TYPE_THUMBNAIL,
+                    GlobalConstants.TYPE_THUMBNAIL,
                     comicRequest.getSlug() + "_thumb");
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
             thumbUrl = response.getMessage();
         }
-        String folderId = googleDriveService.createFolder(comicRequest.getSlug(), GoogleDriveConstants.FOLDER_ID_COMIC);
+        String folderId = null;
+        if (storageFactory.getStorageProvider() == "google") {
+            folderId = storageFactory.getStorageService().createFolder(comicRequest.getSlug(),
+                    GoogleDriveConstants.FOLDER_ID_COMIC);
+        } else {
+            folderId = B2Constants.FOLDER_KEY_COMIC;
+        }
         Comic comic = comicMapper.toComic(comicRequest);
         comic.setFolderId(folderId);
         List<String> categories = comicRequest.getCategories();
@@ -117,45 +124,48 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
-        ValidationUtils.checkNullId(id);
+        return null;
+        // ValidationUtils.checkNullId(id);
 
-        Comic comic = findComicById(id);
+        // Comic comic = findComicById(id);
 
-        if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
-                && !comicRequest.getSlug().equals(comic.getSlug())) {
-            validateComicRequest(comicRequest);
-            if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
-                googleDriveService.rename(comic.getFolderId(), comicRequest.getSlug());
-            }
-        }
+        // if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
+        // && !comicRequest.getSlug().equals(comic.getSlug())) {
+        // validateComicRequest(comicRequest);
+        // if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
+        // storageFactory.getStorageService().rename(comic.getFolderId(),
+        // comicRequest.getSlug());
+        // }
+        // }
 
-        String thumbUrl = comic.getThumbUrl();
-        if (cover != null) {
-            var response = googleDriveService.uploadFile(
-                    cover,
-                    GoogleDriveConstants.TYPE_THUMBNAIL,
-                    comicRequest.getSlug() + "_thumb");
-            if (response.getStatus() != HttpStatus.OK.value()) {
-                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-            }
-            thumbUrl = response.getMessage();
-        }
+        // String thumbUrl = comic.getThumbUrl();
+        // if (cover != null) {
+        // var response = googleDriveService.uploadFile(
+        // cover,
+        // GoogleDriveConstants.TYPE_THUMBNAIL,
+        // comicRequest.getSlug() + "_thumb");
+        // if (response.getStatus() != HttpStatus.OK.value()) {
+        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        // }
+        // thumbUrl = response.getMessage();
+        // }
 
-        List<Category> categoriesNew = convertCategories(comicRequest.getCategories());
+        // List<Category> categoriesNew =
+        // convertCategories(comicRequest.getCategories());
 
-        comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
+        // comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
 
-        comic.addCategories(categoriesNew);
-        comic.setSlug(comicRequest.getSlug());
-        comic.setName(comicRequest.getName());
-        comic.setDescription(comicRequest.getDescription());
-        comic.setAuthor(comicRequest.getAuthor());
-        comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
-        comic.setThumbUrl(thumbUrl);
-        comic.setOriginName(comicRequest.getOriginName());
+        // comic.addCategories(categoriesNew);
+        // comic.setSlug(comicRequest.getSlug());
+        // comic.setName(comicRequest.getName());
+        // comic.setDescription(comicRequest.getDescription());
+        // comic.setAuthor(comicRequest.getAuthor());
+        // comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
+        // comic.setThumbUrl(thumbUrl);
+        // comic.setOriginName(comicRequest.getOriginName());
 
-        comicRepository.save(comic);
-        return BaseResponse.success(comic);
+        // comicRepository.save(comic);
+        // return BaseResponse.success(comic);
     }
 
     private Comic findComicById(String id) {
@@ -171,10 +181,11 @@ public class ComicServiceImpl implements ComicService {
 
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
 
-        if (comic.getThumbUrl() != null &&
-                !comic.getThumbUrl().isEmpty() &&
-                comic.getThumbUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.remove(StringUtils.getIdFromUrl(comic.getThumbUrl()));
+        String thumbUrl = comic.getThumbUrl();
+        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(thumbUrl));
+        } else if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
+            storageFactory.getStorageService().remove(thumbUrl);
         }
         comicRepository.delete(comic);
         return BaseResponse.success(comic);

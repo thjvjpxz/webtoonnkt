@@ -15,12 +15,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "levels")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Level {
 
@@ -34,11 +40,10 @@ public class Level {
 
     String name;
 
-    @Column(columnDefinition = "VARCHAR(7)")
     String color;
 
     @Column(name = "exp_required")
-    double expRequired;
+    Integer expRequired;
 
     @Column(name = "url_gif")
     String urlGif;

@@ -16,6 +16,7 @@ import { formatDate } from "@/utils/helpers";
 import { useLevel } from "@/hooks/useLevel";
 import DeleteLevelModal from "@/components/dashboard/levels/DeleteLevelModal";
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 
 export default function Levels() {
   const {
@@ -186,7 +187,15 @@ export default function Levels() {
                         className="hover:bg-green-50/50 dark:hover:bg-green-900/10"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-800 dark:text-gray-200">
+                          <div className="font-medium text-gray-800 dark:text-gray-200"
+                            style={{
+                              color: level.levelNumber === 1 ? level.urlGif : "transparent",
+                              backgroundImage: level.levelNumber !== 1 ? `url(${level.urlGif})` : "none",
+                              backgroundSize: level.levelNumber !== 1 ? "auto" : "none",
+                              backgroundPosition: level.levelNumber !== 1 ? "center" : "none",
+                              WebkitBackgroundClip: level.levelNumber !== 1 ? "text" : "none",
+                            }}
+                          >
                             {level.name}
                           </div>
                         </td>
@@ -209,19 +218,28 @@ export default function Levels() {
                           <div className="flex justify-center">
                             <div
                               className="w-6 h-6 rounded-full"
-                              style={{ backgroundColor: level.color }}
-                              title={level.color}
+                              style={{ background: level.color }}
                             ></div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="flex justify-center">
-                            {level.urlGif ? (
-                              <img
+                            {level.urlGif && level.levelNumber !== 1 ? (
+                              <Image
                                 src={level.urlGif}
                                 alt={level.name}
-                                className="w-10 h-10 object-cover rounded"
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                className="object-cover rounded !h-10"
                               />
+                            ) : level.levelNumber === 1 ? (
+                              <div
+                                className="w-10 h-10 rounded"
+                                style={{
+                                  backgroundColor: level.urlGif,
+                                }}
+                              ></div>
                             ) : (
                               <span className="text-gray-400">Không có</span>
                             )}

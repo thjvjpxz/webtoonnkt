@@ -7,8 +7,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -155,6 +155,12 @@ public class ChapterServiceImpl implements ChapterService {
         chapter.setDetailChapters(detailChapters);
 
         chapterRepository.save(chapter);
+
+        double chapterNumberMax = chapterRepository.findMaxChapterNumberByComicId(chapterRequest.getComicId());
+        if (chapter.getChapterNumber() >= chapterNumberMax) {
+            comic.setLastChapterId(chapter.getId());
+            comicRepository.save(comic);
+        }
 
         return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
     }

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
+import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.LevelRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -18,8 +20,8 @@ import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.LevelType;
 import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
-import com.thjvjpxx.backend_comic.service.GoogleDriveService;
 import com.thjvjpxx.backend_comic.service.LevelService;
+import com.thjvjpxx.backend_comic.service.StorageFactory;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -35,7 +37,7 @@ public class LevelServiceImpl implements LevelService {
     LevelRepository levelRepository;
     LevelMapper levelMapper;
     LevelTypeRepository levelTypeRepository;
-    GoogleDriveService googleDriveService;
+    StorageFactory storageFactory;
 
     private boolean isLevelExists(String levelName) {
         return levelRepository.existsByName(levelName);
@@ -77,7 +79,8 @@ public class LevelServiceImpl implements LevelService {
 
         String urlGif = null;
         if (file != null) {
-            var response = googleDriveService.uploadFile(file, GoogleDriveConstants.TYPE_LEVEL, nameNormalize);
+            var response = storageFactory.getStorageService().uploadFile(file, GlobalConstants.TYPE_LEVEL,
+                    nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
@@ -108,7 +111,8 @@ public class LevelServiceImpl implements LevelService {
         String urlGif = level.getUrlGif();
         String nameNormalize = StringUtils.generateSlug(request.getName());
         if (file != null) {
-            var response = googleDriveService.uploadFile(file, GoogleDriveConstants.TYPE_LEVEL, nameNormalize);
+            var response = storageFactory.getStorageService().uploadFile(file, GlobalConstants.TYPE_LEVEL,
+                    nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
@@ -137,14 +141,37 @@ public class LevelServiceImpl implements LevelService {
 
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
-        levelRepository.delete(level);
-        if (level.getUrlGif() != null
-                && !level.getUrlGif().isEmpty()
-                && level.getUrlGif().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            googleDriveService.remove(StringUtils.getIdFromUrl(level.getUrlGif()));
+        String urlGif = level.getUrlGif();
+        if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
+            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(urlGif));
+        } else if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(B2Constants.URL_PREFIX)) {
+            storageFactory.getStorageService().remove(urlGif);
         }
-
+        levelRepository.delete(level);
         return BaseResponse.success(level);
     }
 
+    @Override
+    public Level getLevelDefaultUser() {
+        int levelNumber = 1;
+        LevelType levelType = levelTypeRepository.findByName("Không chọn")
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
+        return levelRepository.findByLevelNumberAndLevelType(levelNumber, levelType)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+    }
+
+    @Override
+    public Level getLevelById(String id) {
+        return levelRepository.findById(id)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+    }
+
+    @Override
+    public BaseResponse<?> getLevelByType(String levelTypeId) {
+        LevelType levelType = levelTypeRepository.findById(levelTypeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
+        List<Level> levels = levelRepository.findByLevelTypeOrderByLevelNumberAsc(levelType)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+        return BaseResponse.success(levels);
+    }
 }

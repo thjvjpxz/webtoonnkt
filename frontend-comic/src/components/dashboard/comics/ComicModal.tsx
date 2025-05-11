@@ -20,7 +20,7 @@ export default function ComicModal({
     slug: "",
     description: "",
     author: "",
-    status: "ongoing",
+    status: "ONGOING",
     categories: [],
     thumbUrl: "",
     originName: "",
@@ -52,7 +52,7 @@ export default function ComicModal({
         description: comic.description || "",
         author: comic.author || "",
         thumbUrl: comic.thumbUrl || "",
-        status: comic.status || "ongoing",
+        status: comic.status || "ONGOING",
         originName: comic.originName || "",
         categories: comic.categories?.map((cat) => cat.id) || [],
       });
@@ -530,8 +530,9 @@ export default function ComicModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
               >
-                <option value="ongoing">Đang cập nhật</option>
-                <option value="completed">Đã hoàn thành</option>
+                <option value="ONGOING">Đang cập nhật</option>
+                <option value="COMPLETED">Đã hoàn thành</option>
+                <option value="COMING_SOON">Sắp ra mắt</option>
               </select>
             </div>
 

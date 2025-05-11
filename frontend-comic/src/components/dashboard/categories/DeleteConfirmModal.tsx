@@ -19,6 +19,7 @@ export default function DeleteConfirmModal({
       await onConfirm();
       // onConfirm sẽ xử lý việc đóng modal sau khi thành công
     } catch (error) {
+      console.error("Lỗi khi xóa thể loại:", error);
       setIsDeleting(false);
     }
   };

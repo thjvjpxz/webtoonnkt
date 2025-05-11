@@ -1,6 +1,5 @@
 import React from "react";
 import { ButtonProps } from "@/types/button";
-import { FiLoader } from "react-icons/fi";
 
 const Button: React.FC<ButtonProps> = ({
   variant = "primary",

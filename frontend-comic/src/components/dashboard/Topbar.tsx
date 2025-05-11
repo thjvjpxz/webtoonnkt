@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FiBell, FiSun, FiMoon } from "react-icons/fi";
+import { FiBell } from "react-icons/fi";
 import { TopbarProps } from "@/types/dashboard";
 
 export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
