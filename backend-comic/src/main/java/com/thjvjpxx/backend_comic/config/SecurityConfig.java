@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Các API công khai
                         .requestMatchers("/auth/login", "/auth/register", "/auth/refresh-token").permitAll()
+                        .requestMatchers("/public/**").permitAll()
 
                         // Các API cần xác thực với vai trò ADMIN
                         .requestMatchers("/admin/**").hasRole("ADMIN")

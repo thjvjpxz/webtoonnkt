@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -24,5 +25,7 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
 
     @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
     Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);
+
+    Page<Comic> findByUpdatedAtAfter(LocalDateTime date, Pageable pageable);
 
 }

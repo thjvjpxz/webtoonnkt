@@ -3,6 +3,7 @@ package com.thjvjpxx.backend_comic.exception;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -47,5 +48,14 @@ public class GlobalException {
                 .status(ErrorCode.INVALID_ARGUMENT.getStatus())
                 .body(BaseResponse.error(ErrorCode.INVALID_ARGUMENT.getStatus().value(),
                         "Dữ liệu gửi lên không hợp lệ"));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<BaseResponse<?>> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException ex) {
+        return ResponseEntity
+                .status(ErrorCode.INVALID_ARGUMENT.getStatus())
+                .body(BaseResponse.error(ErrorCode.INVALID_ARGUMENT.getStatus().value(),
+                        "Thiếu tham số bắt buộc: " + ex.getParameterName()));
     }
 }
