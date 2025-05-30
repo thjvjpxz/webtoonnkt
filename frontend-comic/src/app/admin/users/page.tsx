@@ -12,7 +12,6 @@ import {
   FiX,
   FiUsers,
 } from "react-icons/fi";
-import "@/styles/scrollbar.css";
 import Pagination from "@/components/admin/Pagination";
 import { formatDate } from "@/utils/helpers";
 import Button from "@/components/ui/Button";

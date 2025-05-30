@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import "@/styles/scrollbar.css";
 import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";

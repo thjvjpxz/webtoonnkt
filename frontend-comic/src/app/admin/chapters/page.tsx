@@ -6,7 +6,6 @@ import Pagination from "@/components/admin/Pagination";
 import { useChapter } from "@/hooks/useChapter";
 import Image from "next/image";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
-import "@/styles/scrollbar.css";
 import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
 import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
 import ChapterModal from "@/components/admin/chapters/ChapterModal";

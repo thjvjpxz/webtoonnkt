@@ -8,7 +8,6 @@ import {
   FiSearch,
   FiAlertCircle,
 } from "react-icons/fi";
-import "@/styles/scrollbar.css";
 import Pagination from "@/components/admin/Pagination";
 import LevelModal from "@/components/admin/levels/LevelModal";
 import LevelTypeModal from "@/components/admin/levels/LevelTypeModal";
