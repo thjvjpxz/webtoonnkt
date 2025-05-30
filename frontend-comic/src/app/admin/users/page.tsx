@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import {
   FiPlus,
   FiEdit,
@@ -13,13 +13,13 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import "@/styles/scrollbar.css";
-import Pagination from "@/components/dashboard/Pagination";
+import Pagination from "@/components/admin/Pagination";
 import { formatDate } from "@/utils/helpers";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import { useUser } from "@/hooks/useUser";
-import UserModal from "@/components/dashboard/users/UserModal";
-import DeleteUserModal from "@/components/dashboard/users/DeleteUserModal";
+import UserModal from "@/components/admin/users/UserModal";
+import DeleteUserModal from "@/components/admin/users/DeleteUserModal";
 
 export default function Users() {
   const {

@@ -1,10 +1,10 @@
 "use client";
 
-import ComicModal from "@/components/dashboard/comics/ComicModal";
-import DeleteComicModal from "@/components/dashboard/comics/DeleteComicModal";
-import ViewComic from "@/components/dashboard/comics/ViewComic";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import Pagination from "@/components/dashboard/Pagination";
+import ComicModal from "@/components/admin/comics/ComicModal";
+import DeleteComicModal from "@/components/admin/comics/DeleteComicModal";
+import ViewComic from "@/components/admin/comics/ViewComic";
+import DashboardLayout from "@/components/admin/DashboardLayout";
+import Pagination from "@/components/admin/Pagination";
 import Button from "@/components/ui/Button";
 import { useComic } from "@/hooks/useComic";
 import Image from "next/image";

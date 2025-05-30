@@ -29,44 +29,44 @@ export default function Sidebar({
   };
 
   const navItems = [
-    { path: "/dashboard", icon: <FiHome size={20} />, label: "Tổng quan" },
+    { path: "/admin/dashboard", icon: <FiHome size={20} />, label: "Tổng quan" },
     {
-      path: "/dashboard/categories",
+      path: "/admin/categories",
       icon: <FiTag size={20} />,
       label: "Thể loại",
     },
     {
-      path: "/dashboard/comics",
+      path: "/admin/comics",
       icon: <FiBook size={20} />,
       label: "Quản lý truyện",
     },
     {
-      path: "/dashboard/levels",
+      path: "/admin/levels",
       icon: <FiAward size={20} />,
       label: "Cấp độ",
     },
     {
-      path: "/dashboard/chapters",
+      path: "/admin/chapters",
       icon: <FiFileText size={20} />,
       label: "Quản lý chương",
     },
     {
-      path: "/dashboard/users",
+      path: "/admin/users",
       icon: <FiUsers size={20} />,
       label: "Người dùng",
     },
     {
-      path: "/dashboard/comments",
+      path: "/admin/comments",
       icon: <FiMessageSquare size={20} />,
       label: "Bình luận",
     },
     {
-      path: "/dashboard/crawler",
+      path: "/admin/crawler",
       icon: <FiDownload size={20} />,
       label: "Crawler Truyện",
     },
     {
-      path: "/dashboard/settings",
+      path: "/admin/settings",
       icon: <FiSettings size={20} />,
       label: "Cài đặt",
     },

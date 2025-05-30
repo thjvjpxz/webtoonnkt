@@ -2,7 +2,7 @@
 
 import { useCrawler } from "@/hooks/useCrawler";
 import { CrawlerStatus } from "@/types/crawler";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import {
   FiCheckCircle,
   FiAlertCircle,

@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import {
   FiPlus,
   FiEdit,
@@ -8,10 +8,9 @@ import {
   FiSearch,
   FiAlertCircle,
 } from "react-icons/fi";
-import CategoryModal from "@/components/dashboard/categories/CategoryModal";
-import DeleteConfirmModal from "@/components/dashboard/categories/DeleteConfirmModal";
-import Pagination from "@/components/dashboard/Pagination";
-import "@/styles/scrollbar.css";
+import CategoryModal from "@/components/admin/categories/CategoryModal";
+import DeleteConfirmModal from "@/components/admin/categories/DeleteConfirmModal";
+import Pagination from "@/components/admin/Pagination"
 import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
 import Button from "@/components/ui/Button";

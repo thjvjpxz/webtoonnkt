@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import {
   FiPlus,
   FiEdit,
@@ -9,12 +9,12 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 import "@/styles/scrollbar.css";
-import Pagination from "@/components/dashboard/Pagination";
-import LevelModal from "@/components/dashboard/levels/LevelModal";
-import LevelTypeModal from "@/components/dashboard/levels/LevelTypeModal";
+import Pagination from "@/components/admin/Pagination";
+import LevelModal from "@/components/admin/levels/LevelModal";
+import LevelTypeModal from "@/components/admin/levels/LevelTypeModal";
 import { formatDate } from "@/utils/helpers";
 import { useLevel } from "@/hooks/useLevel";
-import DeleteLevelModal from "@/components/dashboard/levels/DeleteLevelModal";
+import DeleteLevelModal from "@/components/admin/levels/DeleteLevelModal";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 

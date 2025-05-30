@@ -1,9 +1,9 @@
 "use client";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import StatsOverview from "@/components/dashboard/StatsOverview";
-import ChartSection from "@/components/dashboard/ChartSection";
-import RecentComicsTable from "@/components/dashboard/RecentComicsTable";
+import DashboardLayout from "@/components/admin/DashboardLayout";
+import StatsOverview from "@/components/admin/StatsOverview";
+import ChartSection from "@/components/admin/ChartSection";
+import RecentComicsTable from "@/components/admin/RecentComicsTable";
 import { ComicData } from "@/types/dashboard";
 
 // Component Dashboard chính

@@ -1,15 +1,15 @@
 'use client'
 
 import { FiPlus, FiEdit, FiTrash2, FiSearch, FiAlertCircle, FiBookOpen, FiEye } from "react-icons/fi";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import Pagination from "@/components/dashboard/Pagination";
+import DashboardLayout from "@/components/admin/DashboardLayout";
+import Pagination from "@/components/admin/Pagination";
 import { useChapter } from "@/hooks/useChapter";
 import Image from "next/image";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import "@/styles/scrollbar.css";
-import ViewChapterModal from "@/components/dashboard/chapters/ViewChapterModal";
-import DeleteChapterModal from "@/components/dashboard/chapters/DeleteChapterModal";
-import ChapterModal from "@/components/dashboard/chapters/ChapterModal";
+import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
+import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
+import ChapterModal from "@/components/admin/chapters/ChapterModal";
 import Button from "@/components/ui/Button";
 
 export default function Chapters() {
