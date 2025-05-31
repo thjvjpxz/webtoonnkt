@@ -14,6 +14,7 @@ import Pagination from "@/components/admin/Pagination"
 import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 
 export default function Categories() {
   const {
@@ -44,14 +45,13 @@ export default function Categories() {
     <DashboardLayout title="Quản lý thể loại">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <form onSubmit={handleSearch} className="relative">
-          <input
-            type="text"
+          <Input
             placeholder="Tìm kiếm thể loại..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+            className="sm:w-80"
+            leftIcon={<FiSearch className="h-5 w-5 text-[var(--primary)]" />}
           />
-          <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
           <button type="submit" className="hidden">
             Tìm kiếm
           </button>
@@ -69,9 +69,9 @@ export default function Categories() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
-        <div className="p-6 border-b border-green-100 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+      <div className="bg-[var(--background)] rounded-xl shadow-sm overflow-hidden border border-[var(--border)] dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 border-b border-[var(--border)] dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Danh sách thể loại
           </h2>
         </div>

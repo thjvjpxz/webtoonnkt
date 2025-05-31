@@ -6,6 +6,8 @@ import { CategoryCreateUpdate } from "@/types/category";
 import { generateSlug } from "@/utils/string";
 import { CategoryModalProps } from "@/types/category";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
 
 export default function CategoryModal({
   category,
@@ -94,78 +96,46 @@ export default function CategoryModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+      <div className="bg-[var(--background)] rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div className="flex justify-between items-center p-6 border-b border-[var(--border)] dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">
             {category ? "Sửa thể loại" : "Thêm thể loại mới"}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-[var(--text-primary)] hover:text-[var(--primary)] dark:text-gray-400 dark:hover:text-gray-200"
           >
             <FiX size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-            >
-              Tên thể loại
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 border ${errors.name ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <Input
+            id="name"
+            name="name"
+            label="Tên thể loại"
+            value={formData.name}
+            onChange={handleChange}
+            error={errors.name}
+          />
 
-          <div className="mb-4">
-            <label
-              htmlFor="slug"
-              className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-            >
-              Slug
-            </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              value={formData.slug}
-              onChange={handleChange}
-              className={`w-full px-3 py-2 border ${errors.slug ? "border-rose-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-            />
-            {errors.slug && (
-              <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>
-            )}
-          </div>
+          <Input
+            id="slug"
+            name="slug"
+            label="Slug"
+            value={formData.slug}
+            onChange={handleChange}
+            error={errors.slug}
+          />
 
-          <div className="mb-6">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-            >
-              Mô tả
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description || ""}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
+          <Textarea
+            id="description"
+            name="description"
+            label="Mô tả"
+            value={formData.description || ""}
+            onChange={handleChange}
+            rows={3}
+          />
 
           <div className="flex justify-end space-x-3">
             <Button

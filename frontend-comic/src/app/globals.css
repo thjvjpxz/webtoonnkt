@@ -3,40 +3,25 @@
 :root {
   /* Light Theme */
   --background: #fefffe;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #2d2d2d;
-  --border: #e8f5e8;
-  --input: #f8fcf8;
+  --foreground: #e8f5e8;
   --primary: #22c55e;
-  --primary-foreground: #ffffff;
-  --secondary: #dcfce7;
-  --secondary-foreground: #166534;
-  --muted: #f1f8f1;
-  --accent: #bbf7d0;
-  --success: #16a34a;
-  --warning: #eab308;
-  --destructive: #dc2626;
+  --primary-foreground: #e8f5e8;
+  --primary-hover: #16a34a;
+  --text-primary: #000;
+  --border: var(--foreground);
 }
 
 [data-theme="dark"] {
   /* Dark Theme */
-  --background: #0f1419;
+  --background: #1e2939;
   --foreground: #e8f5e8;
-  --card: #1a2e1a;
-  --card-foreground: #f0f9f0;
-  --border: #2d4a2d;
-  --input: #243324;
-  --primary: #4ade80;
-  --primary-foreground: #0a2e0a;
-  --secondary: #1e3a1e;
-  --secondary-foreground: #a7f3a7;
-  --muted: #1a2e1a;
-  --accent: #22543d;
-  --success: #22c55e;
-  --warning: #fbbf24;
-  --destructive: #ef4444;
+  --primary: #008236;
+  --primary-foreground: #e8f5e8;
+  --primary-hover: #00642a;
+  --text-primary: #fff;
+  --border: var(--primary);
 }
+
 
 
 body {
@@ -44,4 +29,5 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  box-sizing: border-box;
 }
