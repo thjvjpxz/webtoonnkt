@@ -36,7 +36,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Apply theme to document và save to localStorage
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
+    const root = document.documentElement;
+    root.setAttribute("data-theme", theme);
+
+    // Thêm hoặc xóa class 'dark' dựa trên theme hiện tại
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+
     localStorage.setItem("theme", theme);
   }, [theme]);
 

@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light Theme */
+  --background: #fefffe;
+  --foreground: #1a1a1a;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --border: #e5e7eb;
-  --input: #f9fafb;
+  --card-foreground: #2d2d2d;
+  --border: #e8f5e8;
+  --input: #f8fcf8;
   --primary: #22c55e;
   --primary-foreground: #ffffff;
+  --secondary: #dcfce7;
+  --secondary-foreground: #166534;
+  --muted: #f1f8f1;
+  --accent: #bbf7d0;
+  --success: #16a34a;
+  --warning: #eab308;
+  --destructive: #dc2626;
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #1f2937;
-  --card-foreground: #f9fafb;
-  --border: #374151;
-  --input: #374151;
+  /* Dark Theme */
+  --background: #0f1419;
+  --foreground: #e8f5e8;
+  --card: #1a2e1a;
+  --card-foreground: #f0f9f0;
+  --border: #2d4a2d;
+  --input: #243324;
   --primary: #4ade80;
-  --primary-foreground: #052e16;
+  --primary-foreground: #0a2e0a;
+  --secondary: #1e3a1e;
+  --secondary-foreground: #a7f3a7;
+  --muted: #1a2e1a;
+  --accent: #22543d;
+  --success: #22c55e;
+  --warning: #fbbf24;
+  --destructive: #ef4444;
 }
+
 
 body {
   background: var(--background);
