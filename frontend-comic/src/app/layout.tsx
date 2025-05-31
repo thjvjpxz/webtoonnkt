@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <head>
-        <link rel="stylesheet" href="/css/scrollbar.css" type="text/css" media="all" />
+        {/* <link rel="stylesheet" href="/css/scrollbar.css" type="text/css" media="all" /> */}
       </head>
       <body className={`${inter.className}`}>
         <ThemeProvider>

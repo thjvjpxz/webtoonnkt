@@ -2,7 +2,7 @@ import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 export default function ViewChapterModal({
   isOpen,
@@ -93,7 +93,6 @@ export default function ViewChapterModal({
           <Button
             variant="secondary"
             onClick={onClose}
-            size="md"
           >
             Đóng
           </Button>

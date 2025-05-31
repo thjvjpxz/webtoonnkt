@@ -2,7 +2,15 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 import { DeleteComicModalProps } from "@/types/comic";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function DeleteComicModal({
   comicTitle,
@@ -11,42 +19,52 @@ export default function DeleteComicModal({
   isDeleting,
 }: DeleteComicModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4 text-rose-500">
-            <FiAlertTriangle size={48} />
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-card border-border shadow-strong">
+        <DialogHeader>
+          <DialogTitle className="text-foreground flex items-center gap-2">
+            <div className="bg-destructive/10 p-2 rounded-full text-destructive">
+              <FiAlertTriangle size={20} />
+            </div>
+            Xác nhận xóa truyện
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Hành động này không thể hoàn tác và sẽ xóa vĩnh viễn truyện cùng tất cả chương.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="bg-destructive/10 p-4 rounded-full text-destructive mb-4 shadow-soft">
+            <FiAlertTriangle size={32} />
           </div>
-
-          <h3 className="text-lg font-semibold text-gray-800 text-center mb-2 dark:text-gray-200">
-            Xác nhận xóa
-          </h3>
-
-          <p className="text-gray-600 text-center mb-6 dark:text-gray-400">
+          <p className="text-foreground mb-2">
             Bạn có chắc chắn muốn xóa truyện{" "}
-            <span className="font-semibold">&quot;{comicTitle}&quot;</span>?
-            Hành động này không thể hoàn tác.
+            <span className="font-semibold text-primary">&quot;{comicTitle}&quot;</span> không?
           </p>
-
-          <div className="flex justify-center space-x-3">
-            <Button
-              onClick={onClose}
-              variant="secondary"
-              size="md"
-            >
-              Hủy
-            </Button>
-            <Button
-              onClick={onConfirm}
-              variant="danger"
-              size="md"
-              isLoading={isDeleting}
-            >
-              Xóa
-            </Button>
-          </div>
+          <p className="text-muted-foreground text-sm">
+            Tất cả chương và dữ liệu liên quan sẽ bị xóa vĩnh viễn.
+          </p>
         </div>
-      </div>
-    </div>
+
+        <DialogFooter className="gap-2">
+          <Button
+            onClick={onClose}
+            variant="outline"
+            disabled={isDeleting}
+            className="border-border hover:bg-muted"
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={onConfirm}
+            variant="destructive"
+            disabled={isDeleting}
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+          >
+            {isDeleting ? "Đang xóa..." : "Xóa truyện"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

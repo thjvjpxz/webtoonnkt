@@ -1,13 +1,12 @@
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import Image from "next/image";
-import Button from "./ui/Button";
-import { FiSearch } from "react-icons/fi";
-import Input from "./ui/Input";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 export default function Header() {
   return (
-    <header className="flex justify-between items-center py-3 pe-5">
+    <header className="flex justify-between items-center py-3 pe-5 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center gap-2">
         <Link href="/">
           <Image
@@ -22,18 +21,17 @@ export default function Header() {
         <div className="flex gap-2 relative">
           <Input
             placeholder="Tìm kiếm truyện..."
-            leftIcon={<FiSearch className="h-5 w-5 text-green-400 dark:text-green-500" />}
+            className="w-64"
           />
         </div>
-
         {/* End Search bar */}
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
-        <Button variant="primaryOutline" size="sm">
+        <Button variant="outline" size="sm">
           Đăng ký
         </Button>
-        <Button variant="primary" size="sm">
+        <Button size="sm">
           Đăng nhập
         </Button>
       </div>

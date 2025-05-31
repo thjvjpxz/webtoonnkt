@@ -3,8 +3,15 @@
 import { FiAlertTriangle } from "react-icons/fi";
 import { DeleteConfirmModalProps } from "@/types/category";
 import { useState } from "react";
-import Button from "@/components/ui/Button";
-
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function DeleteConfirmModal({
   categoryName,
@@ -25,44 +32,52 @@ export default function DeleteConfirmModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4 text-rose-500">
-            <FiAlertTriangle size={48} />
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-card border-border shadow-strong">
+        <DialogHeader>
+          <DialogTitle className="text-foreground flex items-center gap-2">
+            <div className="bg-destructive/10 p-2 rounded-full text-destructive">
+              <FiAlertTriangle size={20} />
+            </div>
+            Xác nhận xóa thể loại
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Hành động này không thể hoàn tác và sẽ xóa vĩnh viễn thể loại.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="bg-destructive/10 p-4 rounded-full text-destructive mb-4 shadow-soft">
+            <FiAlertTriangle size={32} />
           </div>
-
-          <h3 className="text-lg font-semibold text-gray-800 text-center mb-2 dark:text-gray-200">
-            Xác nhận xóa
-          </h3>
-
-          <p className="text-gray-600 text-center mb-6 dark:text-gray-400">
+          <p className="text-foreground mb-2">
             Bạn có chắc chắn muốn xóa thể loại{" "}
-            <span className="font-semibold">&quot;{categoryName}&quot;</span>?
-            Hành động này không thể hoàn tác.
+            <span className="font-semibold text-primary">&quot;{categoryName}&quot;</span> không?
           </p>
-
-          <div className="flex justify-center space-x-3">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-              disabled={isDeleting}
-              size="md"
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="danger"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              size="md"
-              isLoading={isDeleting}
-            >
-              Xoá
-            </Button>
-          </div>
+          <p className="text-muted-foreground text-sm">
+            Tất cả truyện thuộc thể loại này sẽ bị ảnh hưởng.
+          </p>
         </div>
-      </div>
-    </div>
+
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isDeleting}
+            className="border-border hover:bg-muted"
+          >
+            Hủy
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+          >
+            {isDeleting ? "Đang xóa..." : "Xóa thể loại"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

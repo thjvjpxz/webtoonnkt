@@ -2,14 +2,16 @@
 
 import { useTheme } from "@/contexts/ThemeContext";
 import { FaSun, FaMoon } from "react-icons/fa";
-import Button from "./ui/Button";
+import { Button } from "./ui/button";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <Button
-      variant="primaryOutline"
+      variant="ghost"
+      size="sm"
+      className="p-2 h-auto rounded-full bg-primary/10 hover:bg-primary/20 text-primary"
       onClick={toggleTheme}
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
     >

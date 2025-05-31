@@ -2,6 +2,7 @@
 
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { PaginationProps } from "@/types/dashboard";
+import { Button } from "@/components/ui/button";
 
 export default function Pagination({
   currentPage,
@@ -50,48 +51,57 @@ export default function Pagination({
   };
 
   return (
-    <div className="flex justify-center items-center">
-      <button
+    <div className="flex justify-center items-center gap-2">
+      {/* Nút trang trước */}
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-md mr-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 cursor-pointer"
+        className="h-9 w-9 p-0 border-border/50 hover:bg-primary/10 hover:text-primary hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Trang trước"
       >
-        <FiChevronLeft size={20} />
-      </button>
+        <FiChevronLeft size={16} />
+      </Button>
 
-      <div className="flex space-x-1">
+      {/* Các số trang */}
+      <div className="flex gap-1">
         {getPageNumbers().map((page, index) =>
           page === "..." ? (
             <span
               key={`ellipsis-${index}`}
-              className="px-3 py-1 text-gray-500 dark:text-gray-400"
+              className="flex items-center justify-center h-9 px-3 text-muted-foreground"
             >
               ...
             </span>
           ) : (
-            <button
+            <Button
               key={`page-${page}`}
+              variant={currentPage === page ? "default" : "outline"}
+              size="sm"
               onClick={() => typeof page === "number" && onPageChange(page)}
-              className={`px-3 py-1 rounded-md cursor-pointer ${currentPage === page
-                ? "bg-green-600 text-white dark:bg-green-700"
-                : "text-gray-700 hover:bg-green-50 dark:text-gray-300 dark:hover:bg-green-900/20"
+              className={`h-9 min-w-[36px] px-3 ${currentPage === page
+                  ? "bg-primary text-primary-foreground shadow-soft border-primary"
+                  : "border-border/50 hover:bg-primary/10 hover:text-primary hover:border-primary/50"
                 }`}
             >
               {page}
-            </button>
+            </Button>
           )
         )}
       </div>
 
-      <button
+      {/* Nút trang sau */}
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-md ml-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 cursor-pointer"
+        className="h-9 w-9 p-0 border-border/50 hover:bg-primary/10 hover:text-primary hover:border-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Trang sau"
       >
-        <FiChevronRight size={20} />
-      </button>
+        <FiChevronRight size={16} />
+      </Button>
     </div>
   );
 }

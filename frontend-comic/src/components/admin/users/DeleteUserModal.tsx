@@ -1,7 +1,15 @@
 "use client";
 
 import { FiAlertTriangle, FiX } from "react-icons/fi";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DeleteUserModalProps } from "@/types/user";
 
 export default function DeleteUserModal({
@@ -11,42 +19,40 @@ export default function DeleteUserModal({
   isDeleting,
 }: DeleteUserModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-card border-border shadow-strong">
+        <DialogHeader>
+          <DialogTitle className="text-foreground flex items-center gap-2">
+            <div className="bg-destructive/10 p-2 rounded-full text-destructive">
+              <FiAlertTriangle size={20} />
+            </div>
             Xác nhận xóa người dùng
-          </h2>
-          <button
-            onClick={onClose}
-            disabled={isDeleting}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
-            aria-label="Đóng"
-          >
-            <FiX size={20} />
-          </button>
-        </div>
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Hành động này không thể hoàn tác và sẽ xóa vĩnh viễn tài khoản người dùng.
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex flex-col items-center justify-center p-4 mb-4 text-center">
-          <div className="bg-rose-100 p-3 rounded-full text-rose-500 mb-4 dark:bg-rose-900/30">
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="bg-destructive/10 p-4 rounded-full text-destructive mb-4 shadow-soft">
             <FiAlertTriangle size={32} />
           </div>
-          <p className="text-gray-600 dark:text-gray-300 mb-2">
+          <p className="text-foreground mb-2">
             Bạn có chắc chắn muốn xóa người dùng{" "}
-            <span className="font-semibold">{username}</span> không?
+            <span className="font-semibold text-primary">{username}</span> không?
           </p>
-          <p className="text-gray-500 text-sm dark:text-gray-400">
-            Hành động này không thể hoàn tác.
+          <p className="text-muted-foreground text-sm">
+            Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.
           </p>
         </div>
 
-        <div className="flex justify-center space-x-3">
+        <DialogFooter className="gap-2">
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             onClick={onClose}
             disabled={isDeleting}
-            size="md"
+            className="border-border hover:bg-muted"
           >
             Hủy
           </Button>
@@ -54,14 +60,13 @@ export default function DeleteUserModal({
             type="button"
             onClick={onConfirm}
             disabled={isDeleting}
-            variant="danger"
-            size="md"
-            isLoading={isDeleting}
+            variant="destructive"
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
-            Xóa
+            {isDeleting ? "Đang xóa..." : "Xóa người dùng"}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 } 

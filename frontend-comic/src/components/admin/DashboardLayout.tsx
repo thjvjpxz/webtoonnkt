@@ -16,13 +16,13 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex h-screen bg-green-50/50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background">
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar title={title} isSidebarOpen={isSidebarOpen} />
 
-        <main className="flex-1 overflow-y-auto bg-green-50/50 p-6 dark:bg-gray-900 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto bg-muted/30 p-6 custom-scrollbar">
           {children}
         </main>
       </div>
