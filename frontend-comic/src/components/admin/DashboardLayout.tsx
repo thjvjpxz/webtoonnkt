@@ -22,7 +22,7 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar title={title} isSidebarOpen={isSidebarOpen} />
 
-        <main className="flex-1 overflow-y-auto bg-muted/30 p-6 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           {children}
         </main>
       </div>

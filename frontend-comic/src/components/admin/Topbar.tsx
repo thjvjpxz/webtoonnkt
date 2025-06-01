@@ -8,7 +8,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
   return (
-    <header className="bg-card shadow-soft border-b border-border backdrop-blur-sm">
+    <header className="bg-background shadow-soft border-b border-border backdrop-blur-sm">
       <div className="px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
           <h2 className="text-xl font-semibold text-foreground">

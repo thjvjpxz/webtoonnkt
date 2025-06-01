@@ -66,18 +66,24 @@ export default function Sidebar({
   return (
     <div
       className={`${isSidebarOpen ? "w-64" : "w-20"
-        } bg-sidebar shadow-medium transition-all duration-300 flex flex-col border-r border-sidebar-border`}
+        } bg-background shadow-medium transition-all duration-300 flex flex-col border-r border-sidebar-border`}
     >
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-sidebar-border">
+      <div className="p-4 flex items-center justify-between border-b border-sidebar-border relative">
         {isSidebarOpen ? (
-          <h1 className="text-xl font-bold text-primary">
-            Comic Admin
-          </h1>
+          <img
+            src="/images/logo.svg"
+            alt="logo"
+            width={150}
+            height={100}
+            className="object-cover"
+          />
         ) : (
-          <h1 className="text-xl font-bold text-primary">
-            CA
-          </h1>
+          <img
+            src="/images/icon_logo.svg"
+            alt="logo"
+            className="object-cover w-7 h-7"
+          />
         )}
         <Button
           variant="ghost"
