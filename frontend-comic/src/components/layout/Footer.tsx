@@ -2,11 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   FaFacebook,
-  FaGithub,
-  FaTwitter,
-  FaInstagram
+  FaGithub
 } from "react-icons/fa";
-import { FiHeart } from "react-icons/fi";
 
 const socialLinks = [
   {
