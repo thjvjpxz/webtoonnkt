@@ -13,7 +13,7 @@ export const createLevelType = async (
 ): Promise<ApiResponse<LevelTypeResponse>> => {
   return await fetchApi<ApiResponse<LevelTypeResponse>>(endpoint, {
     method: "POST",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 
@@ -23,7 +23,7 @@ export const updateLevelType = async (
 ): Promise<ApiResponse<LevelTypeResponse>> => {
   return await fetchApi<ApiResponse<LevelTypeResponse>>(`${endpoint}/${id}`, {
     method: "PUT",
-    body: JSON.stringify(data),
+    data: data,
   });
 };
 

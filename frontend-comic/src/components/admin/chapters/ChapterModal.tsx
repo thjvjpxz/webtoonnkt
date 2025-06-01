@@ -1,11 +1,18 @@
-import { ChapterModalProps } from "@/types/chapter";
 import { FiPlus, FiUpload, FiX, FiSearch } from "react-icons/fi";
 import { IoMdClose } from "react-icons/io";
 import Image from "next/image";
 import { useChapterModal } from "@/hooks/useChapterModal";
-import { ChapterStatus } from "@/types/chapter";
+import { Chapter, ChapterCreateUpdate, ChapterStatus } from "@/types/chapter";
 import { Button } from "@/components/ui/button";
+import { ComicResponse } from "@/types/comic";
 
+interface ChapterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (chapterData: ChapterCreateUpdate, images: File[]) => void;
+  chapter?: Chapter | null;
+  comicOptions: ComicResponse[];
+}
 export default function ChapterModal({
   isOpen,
   onClose,

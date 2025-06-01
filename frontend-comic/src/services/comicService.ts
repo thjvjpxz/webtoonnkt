@@ -57,7 +57,7 @@ export const createComicWithCover = async (
 
   return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
     method: "POST",
-    body: formData,
+    data: formData,
   });
 };
 
@@ -80,7 +80,7 @@ export const updateComicWithCover = async (
     `/comics/${id}`,
     {
       method: "PUT",
-      body: formData,
+      data: formData,
     }
   );
 };

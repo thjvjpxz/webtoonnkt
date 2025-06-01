@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { ViewComicModalProps } from "@/types/comic";
+import { ComicResponse } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 
+interface ViewComicModalProps {
+  comic: ComicResponse;
+  onClose: () => void;
+}
 export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
   const renderStatus = (status: string) => {
     switch (status) {

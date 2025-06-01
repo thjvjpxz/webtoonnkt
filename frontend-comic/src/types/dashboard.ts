@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export type ComicData = {
+export interface ComicData {
   id: number;
   title: string;
   author: string;
@@ -8,7 +8,7 @@ export type ComicData = {
   status: "published" | "draft" | "review";
   lastUpdated: string;
   coverImage: string;
-};
+}
 
 export type DashboardLayoutProps = {
   children: ReactNode;

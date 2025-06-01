@@ -1,8 +1,14 @@
-import { ViewChapterModalProps, DetailChapter } from "@/types/chapter";
+import { Chapter, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
+
+interface ViewChapterModalProps {
+  isOpen: boolean;
+  chapter: Chapter | null;
+  onClose: () => void;
+}
 
 export default function ViewChapterModal({
   isOpen,
@@ -64,18 +70,18 @@ export default function ViewChapterModal({
               {chapter.detailChapters && chapter.detailChapters.length > 0 ? (
                 chapter.detailChapters
                   .sort((a, b) => a.orderNumber - b.orderNumber)
-                  .map((detail: DetailChapter) => (
-                    <div key={detail.id} className="mb-0">
+                  .map((image: DetailChapter) => (
+                    <div key={image.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
-                          src={constructImageUrl(chapter, detail.imgUrl)}
-                          alt={`Trang ${detail.orderNumber}`}
+                          src={constructImageUrl(chapter, image.imgUrl)}
+                          alt={`Trang ${image.orderNumber}`}
                           width={1500}
                           height={2400}
                           className="shadow-lg w-full h-auto object-contain mx-auto"
                         />
                         <div className="absolute bottom-3 right-3 bg-black/70 text-white text-sm px-3 py-1.5 rounded-md">
-                          {detail.orderNumber}
+                          {image.orderNumber}
                         </div>
                       </div>
                     </div>

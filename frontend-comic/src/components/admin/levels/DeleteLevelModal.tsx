@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FiAlertTriangle } from "react-icons/fi";
-import { DeleteLevelModalProps } from "@/types/level";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+interface DeleteLevelModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  itemType?: "level" | "level-type";
+  itemName: string;
+};
+
 
 export default function DeleteLevelModal({
   isOpen,

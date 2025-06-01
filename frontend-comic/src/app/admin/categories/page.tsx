@@ -10,7 +10,7 @@ import {
   FiTag,
 } from "react-icons/fi";
 import CategoryModal from "@/components/admin/categories/CategoryModal";
-import DeleteConfirmModal from "@/components/admin/categories/DeleteConfirmModal";
+import DeleteCategoryModal from "@/components/admin/categories/DeleteCategoryModal";
 import Pagination from "@/components/admin/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -213,7 +213,7 @@ export default function Categories() {
 
       {/* Modal xác nhận xóa */}
       {isDeleteModalOpen && currentCategory && (
-        <DeleteConfirmModal
+        <DeleteCategoryModal
           categoryName={currentCategory.name}
           onClose={handleCloseDeleteModal}
           onConfirm={handleDeleteCategory}

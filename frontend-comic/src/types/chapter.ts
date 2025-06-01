@@ -1,25 +1,44 @@
 import { ComicResponse } from "./comic";
 
-export type Chapter = {
+export interface Chapter {
   id: string;
+  chapterNumber: string;
   title: string;
-  chapterNumber: number;
+  viewCount: number;
+  comicId: string;
   comicName: string;
-  status: ChapterStatus;
+  detailChapters: DetailChapter[];
   domainCdn: string;
   chapterPath: string;
-  detailChapters: DetailChapter[];
+  imageCount: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export type ChapterCreateUpdate = {
+export interface ChapterCreateUpdate {
   id?: string;
+  chapterNumber: string;
   title: string;
-  chapterNumber: number;
   comicId: string;
-  status: ChapterStatus;
-  detailChapters?: DetailChapterCreateUpdate[];
+}
+
+export interface ChapterImage {
+  id: string;
+  url: string;
+  page: number;
+  chapterId: string;
+}
+
+export interface ChapterListResponse {
+  id: string;
+  chapterNumber: string;
+  title: string;
+  viewCount: number;
+  comicId: string;
+  comicName: string;
+  imageCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export enum ChapterStatus {
@@ -28,38 +47,17 @@ export enum ChapterStatus {
   VIP
 }
 
-export type DetailChapterCreateUpdate = {
+export interface DetailChapterCreateUpdate {
   imgUrl: string;
   orderNumber: number;
   newImage: boolean;
   hasRemove: boolean;
 }
 
-export type DetailChapter = {
+export interface DetailChapter {
   id: string;
   imgUrl: string;
   orderNumber: number;
 }
 
-export type DeleteChapterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  comicName: string;
-  chapterTitle: string;
-  chapterNumber: number;
-};
 
-export type ChapterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (chapterData: ChapterCreateUpdate, images: File[]) => void;
-  chapter?: Chapter | null;
-  comicOptions: ComicResponse[];
-};
-
-export type ViewChapterModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  chapter: Chapter | null;
-};

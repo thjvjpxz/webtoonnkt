@@ -10,7 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DeleteUserModalProps } from "@/types/user";
+
+interface DeleteUserModalProps {
+  username: string;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  isDeleting: boolean;
+};
 
 export default function DeleteUserModal({
   username,

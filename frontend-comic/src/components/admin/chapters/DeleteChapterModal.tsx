@@ -1,5 +1,4 @@
 import { FiAlertTriangle } from "react-icons/fi";
-import { DeleteChapterModalProps } from "@/types/chapter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+interface DeleteChapterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  comicName: string;
+  chapterTitle: string;
+  chapterNumber: number;
+};
 
 export default function DeleteChapterModal({
   isOpen,

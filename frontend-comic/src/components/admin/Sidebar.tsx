@@ -15,8 +15,12 @@ import {
   FiChevronRight,
   FiAward,
 } from "react-icons/fi";
-import { SidebarProps } from "@/types/dashboard";
 import { Button } from "@/components/ui/button";
+
+export interface SidebarProps {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+}
 
 export default function Sidebar({
   isSidebarOpen,

@@ -38,7 +38,7 @@ export const createChapter = async (
   });
   return await fetchApiWithFormData<ApiResponse<Chapter>>("/chapters", {
     method: "POST",
-    body: formData,
+    data: formData,
   });
 }
 
@@ -55,7 +55,7 @@ export const updateChapter = async (
   });
   return await fetchApiWithFormData<ApiResponse<Chapter>>(`/chapters/${chapterId}`, {
     method: "PUT",
-    body: formData,
+    data: formData,
   });
 }
 

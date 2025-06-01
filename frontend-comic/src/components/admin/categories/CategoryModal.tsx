@@ -6,7 +6,7 @@ import { CategoryCreateUpdate, CategoryResponse } from "@/types/category";
 import { generateSlug } from "@/utils/string";
 import { Button } from "@/components/ui/button";
 
-export interface CategoryModalProps {
+interface CategoryModalProps {
   category: CategoryResponse | null;
   onClose: () => void;
   onSave: (category: CategoryCreateUpdate) => void;
