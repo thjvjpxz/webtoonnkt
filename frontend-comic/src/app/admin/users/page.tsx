@@ -113,7 +113,7 @@ export default function Users() {
               placeholder="Tìm kiếm người dùng..."
               className="pl-10 w-full sm:w-80 border-border focus:border-primary"
             />
-            <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+            <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
             <button type="submit" className="hidden">
               Tìm kiếm
             </button>
@@ -136,7 +136,7 @@ export default function Users() {
                 </option>
               ))}
             </select>
-            <FiUsers className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+            <FiUsers className="h-5 w-5 text-primary absolute left-3 top-2" />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
               <svg
                 className="w-5 h-5"

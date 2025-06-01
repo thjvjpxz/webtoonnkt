@@ -4,19 +4,19 @@ import { FaFacebook, FaGithub, FaTwitter } from "react-icons/fa";
 const socialLinks = [
   {
     href: "https://www.facebook.com/thi.17.8",
-    icon: <FaFacebook className="w-6 h-6 text-[var(--primary)] hover:text-[var(--primary-hover)] transition-all duration-200" />,
+    icon: <FaFacebook className="w-6 h-6 text-primary hover:text-primary/90 transition-all duration-200" />,
   },
   {
     href: "https://github.com/thjvjpxz",
-    icon: <FaGithub className="w-6 h-6 text-[var(--primary)] hover:text-[var(--primary-hover)] transition-all duration-200" />,
+    icon: <FaGithub className="w-6 h-6 text-primary hover:text-primary/90 transition-all duration-200" />,
   }
 ];
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--background)]  border-t border-[var(--foreground)]">
+    <footer className="bg-background border-t border-border">
       <div className="flex flex-col items-center justify-center py-6">
-        <p className="text-sm text-center text-[var(--text-primary)]">
+        <p className="text-sm text-center text-muted-foreground">
           &copy; 2025 Nguyễn Kim Thi
         </p>
         <div className="mt-3 flex justify-center items-center gap-2 ">

@@ -108,7 +108,7 @@ export default function Levels() {
                 onChange={(e) => setLevelSearchTerm(e.target.value)}
                 className="pl-10 w-full sm:w-80 border-border focus:border-primary"
               />
-              <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+              <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
               <button type="submit" className="hidden">
                 Tìm kiếm
               </button>
@@ -313,7 +313,7 @@ export default function Levels() {
                 onChange={(e) => setLevelTypeSearchTerm(e.target.value)}
                 className="pl-10 w-full sm:w-80 border-border focus:border-primary"
               />
-              <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+              <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
               <button type="submit" className="hidden">
                 Tìm kiếm
               </button>

@@ -3,6 +3,7 @@ import ThemeToggle from "./ThemeToggle";
 import Image from "next/image";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { FiSearch } from "react-icons/fi";
 
 export default function Header() {
   return (
@@ -21,8 +22,12 @@ export default function Header() {
         <div className="flex gap-2 relative">
           <Input
             placeholder="Tìm kiếm truyện..."
-            className="w-64"
+            className="pl-10 w-full sm:w-80 border-border focus:border-primary"
           />
+          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
+          <button type="submit" className="hidden">
+            Tìm kiếm
+          </button>
         </div>
         {/* End Search bar */}
       </div>

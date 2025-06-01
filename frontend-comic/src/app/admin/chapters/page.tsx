@@ -75,7 +75,7 @@ export default function Chapters() {
               placeholder="Tìm kiếm chương..."
               className="pl-10 w-full sm:w-80 border-border focus:border-primary"
             />
-            <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+            <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
             <button type="submit" className="hidden">
               Tìm kiếm
             </button>
@@ -94,7 +94,7 @@ export default function Chapters() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
-            <FiBookOpen className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+            <FiBookOpen className="h-5 w-5 text-primary absolute left-3 top-2" />
 
             {isComicDropdownOpen && (
               <div

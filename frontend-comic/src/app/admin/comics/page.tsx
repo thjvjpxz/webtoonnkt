@@ -95,7 +95,7 @@ export default function Comics() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 w-full sm:w-80 border-border focus:border-primary"
           />
-          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
           <button type="submit" className="hidden">
             Tìm kiếm
           </button>
@@ -127,7 +127,7 @@ export default function Comics() {
             <option value="ongoing">Đang cập nhật</option>
             <option value="completed">Đã hoàn thành</option>
           </select>
-          <FiFilter className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+          <FiFilter className="h-5 w-5 text-primary absolute left-3 top-2" />
         </div>
 
         <div className="relative">
@@ -146,7 +146,7 @@ export default function Comics() {
               </option>
             ))}
           </select>
-          <FiFilter className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+          <FiFilter className="h-5 w-5 text-primary absolute left-3 top-2" />
         </div>
       </div>
 
@@ -267,7 +267,7 @@ export default function Comics() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex flex-wrap gap-1 justify-center">
-                          {comic.categories.slice(0, 2).map((category) => (
+                          {comic.categories.slice(0,).map((category) => (
                             <span
                               key={category.id}
                               className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
@@ -360,7 +360,7 @@ export default function Comics() {
 
       {isDeleteModalOpen && currentComic && (
         <DeleteComicModal
-          comicTitle={currentComic.title}
+          comicTitle={currentComic.name}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteComic}
           isDeleting={isDeleting}

@@ -56,7 +56,7 @@ export default function Categories() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 w-full sm:w-80 border-border focus:border-primary"
           />
-          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2.5" />
+          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
           <button type="submit" className="hidden">
             Tìm kiếm
           </button>
