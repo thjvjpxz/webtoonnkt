@@ -1,6 +1,6 @@
 "use client";
 
-import { FiAlertTriangle, FiX } from "react-icons/fi";
+import { FiAlertTriangle } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

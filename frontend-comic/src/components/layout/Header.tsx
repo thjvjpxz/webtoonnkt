@@ -171,7 +171,7 @@ export default function Header() {
                   {isSearchFocused && searchQuery && (
                     <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50">
                       <div className="p-2 text-sm text-muted-foreground">
-                        Nhấn Enter để tìm kiếm "{searchQuery}"
+                        Nhấn Enter để tìm kiếm &quot;{searchQuery}&quot;
                       </div>
                     </div>
                   )}

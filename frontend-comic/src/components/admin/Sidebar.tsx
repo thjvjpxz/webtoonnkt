@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   FiHome,
@@ -9,12 +10,10 @@ import {
   FiTag,
   FiUsers,
   FiMessageSquare,
-  FiSettings,
   FiLogOut,
   FiChevronLeft,
   FiChevronRight,
   FiAward,
-  FiDownload,
 } from "react-icons/fi";
 import { SidebarProps } from "@/types/dashboard";
 import { Button } from "@/components/ui/button";
@@ -71,18 +70,22 @@ export default function Sidebar({
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-sidebar-border relative">
         {isSidebarOpen ? (
-          <img
+          <Image
             src="/images/logo.svg"
             alt="logo"
             width={150}
             height={100}
             className="object-cover"
+            priority
           />
         ) : (
-          <img
+          <Image
             src="/images/icon_logo.svg"
             alt="logo"
-            className="object-cover w-7 h-7"
+            width={28}
+            height={28}
+            className="object-cover"
+            priority
           />
         )}
         <Button

@@ -103,7 +103,7 @@ export default function Nav() {
         <span className="transition-transform duration-200 group-hover:scale-110">
           {item.icon}
         </span>
-        <span>{item.label}</span>
+        <span className="text-sm">{item.label}</span>
       </Link>
     );
   }
@@ -112,7 +112,7 @@ export default function Nav() {
     <nav className="bg-primary text-primary-foreground shadow-lg border-b border-primary-foreground/10">
       <div className="container mx-auto px-4">
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center py-3">
+        <div className="hidden md:flex items-center py-2">
           <ul className="flex items-center gap-1">
             {navItems.map((item) => (
               <li key={item.href}>
@@ -123,7 +123,7 @@ export default function Nav() {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center justify-between py-3">
+        <div className="md:hidden flex items-center justify-between py-2">
           <div className="flex items-center gap-2">
             <FiGrid className="w-5 h-5" />
             <span className="font-semibold">Menu</span>
@@ -146,7 +146,7 @@ export default function Nav() {
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-primary-foreground/10 py-3">
+          <div className="md:hidden border-t border-primary-foreground/10 py-2">
             <ul className="space-y-1">
               {navItems.map((item) => (
                 <li key={item.href}>

@@ -97,7 +97,7 @@ export default function RegisterModal({
       // Reset form
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });
     } catch (error) {
-      setErrors({ general: "Đăng ký thất bại. Vui lòng thử lại." });
+      setErrors({ general: "Đăng ký thất bại. Vui lòng thử lại." + error });
     } finally {
       setIsLoading(false);
     }

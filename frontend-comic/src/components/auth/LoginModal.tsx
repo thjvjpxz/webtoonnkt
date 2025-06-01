@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FiUser, FiLock, FiEye, FiEyeOff, FiX } from "react-icons/fi";
+import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -72,7 +72,7 @@ export default function LoginModal({
       // Reset form
       setFormData({ username: "", password: "" });
     } catch (error) {
-      setErrors({ general: "Đăng nhập thất bại. Vui lòng thử lại." });
+      setErrors({ general: "Đăng nhập thất bại. Vui lòng thử lại." + error });
     } finally {
       setIsLoading(false);
     }

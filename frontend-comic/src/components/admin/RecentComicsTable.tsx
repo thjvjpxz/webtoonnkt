@@ -4,7 +4,6 @@ import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import { ComicData } from "@/types/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {

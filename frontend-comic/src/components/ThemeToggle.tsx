@@ -2,7 +2,7 @@
 
 import { useTheme } from "@/contexts/ThemeContext";
 import { FaSun, FaMoon } from "react-icons/fa";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
 export default function ThemeToggle() {
