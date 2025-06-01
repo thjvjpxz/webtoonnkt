@@ -8,16 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case "published":
-        return "default";
-      case "draft":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
+// Removed unused getStatusVariant function.
 
   const getStatusText = (status: string) => {
     switch (status) {
