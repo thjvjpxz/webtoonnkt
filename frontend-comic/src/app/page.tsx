@@ -12,8 +12,8 @@ export default function Home() {
       <div className="flex flex-col min-h-screen container mx-auto">
         <Sidebar />
         <Content />
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }

@@ -22,15 +22,29 @@ import {
   FiX
 } from "react-icons/fi";
 import { useState } from "react";
+import LoginModal from "./auth/LoginModal";
+import RegisterModal from "./auth/RegisterModal";
+import { useAuthModals } from "@/hooks/useAuthModals";
 
 export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Mock user state - thay thế bằng real auth state
+  // Auth state - thay thế bằng real auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({ name: "Người dùng", avatar: null });
+
+  // Auth modals
+  const {
+    isLoginOpen,
+    isRegisterOpen,
+    openLogin,
+    openRegister,
+    closeAll,
+    switchToRegister,
+    switchToLogin,
+  } = useAuthModals();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +52,25 @@ export default function Header() {
       // Implement search logic here
       console.log("Searching for:", searchQuery);
     }
+  };
+
+  const handleLogin = (username: string, password: string) => {
+    console.log("Login:", { username, password });
+    // Implement real login logic here
+    setIsLoggedIn(true);
+    setUser({ name: username, avatar: null });
+  };
+
+  const handleRegister = (username: string, email: string, password: string) => {
+    console.log("Register:", { username, email, password });
+    // Implement real register logic here
+    setIsLoggedIn(true);
+    setUser({ name: username, avatar: null });
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUser({ name: "Người dùng", avatar: null });
   };
 
   const UserMenu = () => (
@@ -83,7 +116,7 @@ export default function Header() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex items-center gap-2 text-destructive focus:text-destructive cursor-pointer"
-          onClick={() => setIsLoggedIn(false)}
+          onClick={handleLogout}
         >
           <FiLogOut className="w-4 h-4" />
           <span>Đăng xuất</span>
@@ -93,128 +126,144 @@ export default function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-3 gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
-            >
-              <Image
-                src="/images/logo.svg"
-                alt="Comic Logo"
-                width={160}
-                height={32}
-                className="object-contain"
-                priority
-              />
-            </Link>
+    <>
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between py-3 gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
+              >
+                <Image
+                  src="/images/logo.svg"
+                  alt="Comic Logo"
+                  width={160}
+                  height={32}
+                  className="object-contain"
+                  priority
+                />
+              </Link>
+            </div>
+
+            {/* Desktop Search */}
+            <div className="hidden md:flex flex-1 max-w-md mx-4">
+              <form onSubmit={handleSearchSubmit} className="relative w-full group">
+                <div className={`relative transition-all duration-300 ${isSearchFocused ? 'transform scale-105' : ''
+                  }`}>
+                  <Input
+                    type="search"
+                    placeholder="Tìm kiếm truyện, tác giả..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsSearchFocused(true)}
+                    onBlur={() => setIsSearchFocused(false)}
+                    className={`pl-12 pr-4 py-2 w-full border-2 transition-all duration-300 ${isSearchFocused
+                      ? 'border-primary shadow-lg shadow-primary/20'
+                      : 'border-border hover:border-primary/50'
+                      }`}
+                  />
+                  <FiSearch className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${isSearchFocused ? 'text-primary scale-110' : 'text-muted-foreground'
+                    } w-4 h-4`} />
+
+                  {/* Search suggestions - có thể implement sau */}
+                  {isSearchFocused && searchQuery && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50">
+                      <div className="p-2 text-sm text-muted-foreground">
+                        Nhấn Enter để tìm kiếm "{searchQuery}"
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* Right side actions */}
+            <div className="flex items-center gap-2">
+              {/* Mobile search toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                aria-label="Toggle search"
+              >
+                <FiSearch className="w-4 h-4" />
+              </Button>
+
+              {/* Theme toggle */}
+              <ThemeToggle />
+
+              {/* Auth section */}
+              {isLoggedIn ? (
+                <UserMenu />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:flex hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                    onClick={openLogin}
+                  >
+                    Đăng nhập
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
+                    onClick={openRegister}
+                  >
+                    <span className="hidden sm:inline">Đăng ký</span>
+                    <span className="sm:hidden">
+                      <FiUser className="w-4 h-4" />
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Desktop Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <form onSubmit={handleSearchSubmit} className="relative w-full group">
-              <div className={`relative transition-all duration-300 ${isSearchFocused ? 'transform scale-105' : ''
-                }`}>
+          {/* Mobile Search */}
+          {isMobileSearchOpen && (
+            <div className="md:hidden pb-3 border-t border-border mt-3 pt-3">
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <Input
                   type="search"
                   placeholder="Tìm kiếm truyện, tác giả..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                  className={`pl-12 pr-4 py-2 w-full border-2 transition-all duration-300 ${isSearchFocused
-                    ? 'border-primary shadow-lg shadow-primary/20'
-                    : 'border-border hover:border-primary/50'
-                    }`}
+                  className="pl-12 pr-4 py-2 w-full border-2 border-border focus:border-primary"
+                  autoFocus
                 />
-                <FiSearch className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 ${isSearchFocused ? 'text-primary scale-110' : 'text-muted-foreground'
-                  } w-4 h-4`} />
-
-                {/* Search suggestions - có thể implement sau */}
-                {isSearchFocused && searchQuery && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg z-50">
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Nhấn Enter để tìm kiếm "{searchQuery}"
-                    </div>
-                  </div>
-                )}
-              </div>
-            </form>
-          </div>
-
-          {/* Right side actions */}
-          <div className="flex items-center gap-2">
-            {/* Mobile search toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="md:hidden"
-              onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-              aria-label="Toggle search"
-            >
-              <FiSearch className="w-4 h-4" />
-            </Button>
-
-            {/* Theme toggle */}
-            <ThemeToggle />
-
-            {/* Auth section */}
-            {isLoggedIn ? (
-              <UserMenu />
-            ) : (
-              <div className="flex items-center gap-2">
+                <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
-                  className="hidden sm:flex hover:bg-accent hover:text-accent-foreground transition-all duration-200"
-                  onClick={() => setIsLoggedIn(true)} // Mock login
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setIsMobileSearchOpen(false)}
                 >
-                  Đăng nhập
+                  <FiX className="w-4 h-4" />
                 </Button>
-                <Button
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
-                  onClick={() => setIsLoggedIn(true)} // Mock signup
-                >
-                  <span className="hidden sm:inline">Đăng ký</span>
-                  <span className="sm:hidden">
-                    <FiUser className="w-4 h-4" />
-                  </span>
-                </Button>
-              </div>
-            )}
-          </div>
+              </form>
+            </div>
+          )}
         </div>
+      </header>
 
-        {/* Mobile Search */}
-        {isMobileSearchOpen && (
-          <div className="md:hidden pb-3 border-t border-border mt-3 pt-3">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <Input
-                type="search"
-                placeholder="Tìm kiếm truyện, tác giả..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-2 w-full border-2 border-border focus:border-primary"
-                autoFocus
-              />
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={() => setIsMobileSearchOpen(false)}
-              >
-                <FiX className="w-4 h-4" />
-              </Button>
-            </form>
-          </div>
-        )}
-      </div>
-    </header>
+      {/* Auth Modals */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={closeAll}
+        onSwitchToRegister={switchToRegister}
+        onLogin={handleLogin}
+      />
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={closeAll}
+        onSwitchToLogin={switchToLogin}
+        onRegister={handleRegister}
+      />
+    </>
   );
 }
