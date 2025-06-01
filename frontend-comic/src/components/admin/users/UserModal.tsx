@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { UserCreateUpdate, UserModalProps } from "@/types/user";
 import { LevelTypeResponse, LevelResponse } from "@/types/level";
 import { FiX, FiImage, FiLoader } from "react-icons/fi";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 interface ExtendedUserModalProps extends UserModalProps {
@@ -508,21 +508,19 @@ export default function UserModal({
           <div className="flex justify-end space-x-3 mt-6">
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              size="md"
+              className="border-border hover:bg-muted"
             >
               Hủy
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              variant="success"
-              size="md"
-              isLoading={isSubmitting}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {user ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? "Đang xử lý..." : (user ? "Cập nhật" : "Thêm mới")}
             </Button>
           </div>
         </form>

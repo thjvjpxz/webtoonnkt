@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import { CategoryCreateUpdate } from "@/types/category";
+import { CategoryCreateUpdate, CategoryResponse } from "@/types/category";
 import { generateSlug } from "@/utils/string";
-import { CategoryModalProps } from "@/types/category";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
+
+export interface CategoryModalProps {
+  category: CategoryResponse | null;
+  onClose: () => void;
+  onSave: (category: CategoryCreateUpdate) => void;
+}
 
 export default function CategoryModal({
   category,
@@ -170,21 +175,19 @@ export default function CategoryModal({
           <div className="flex justify-end space-x-3">
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              size="md"
+              className="border-border hover:bg-muted"
             >
               Hủy
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              variant="success"
-              size="md"
-              isLoading={isSubmitting}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {category ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? "Đang xử lý..." : (category ? "Cập nhật" : "Thêm mới")}
             </Button>
           </div>
         </form>

@@ -7,13 +7,17 @@ import {
   FiTrash2,
   FiSearch,
   FiAlertCircle,
+  FiTag,
 } from "react-icons/fi";
 import CategoryModal from "@/components/admin/categories/CategoryModal";
 import DeleteConfirmModal from "@/components/admin/categories/DeleteConfirmModal";
-import Pagination from "@/components/admin/Pagination"
+import Pagination from "@/components/admin/Pagination";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
-import Button from "@/components/ui/Button";
 
 export default function Categories() {
   const {
@@ -42,139 +46,161 @@ export default function Categories() {
 
   return (
     <DashboardLayout title="Quản lý thể loại">
+      {/* Search and Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <form onSubmit={handleSearch} className="relative">
-          <input
+          <Input
             type="text"
             placeholder="Tìm kiếm thể loại..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-green-200 rounded-lg w-full sm:w-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+            className="pl-10 w-full sm:w-80 border-border focus:border-primary"
           />
-          <FiSearch className="h-5 w-5 text-green-400 absolute left-3 top-2.5 dark:text-green-500" />
+          <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
           <button type="submit" className="hidden">
             Tìm kiếm
           </button>
         </form>
 
         <Button
-          variant="success"
           onClick={handleOpenAddModal}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
           aria-label="Thêm thể loại mới"
           title="Thêm thể loại mới"
-          icon={<FiPlus size={18} />}
-          size="md"
         >
-          <span>Thêm thể loại mới</span>
+          <FiPlus className="mr-2" size={18} />
+          Thêm thể loại mới
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
-        <div className="p-6 border-b border-green-100 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+      {/* Categories Table */}
+      <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-border/50">
+          <CardTitle className="text-foreground flex items-center gap-2">
+            <FiTag className="text-primary" size={20} />
             Danh sách thể loại
-          </h2>
-        </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-8 flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center flex flex-col items-center">
+              <FiAlertCircle size={40} className="mb-2 text-destructive" />
+              <p className="text-destructive">{error}</p>
+              <Button
+                onClick={handleSearch}
+                className="mt-4 bg-primary hover:bg-primary/90"
+              >
+                Thử lại
+              </Button>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="p-12 text-center">
+              <FiTag className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                Không có thể loại nào
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Chưa có thể loại nào được thêm vào hệ thống.
+              </p>
+              <Button
+                onClick={handleOpenAddModal}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <FiPlus className="mr-2" size={18} />
+                Thêm thể loại mới
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto custom-scrollbar">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border/50 hover:bg-muted/30">
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Tên thể loại
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Mô tả
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Ngày tạo
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Ngày sửa
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Thao tác
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {categories.map((category) => (
+                    <TableRow
+                      key={category.id}
+                      className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
+                    >
+                      <TableCell className="text-center py-4">
+                        <div className="font-semibold text-foreground">
+                          {category.name}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-4 text-muted-foreground max-w-xs">
+                        <div className="truncate" title={category.description}>
+                          {category.description}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-4 text-muted-foreground">
+                        {formatDate(category.createdAt)}
+                      </TableCell>
+                      <TableCell className="text-center py-4 text-muted-foreground">
+                        {formatDate(category.updatedAt)}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex justify-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenEditModal(category)}
+                            className="h-8 px-2 text-primary hover:bg-primary/10 hover:text-primary"
+                            aria-label="Sửa thể loại"
+                            title="Sửa"
+                          >
+                            <FiEdit size={14} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenDeleteModal(category)}
+                            className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            aria-label="Xoá thể loại"
+                            title="Xóa"
+                          >
+                            <FiTrash2 size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
-        {isLoading ? (
-          <div className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-          </div>
-        ) : error ? (
-          <div className="p-8 text-center text-rose-500 flex flex-col items-center">
-            <FiAlertCircle size={40} className="mb-2" />
-            <p>{error}</p>
-            <Button
-              variant="success"
-              onClick={handleSearch}
-              className="mt-4"
-            >
-              Thử lại
-            </Button>
-          </div>
-        ) : categories.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-            Không tìm thấy thể loại nào
-          </div>
-        ) : (
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full">
-              <thead className="bg-green-50 dark:bg-green-900/30">
-                <tr>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                    Tên thể loại
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                    Mô tả
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                    Ngày tạo
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                    Ngày sửa
-                  </th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400 ">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-green-100 dark:divide-gray-700">
-                {categories.map((category) => (
-                  <tr
-                    key={category.id}
-                    className="hover:bg-green-50/50 dark:hover:bg-green-900/10"
-                  >
-                    <td className="text-center px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-800 dark:text-gray-200">
-                        {category.name}
-                      </div>
-                    </td>
-                    <td className="text-center px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
-                      {category.description}
-                    </td>
-                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(category.createdAt)}
-                    </td>
-                    <td className="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(category.updatedAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex justify-center space-x-2">
-                        <Button
-                          variant="edit"
-                          onClick={() => handleOpenEditModal(category)}
-                          aria-label="Sửa thể loại"
-                          title="Sửa"
-                          icon={<FiEdit size={18} />}
-                          size="xs"
-                        />
-                        <Button
-                          variant="delete"
-                          onClick={() => handleOpenDeleteModal(category)}
-                          aria-label="Xoá thể loại"
-                          title="Xóa"
-                          icon={<FiTrash2 size={18} />}
-                          size="xs"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!isLoading && !error && categories.length > 0 && (
-          <div className="p-4 border-t border-green-100 dark:border-gray-700">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        )}
-      </div>
+          {/* Pagination */}
+          {!isLoading && !error && categories.length > 0 && (
+            <div className="p-4 border-t border-border/50">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Modal thêm/sửa thể loại */}
       {isModalOpen && (

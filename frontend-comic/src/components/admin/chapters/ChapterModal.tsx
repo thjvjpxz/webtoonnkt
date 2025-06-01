@@ -4,7 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import Image from "next/image";
 import { useChapterModal } from "@/hooks/useChapterModal";
 import { ChapterStatus } from "@/types/chapter";
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 export default function ChapterModal({
   isOpen,
@@ -222,7 +222,7 @@ export default function ChapterModal({
                   <div className="flex items-center gap-2">
                     <Button
                       type="button"
-                      variant={uploadMethod === 'file' ? 'success' : 'secondary'}
+                      variant={uploadMethod === 'file' ? 'default' : 'secondary'}
                       onClick={() => setUploadMethod('file')}
                       size="sm"
                     >
@@ -230,7 +230,7 @@ export default function ChapterModal({
                     </Button>
                     <Button
                       type="button"
-                      variant={uploadMethod === 'link' ? 'success' : 'secondary'}
+                      variant={uploadMethod === 'link' ? 'default' : 'secondary'}
                       onClick={() => setUploadMethod('link')}
                       size="sm"
                     >
@@ -281,10 +281,10 @@ export default function ChapterModal({
                       <div className="flex justify-end">
                         <Button
                           type="button"
-                          variant="success"
+                          variant="default"
                           onClick={handleAddMultipleImageLinks}
                           disabled={!hasValidImageLinks(imageLink)}
-                          size="md"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
                         >
                           <FiPlus size={16} />
                           <span>Thêm các link</span>
@@ -365,16 +365,14 @@ export default function ChapterModal({
               type="button"
               variant="secondary"
               onClick={onClose}
-              size="md"
             >
               Hủy
             </Button>
             <Button
               type="submit"
               disabled={isUploading || isSubmitting || !title || !chapterNumber || !comicId || !status || (previewUrls.length === 0 && !isEditMode)}
-              variant="success"
-              size="md"
-              isLoading={isUploading || isSubmitting}
+              variant="default"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isEditMode ? "Cập nhật" : "Thêm mới"}
             </Button>

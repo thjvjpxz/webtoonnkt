@@ -1,7 +1,6 @@
 "use client";
 
-import Button from "@/components/ui/Button";
-import "@/styles/scrollbar.css";
+import { Button } from "@/components/ui/button";
 import { ComicModalProps, ComicCreateUpdate } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
@@ -439,12 +438,10 @@ export default function ComicModal({
                           </div>
                           <Button
                             type="button"
-                            variant="success"
+                            variant="default"
                             onClick={handleImageUrlSubmit}
                             disabled={!imageUrl.trim() || isUploading}
-                            size="md"
-                            className="w-full"
-                            isLoading={isUploading}
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                           >
                             <FiCheck className="mr-2" size={16} />
                             Sử dụng URL này
@@ -664,16 +661,14 @@ export default function ComicModal({
               variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              size="md"
             >
               Hủy
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              variant="success"
-              size="md"
-              isLoading={isSubmitting}
+              variant="default"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {comic ? "Cập nhật" : "Thêm mới"}
             </Button>

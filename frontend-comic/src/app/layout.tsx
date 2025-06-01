@@ -19,9 +19,11 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <head>
-        <link rel="stylesheet" href="/css/scrollbar.css" />
+        {/* <link rel="stylesheet" href="/css/scrollbar.css" type="text/css" media="all" /> */}
+        {/* Logo */}
+        <link rel="icon" href="/images/icon_logo.ico" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className}`}>
         <ThemeProvider>
           {children}
           <Toaster

@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { ViewComicModalProps } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
 import Image from "next/image";
@@ -136,7 +136,6 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
           <Button
             onClick={onClose}
             variant="secondary"
-            size="md"
           >
             Đóng
           </Button>

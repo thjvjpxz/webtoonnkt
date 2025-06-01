@@ -1,105 +1,124 @@
 import React from "react";
 import Image from "next/image";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import { ComicData } from "@/types/dashboard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {
+// Removed unused getStatusVariant function.
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "published":
+        return "Đã xuất bản";
+      case "draft":
+        return "Bản nháp";
+      default:
+        return "Đang xét duyệt";
+    }
+  };
+
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case "published":
+        return "status-success";
+      case "draft":
+        return "status-warning";
+      default:
+        return "status-info";
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-green-100 dark:bg-gray-800 dark:border-gray-700">
-      <div className="p-6 border-b border-green-100 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+    <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
+      <CardHeader className="border-b border-border/50">
+        <CardTitle className="text-foreground flex items-center gap-2">
+          <FiEye className="text-primary" size={20} />
           Truyện mới cập nhật
-        </h2>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-green-50 dark:bg-green-900/30">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Truyện
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Tác giả
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Lượt xem
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Trạng thái
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Cập nhật
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-400">
-                Thao tác
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-green-100 dark:divide-gray-700">
-            {comics.map((comic) => (
-              <tr
-                key={comic.id}
-                className="hover:bg-green-50/50 dark:hover:bg-green-900/10"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 mr-3">
-                      <Image
-                        src={comic.coverImage}
-                        alt={comic.title}
-                        width={40}
-                        height={40}
-                        className="rounded-md object-cover"
-                      />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border/50 hover:bg-muted/30">
+                <TableHead className="font-semibold text-foreground">Truyện</TableHead>
+                <TableHead className="font-semibold text-foreground">Tác giả</TableHead>
+                <TableHead className="font-semibold text-foreground">Lượt xem</TableHead>
+                <TableHead className="font-semibold text-foreground">Trạng thái</TableHead>
+                <TableHead className="font-semibold text-foreground">Cập nhật</TableHead>
+                <TableHead className="font-semibold text-foreground text-center">Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {comics.map((comic) => (
+                <TableRow
+                  key={comic.id}
+                  className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
+                >
+                  <TableCell className="py-4">
+                    <div className="flex items-center">
+                      <div className="h-12 w-12 flex-shrink-0 mr-4">
+                        <Image
+                          src={comic.coverImage}
+                          alt={comic.title}
+                          width={48}
+                          height={48}
+                          className="rounded-lg object-cover shadow-soft border border-border/30"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-foreground text-sm">
+                          {comic.title}
+                        </div>
+                      </div>
                     </div>
-                    <div className="font-medium text-gray-800 dark:text-gray-200">
-                      {comic.title}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-medium">
+                    {comic.author}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-medium">
+                    <span className="inline-flex items-center gap-1">
+                      <FiEye size={14} className="text-primary" />
+                      {comic.views.toLocaleString()}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(comic.status)}`}>
+                      {getStatusText(comic.status)}
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {comic.author}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {comic.views.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${
-                      comic.status === "published"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400"
-                        : comic.status === "draft"
-                        ? "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-                        : "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-400"
-                    }`}
-                  >
-                    {comic.status === "published"
-                      ? "Đã xuất bản"
-                      : comic.status === "draft"
-                      ? "Bản nháp"
-                      : "Đang xét duyệt"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {comic.lastUpdated}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-green-600 hover:text-green-800 mr-3 flex items-center dark:text-green-500 dark:hover:text-green-400">
-                    <FiEdit className="mr-1" size={16} />
-                    Sửa
-                  </button>
-                  <button className="text-rose-500 hover:text-rose-700 flex items-center dark:text-rose-400 dark:hover:text-rose-300">
-                    <FiTrash2 className="mr-1" size={16} />
-                    Xóa
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-medium">
+                    {comic.lastUpdated}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-primary hover:bg-primary/10 hover:text-primary"
+                      >
+                        <FiEdit size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <FiTrash2 size={14} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

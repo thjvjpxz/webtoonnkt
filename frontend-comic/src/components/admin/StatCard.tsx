@@ -1,5 +1,6 @@
 import React from "react";
 import { StatCardProps } from "@/types/dashboard";
+import { Card, CardContent } from "@/components/ui/card";
 
 const StatCard = ({
   title,
@@ -9,30 +10,34 @@ const StatCard = ({
   isPositive,
 }: StatCardProps) => {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-green-100 dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-gray-600 text-sm font-medium mb-1 dark:text-gray-300">
-            {title}
-          </h3>
-          <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-            {value}
-          </p>
-          {change && (
-            <p
-              className={`text-xs mt-2 ${
-                isPositive ? "text-green-600" : "text-rose-500"
-              }`}
-            >
-              {isPositive ? "↑" : "↓"} {change} so với tháng trước
+    <Card className="hover:shadow-medium transition-all duration-200 border-border/50 bg-card/50 backdrop-blur-sm">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <h3 className="text-muted-foreground text-sm font-medium mb-2">
+              {title}
+            </h3>
+            <p className="text-3xl font-bold text-foreground mb-1">
+              {value}
             </p>
-          )}
+            {change && (
+              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${isPositive
+                  ? "status-success"
+                  : "status-error"
+                }`}>
+                <span className="mr-1">
+                  {isPositive ? "↗" : "↘"}
+                </span>
+                {change} so với tháng trước
+              </div>
+            )}
+          </div>
+          <div className="bg-primary/10 p-3 rounded-xl text-primary shadow-soft">
+            {icon}
+          </div>
         </div>
-        <div className="bg-green-50 p-3 rounded-lg text-green-500 dark:bg-green-900/30 dark:text-green-400">
-          {icon}
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

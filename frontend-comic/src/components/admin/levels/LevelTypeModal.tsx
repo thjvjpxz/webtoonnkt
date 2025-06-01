@@ -1,8 +1,9 @@
 "use client";
 
-import Button from "@/components/ui/Button";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { LevelTypeRequest, LevelTypeResponse } from "@/types/level";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent } from "react";
 import { FiX } from "react-icons/fi";
 
 interface LevelTypeModalProps {
@@ -98,21 +99,19 @@ export default function LevelTypeModal({
           <div className="flex justify-end space-x-3 mt-6">
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              size="md"
+              className="border-border hover:bg-muted"
             >
               Hủy
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              variant="success"
-              size="md"
-              isLoading={isSubmitting}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {levelType ? "Cập nhật" : "Thêm mới"}
+              {isSubmitting ? "Đang xử lý..." : (levelType ? "Cập nhật" : "Thêm mới")}
             </Button>
           </div>
         </form>

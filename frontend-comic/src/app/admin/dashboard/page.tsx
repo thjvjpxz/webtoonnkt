@@ -17,7 +17,7 @@ export default function Dashboard() {
       views: 1250000,
       status: "published",
       lastUpdated: "Hôm nay, 10:30",
-      coverImage: "https://placehold.co/100x150/4ade80/fff?text=OP",
+      coverImage: "https://placehold.co/100x150/05df72/fff?text=OP",
     },
     {
       id: 2,
@@ -26,7 +26,7 @@ export default function Dashboard() {
       views: 980000,
       status: "published",
       lastUpdated: "Hôm qua, 15:45",
-      coverImage: "https://placehold.co/100x150/4ade80/fff?text=NA",
+      coverImage: "https://placehold.co/100x150/05df72/fff?text=NA",
     },
     {
       id: 3,
@@ -35,7 +35,7 @@ export default function Dashboard() {
       views: 870000,
       status: "review",
       lastUpdated: "2 ngày trước",
-      coverImage: "https://placehold.co/100x150/4ade80/fff?text=DB",
+      coverImage: "https://placehold.co/100x150/05df72/fff?text=DB",
     },
     {
       id: 4,
@@ -44,7 +44,7 @@ export default function Dashboard() {
       views: 650000,
       status: "draft",
       lastUpdated: "3 ngày trước",
-      coverImage: "https://placehold.co/100x150/4ade80/fff?text=MHA",
+      coverImage: "https://placehold.co/100x150/05df72/fff?text=MHA",
     },
     {
       id: 5,
@@ -53,7 +53,7 @@ export default function Dashboard() {
       views: 720000,
       status: "published",
       lastUpdated: "4 ngày trước",
-      coverImage: "https://placehold.co/100x150/4ade80/fff?text=JJK",
+      coverImage: "https://placehold.co/100x150/05df72/fff?text=JJK",
     },
   ];
 

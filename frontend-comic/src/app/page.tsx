@@ -6,14 +6,14 @@ import Sidebar from "@/components/Sidebar";
 
 export default function Home() {
   return (
-    <>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <Nav />
+    <div>
+      <Header />
+      <Nav />
+      <div className="flex flex-col min-h-screen container mx-auto">
         <Sidebar />
         <Content />
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
