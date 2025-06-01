@@ -1,8 +1,8 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
 import Content from "@/components/home/Content";
-import Nav from "@/components/Nav";
-import Sidebar from "@/components/Sidebar";
+import Nav from "@/components/layout/Nav";
+import Sidebar from "@/components/layout/Sidebar";
 
 export default function Home() {
   return (

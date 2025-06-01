@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
   FiGrid,
   FiMenu,
   FiX,
 } from "react-icons/fi";
 import { FiClock, FiCheck, FiTrendingUp, FiHome, FiChevronDown } from "react-icons/fi";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 interface NavItem {
   label: string;

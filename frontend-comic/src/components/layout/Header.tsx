@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "../ThemeToggle";
 import Image from "next/image";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import {
   FiSearch,
   FiUser,
@@ -22,8 +22,8 @@ import {
   FiX
 } from "react-icons/fi";
 import { useState } from "react";
-import LoginModal from "./auth/LoginModal";
-import RegisterModal from "./auth/RegisterModal";
+import LoginModal from "../auth/LoginModal";
+import RegisterModal from "../auth/RegisterModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
 
 export default function Header() {
