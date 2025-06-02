@@ -1,5 +1,6 @@
 // Service cơ bản để gọi API
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { ApiResponse } from '@/types/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,51 +12,59 @@ const axiosInstance = axios.create({
   },
 });
 
-// Hàm xử lý lỗi chung
-const handleError = (error: unknown) => {
-  console.error("API Error:", error);
-
+export const handleApiError = (error: unknown): string => {
   if (error instanceof AxiosError) {
-    if (error.response) {
-      // Lỗi từ server với response
-      return {
-        success: false,
-        data: null,
-        error: error.response.data?.message || "Lỗi từ server",
-      };
-    } else if (error.request) {
-      // Lỗi không nhận được response
-      return {
-        success: false,
-        data: null,
-        error: "Không thể kết nối đến server",
-      };
+    if (error.response?.data?.message) {
+      return error.response.data.message;
+    }
+
+    // Lỗi HTTP status
+    if (error.response?.status) {
+      switch (error.response.status) {
+        case 400:
+          return "Dữ liệu không hợp lệ";
+        case 401:
+          return "Không có quyền truy cập";
+        case 403:
+          return "Bị cấm truy cập";
+        case 404:
+          return "Không tìm thấy";
+        case 500:
+          return "Lỗi server";
+        default:
+          return "Có lỗi xảy ra";
+      }
+    }
+
+    // Lỗi kết nối
+    if (error.request) {
+      return "Không thể kết nối đến server";
     }
   }
 
   // Lỗi khác
-  const errorMessage = error instanceof Error ? error.message : "Đã xảy ra lỗi";
-  return {
-    success: false,
-    data: null,
-    error: errorMessage,
-  };
+  return error instanceof Error ? error.message : "Đã xảy ra lỗi";
 };
 
-// Hàm fetch API chung với axios
+// Hàm fetch API chính
 export const fetchApi = async <T>(
   endpoint: string,
   options: AxiosRequestConfig = {}
-): Promise<T> => {
+): Promise<ApiResponse<T>> => {
   try {
     const response = await axiosInstance({
       url: endpoint,
       ...options,
     });
-
     return response.data;
   } catch (error) {
-    throw handleError(error);
+    if (error instanceof AxiosError && error.response?.data) {
+      return error.response.data;
+    }
+
+    const errorMessage = handleApiError(error);
+    console.error(`API Error [${endpoint}]:`, errorMessage);
+    throw new Error(errorMessage);
   }
 };
 
@@ -63,7 +72,7 @@ export const fetchApi = async <T>(
 export const fetchApiWithFormData = async <T>(
   endpoint: string,
   options: AxiosRequestConfig = {}
-): Promise<T> => {
+): Promise<ApiResponse<T>> => {
   try {
     const config: AxiosRequestConfig = {
       url: endpoint,
@@ -77,19 +86,42 @@ export const fetchApiWithFormData = async <T>(
     const response = await axiosInstance(config);
     return response.data;
   } catch (error) {
-    throw handleError(error);
+    if (error instanceof AxiosError && error.response?.data) {
+      return error.response.data;
+    }
+
+    const errorMessage = handleApiError(error);
+    console.error(`API Error [${endpoint}]:`, errorMessage);
+    throw new Error(errorMessage);
   }
 };
 
-// Thêm interceptor để xử lý token nếu cần
+// Request interceptor để thêm token vào header
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Có thể thêm token vào header ở đây nếu cần
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Thêm token vào header nếu có
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// Response interceptor để xử lý token hết hạn
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Token hết hạn, xóa dữ liệu authentication
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+
+      // Có thể redirect về trang login hoặc reload page
+      // window.location.reload();
+    }
+    return Promise.reject(error);
+  }
 );

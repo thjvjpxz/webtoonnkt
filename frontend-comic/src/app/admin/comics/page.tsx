@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useComic } from "@/hooks/useComic";
 import Image from "next/image";
 import {
@@ -64,21 +63,21 @@ export default function Comics() {
     switch (status) {
       case "COMPLETED":
         return (
-          <div className="status-success">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
             Đã hoàn thành
-          </div>
+          </span>
         );
       case "ONGOING":
         return (
-          <div className="status-warning">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
             Đang cập nhật
-          </div>
+          </span>
         );
       default:
         return (
-          <Badge variant="secondary" className="text-xs">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
             Không xác định
-          </Badge>
+          </span>
         );
     }
   };
@@ -267,7 +266,7 @@ export default function Comics() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex flex-wrap gap-1 justify-center">
-                          {comic.categories.slice(0,).map((category) => (
+                          {comic.categories.slice(0, 2).map((category) => (
                             <span
                               key={category.id}
                               className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"

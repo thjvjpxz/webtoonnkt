@@ -9,6 +9,7 @@ import {
 import { FiX, FiUpload } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { Input } from "@/components/ui/input";
 
 interface LevelModalProps {
   isOpen: boolean;
@@ -39,6 +40,15 @@ export default function LevelModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Thêm state cho color picker
+  const [colorType, setColorType] = useState<'solid' | 'gradient'>('solid');
+  const [gradientColors, setGradientColors] = useState({
+    color1: '#fdea0a',
+    color2: '#f8a50c',
+    color3: '#fd08ab',
+    color4: '#fd08ab'
+  });
+
   // Điền dữ liệu vào form khi sửa
   useEffect(() => {
     if (level) {
@@ -51,6 +61,23 @@ export default function LevelModal({
         urlGif: level.urlGif,
       });
       setPreviewUrl(level.urlGif);
+
+      // Kiểm tra xem color có phải là gradient không
+      if (level.color.includes('linear-gradient')) {
+        setColorType('gradient');
+        // Parse gradient colors nếu cần
+        const matches = level.color.match(/#[a-fA-F0-9]{6}/g);
+        if (matches && matches.length >= 4) {
+          setGradientColors({
+            color1: matches[0],
+            color2: matches[1],
+            color3: matches[2],
+            color4: matches[3]
+          });
+        }
+      } else {
+        setColorType('solid');
+      }
     } else {
       // Reset form khi thêm mới
       setFormData({
@@ -63,6 +90,7 @@ export default function LevelModal({
       });
       setPreviewUrl(null);
       setFile(null);
+      setColorType('solid');
     }
   }, [level, levelTypes]);
 
@@ -117,6 +145,36 @@ export default function LevelModal({
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+  };
+
+  // Hàm xử lý thay đổi loại màu
+  const handleColorTypeChange = (type: 'solid' | 'gradient') => {
+    setColorType(type);
+    if (type === 'solid') {
+      setFormData(prev => ({ ...prev, color: '#000000' }));
+    } else {
+      const gradientValue = `linear-gradient(90deg, ${gradientColors.color1} 0%, ${gradientColors.color2} 50%, ${gradientColors.color3} 70%, ${gradientColors.color4} 100%)`;
+      setFormData(prev => ({ ...prev, color: gradientValue }));
+    }
+  };
+
+  // Hàm xử lý thay đổi màu gradient
+  const handleGradientColorChange = (colorKey: keyof typeof gradientColors, value: string) => {
+    const newGradientColors = { ...gradientColors, [colorKey]: value };
+    setGradientColors(newGradientColors);
+
+    const gradientValue = `linear-gradient(90deg, ${newGradientColors.color1} 0%, ${newGradientColors.color2} 50%, ${newGradientColors.color3} 70%, ${newGradientColors.color4} 100%)`;
+    setFormData(prev => ({ ...prev, color: gradientValue }));
+  };
+
+  // Hàm render preview màu
+  const renderColorPreview = () => {
+    return (
+      <div
+        className="w-full h-12 rounded-lg border-2 border-gray-200 dark:border-gray-600"
+        style={{ background: formData.color }}
+      />
+    );
   };
 
   if (!isOpen) return null;
@@ -221,22 +279,138 @@ export default function LevelModal({
               />
             </div>
 
-            <div className="mb-4">
-              <label
-                htmlFor="color"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
+            <div className="mb-4 md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
                 Màu sắc
               </label>
-              <input
-                type="color"
-                id="color"
-                name="color"
-                required
-                value={formData.color}
-                onChange={handleChange}
-                className="h-10 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
-              />
+
+              {/* Color Type Selector */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => handleColorTypeChange('solid')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${colorType === 'solid'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                >
+                  Màu đơn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleColorTypeChange('gradient')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${colorType === 'gradient'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                >
+                  Gradient
+                </button>
+              </div>
+
+              {/* Color Controls */}
+              {colorType === 'solid' ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Input
+                      type="color"
+                      id="color"
+                      name="color"
+                      value={formData.color}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="mb-3">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Xem trước:</div>
+                    {renderColorPreview()}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Màu 1 (0%)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gradientColors.color1}
+                          onChange={(e) => handleGradientColorChange('color1', e.target.value)}
+                          className="w-10 h-8 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={gradientColors.color1}
+                          onChange={(e) => handleGradientColorChange('color1', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Màu 2 (50%)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gradientColors.color2}
+                          onChange={(e) => handleGradientColorChange('color2', e.target.value)}
+                          className="w-10 h-8 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={gradientColors.color2}
+                          onChange={(e) => handleGradientColorChange('color2', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Màu 3 (70%)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gradientColors.color3}
+                          onChange={(e) => handleGradientColorChange('color3', e.target.value)}
+                          className="w-10 h-8 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={gradientColors.color3}
+                          onChange={(e) => handleGradientColorChange('color3', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Màu 4 (100%)</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={gradientColors.color4}
+                          onChange={(e) => handleGradientColorChange('color4', e.target.value)}
+                          className="w-10 h-8 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={gradientColors.color4}
+                          onChange={(e) => handleGradientColorChange('color4', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gradient Value Display */}
+                  <div>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Giá trị CSS:</label>
+                    <textarea
+                      value={formData.color}
+                      onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white text-xs"
+                      rows={2}
+                      placeholder="linear-gradient(90deg, #fdea0a 0%, #f8a50c 50%, #fd08ab 70%, #fd08ab 100%)"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mb-4 md:col-span-2">
@@ -292,7 +466,6 @@ export default function LevelModal({
 
           <div className="flex justify-end space-x-3 mt-6">
             <Button
-              type="button"
               variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
@@ -301,9 +474,8 @@ export default function LevelModal({
               Hủy
             </Button>
             <Button
-              type="submit"
+              variant="default"
               disabled={isSubmitting}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isSubmitting ? "Đang xử lý..." : (level ? "Cập nhật" : "Thêm mới")}
             </Button>

@@ -47,20 +47,16 @@ export default function DeleteUserModal({
 
         <DialogFooter className="gap-2">
           <Button
-            type="button"
             variant="outline"
             onClick={onClose}
             disabled={isDeleting}
-            className="border-border hover:bg-muted"
           >
             Hủy
           </Button>
           <Button
-            type="button"
             onClick={onConfirm}
             disabled={isDeleting}
             variant="destructive"
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {isDeleting ? "Đang xóa..." : "Xóa người dùng"}
           </Button>

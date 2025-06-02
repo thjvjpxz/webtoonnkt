@@ -67,7 +67,6 @@ export default function DeleteChapterModal({
             variant="outline"
             onClick={onClose}
             disabled={isDeleting}
-            className="border-border hover:bg-muted"
           >
             Hủy
           </Button>
@@ -75,7 +74,6 @@ export default function DeleteChapterModal({
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {isDeleting ? "Đang xóa..." : "Xóa"}
           </Button>

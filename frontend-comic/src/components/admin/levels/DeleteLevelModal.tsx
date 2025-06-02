@@ -67,7 +67,6 @@ export default function DeleteLevelModal({
             onClick={onClose}
             variant="outline"
             disabled={isDeleting}
-            className="border-border hover:bg-muted"
           >
             Hủy
           </Button>
@@ -75,7 +74,6 @@ export default function DeleteLevelModal({
             onClick={handleDelete}
             variant="destructive"
             disabled={isDeleting}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {isDeleting ? "Đang xóa..." : "Xóa"}
           </Button>

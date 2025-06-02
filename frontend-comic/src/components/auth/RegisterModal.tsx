@@ -16,14 +16,12 @@ interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
-  onRegister: (username: string, email: string, password: string) => void;
 }
 
 export default function RegisterModal({
   isOpen,
   onClose,
   onSwitchToLogin,
-  onRegister,
 }: RegisterModalProps) {
   const [formData, setFormData] = useState({
     username: "",
@@ -92,7 +90,7 @@ export default function RegisterModal({
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      onRegister(formData.username, formData.email, formData.password);
+      // onRegister(formData.username, formData.email, formData.password);
       onClose();
       // Reset form
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });

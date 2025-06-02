@@ -63,8 +63,8 @@ export default function Categories() {
         </form>
 
         <Button
+          variant="default"
           onClick={handleOpenAddModal}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
           aria-label="Thêm thể loại mới"
           title="Thêm thể loại mới"
         >

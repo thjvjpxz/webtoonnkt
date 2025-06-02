@@ -29,6 +29,8 @@ export function useAuthModals() {
     setTimeout(() => setIsLoginOpen(true), 100);
   };
 
+
+
   return {
     isLoginOpen,
     isRegisterOpen,

@@ -50,7 +50,6 @@ export default function DeleteComicModal({
             onClick={onClose}
             variant="outline"
             disabled={isDeleting}
-            className="border-border hover:bg-muted"
           >
             Hủy
           </Button>
@@ -58,7 +57,6 @@ export default function DeleteComicModal({
             onClick={onConfirm}
             variant="destructive"
             disabled={isDeleting}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {isDeleting ? "Đang xóa..." : "Xóa truyện"}
           </Button>

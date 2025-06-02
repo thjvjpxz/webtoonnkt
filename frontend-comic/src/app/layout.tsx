@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <head>
         {/* <link rel="stylesheet" href="/css/scrollbar.css" type="text/css" media="all" /> */}
         {/* Logo */}
@@ -25,27 +26,30 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className}`}>
         <ThemeProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: "#363636",
-                color: "#fff",
-              },
-              success: {
+          <AuthProvider>
+
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
                 style: {
-                  background: "#22c55e",
+                  background: "#363636",
+                  color: "#fff",
                 },
-              },
-              error: {
-                style: {
-                  background: "#ef4444",
+                success: {
+                  style: {
+                    background: "var(--success)",
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  style: {
+                    background: "var(--destructive)",
+                  },
+                },
+              }}
+            />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

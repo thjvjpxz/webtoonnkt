@@ -16,7 +16,6 @@ public class LoginResponse {
     private String refreshToken;
     private String id;
     private String username;
-    private String email;
     private String imgUrl;
     private Boolean vip;
     private Role role;
