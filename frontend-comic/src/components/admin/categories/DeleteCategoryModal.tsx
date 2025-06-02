@@ -52,18 +52,17 @@ export default function DeleteCategoryModal({
               variant="secondary"
               onClick={onClose}
               disabled={isDeleting}
-              size="md"
+              size="sm"
             >
               Hủy
             </Button>
             <Button
-              variant="danger"
+              variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting}
-              size="md"
-              isLoading={isDeleting}
+              size="sm"
             >
-              Xoá
+              {isDeleting ? "Đang xóa..." : "Xoá"}
             </Button>
           </div>
         </div>

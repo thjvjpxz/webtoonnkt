@@ -149,7 +149,7 @@ export default function Categories() {
                       </TableCell>
                       <TableCell className="text-center py-4 text-muted-foreground max-w-xs">
                         <div className="truncate" title={category.description}>
-                          {category.description}
+                          {category.description || "Không có mô tả"}
                         </div>
                       </TableCell>
                       <TableCell className="text-center py-4 text-muted-foreground">

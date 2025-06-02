@@ -36,8 +36,8 @@ export default function DeleteComicModal({
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
             <p className="text-foreground mb-2">
-              Bạn có chắc chắn muốn xóa truyện{" "}
-              <span className="font-semibold text-primary">&quot;{comicTitle}&quot;</span> không?
+              Bạn có chắc chắn muốn xóa truyện
+              <span className="font-semibold text-primary"> &quot;{comicTitle}&quot;</span> không?
             </p>
             <p className="text-muted-foreground text-sm">
               Tất cả chương và dữ liệu liên quan sẽ bị xóa vĩnh viễn.
