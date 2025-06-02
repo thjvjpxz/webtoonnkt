@@ -245,13 +245,6 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-primary/60;
   }
-
-  /* Enhanced transitions for professional feel */
-  * {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 200ms;
-  }
 }
 
 /* Professional component library */

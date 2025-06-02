@@ -15,25 +15,24 @@ import {
 import {
   FiSearch,
   FiUser,
-  FiSettings,
   FiBookmark,
   FiHeart,
   FiLogOut,
-  FiX
+  FiX,
+  FiSettings
 } from "react-icons/fi";
 import { useState } from "react";
 import LoginModal from "../auth/LoginModal";
 import RegisterModal from "../auth/RegisterModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthState } from "@/hooks/useAuthState";
 
 export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Auth state từ AuthContext
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin } = useAuthState();
 
   // Auth modals
   const {
@@ -54,23 +53,19 @@ export default function Header() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
   const UserMenu = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200"
+          className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200 select-none"
         >
           {user?.imgUrl ? (
             <Image
               src={user.imgUrl}
               alt={user.username}
               fill
-              sizes="40px"
+              sizes="36px"
               className="rounded-full object-cover border-2 border-primary/20"
             />
           ) : (
@@ -85,7 +80,11 @@ export default function Header() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 p-2" align="end" forceMount>
+      <DropdownMenuContent
+        className="w-64 p-2 data-[side=bottom]:slide-in-from-top-2"
+        align="end"
+        forceMount
+      >
         {/* User Info Header */}
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
           {user?.imgUrl ? (
@@ -102,13 +101,12 @@ export default function Header() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground truncate">{user?.username}</p>
+            <p className="font-semibold text-foreground truncate">
+              {user?.username || 'Admin'}
+            </p>
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${user?.vip
-                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                : 'bg-muted text-muted-foreground'
-                }`}>
-                {user?.vip ? '★ VIP' : 'Thành viên'}
+              <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                Quản trị viên
               </span>
             </div>
           </div>
@@ -144,11 +142,23 @@ export default function Header() {
           </Link>
         </DropdownMenuItem>
 
+        {/* Menu Admin - chỉ hiển thị cho ADMIN */}
+        {isAdmin() && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/dashboard" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="font-medium">Quản lý Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuSeparator className="my-2" />
 
         <DropdownMenuItem
           className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group"
-          onClick={handleLogout}
+          onClick={logout}
         >
           <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
             <FiLogOut className="w-4 h-4 text-red-600 dark:text-red-400" />

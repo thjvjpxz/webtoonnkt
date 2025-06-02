@@ -29,7 +29,7 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/refresh")
     public BaseResponse<?> refreshToken(@RequestBody Map<String, String> payload) {
         String refreshToken = payload.get("refreshToken");
         return authService.refreshToken(refreshToken);

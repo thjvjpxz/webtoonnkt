@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Chapters() {
 
@@ -166,8 +167,7 @@ export default function Chapters() {
                   {/* Loading indicator */}
                   {isLoadingComics && (
                     <div className="px-4 py-3 text-center">
-                      <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                      <span className="ml-2 text-sm text-muted-foreground">Đang tải...</span>
+                      <LoadingSpinner />
                     </div>
                   )}
                 </div>
@@ -196,9 +196,7 @@ export default function Chapters() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <div className="p-8 text-center flex flex-col items-center">
               <FiAlertCircle size={40} className="mb-2 text-destructive" />

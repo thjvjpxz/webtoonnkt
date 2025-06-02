@@ -1,6 +1,7 @@
 // Service cơ bản để gọi API
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@/types/api';
+import { handleInvalidToken, getAccessToken } from '@/utils/authUtils';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -100,7 +101,7 @@ export const fetchApiWithFormData = async <T>(
 axiosInstance.interceptors.request.use(
   (config) => {
     // Thêm token vào header nếu có
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -114,13 +115,8 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Token hết hạn, xóa dữ liệu authentication
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
-
-      // Có thể redirect về trang login hoặc reload page
-      // window.location.reload();
+      // Token hết hạn hoặc không hợp lệ, xử lý logout và redirect
+      handleInvalidToken();
     }
     return Promise.reject(error);
   }

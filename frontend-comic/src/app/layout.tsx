@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,10 +28,11 @@ export default function RootLayout({
       <body className={`${inter.className}`}>
         <ThemeProvider>
           <AuthProvider>
-
-            {children}
+            <AuthGuard>
+              {children}
+            </AuthGuard>
             <Toaster
-              position="top-right"
+              position="bottom-right"
               toastOptions={{
                 duration: 3000,
                 style: {

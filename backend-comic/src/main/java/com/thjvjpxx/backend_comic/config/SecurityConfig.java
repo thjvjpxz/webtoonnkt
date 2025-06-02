@@ -39,24 +39,25 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedHandler)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll()
-                        // // Các API công khai
-                        // .requestMatchers("/auth/login", "/auth/register",
-                        // "/auth/refresh-token").permitAll()
-                        // .requestMatchers("/public/**").permitAll()
+                        // .requestMatchers("/**").permitAll()
+                        // Các API công khai
+                        .requestMatchers("/auth/login", "/auth/register",
+                                "/auth/refresh-token")
+                        .permitAll()
+                        .requestMatchers("/public/**").permitAll()
 
-                        // // Các API cần xác thực với vai trò ADMIN
-                        // .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // .requestMatchers("/categories/**").hasRole("ADMIN")
-                        // .requestMatchers("/comics/**").hasRole("ADMIN")
-                        // .requestMatchers("/chapters/**").hasRole("ADMIN")
+                        // Các API cần xác thực với vai trò ADMIN
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/comics/**").hasRole("ADMIN")
+                        .requestMatchers("/chapters/**").hasRole("ADMIN")
 
-                        // // Các API cần xác thực với vai trò PUBLISHER
-                        // .requestMatchers("/publisher/**").hasAnyRole("ADMIN", "PUBLISHER")
+                        // Các API cần xác thực với vai trò PUBLISHER
+                        .requestMatchers("/publisher/**").hasAnyRole("ADMIN", "PUBLISHER")
 
-                        // // Các API cần xác thực với bất kỳ vai trò nào
-                        // .requestMatchers("/user/**").authenticated()
-                        // .requestMatchers("/auth/validate-token").authenticated()
+                        // Các API cần xác thực với bất kỳ vai trò nào
+                        .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/auth/validate-token").authenticated()
 
                         // Các API khác cần xác thực
                         .anyRequest().authenticated())

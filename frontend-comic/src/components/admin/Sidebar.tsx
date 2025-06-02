@@ -128,18 +128,6 @@ export default function Sidebar({
           ))}
         </ul>
       </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
-          aria-label="Đăng xuất"
-        >
-          <FiLogOut size={20} />
-          {isSidebarOpen && <span className="ml-2">Đăng xuất</span>}
-        </Button>
-      </div>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.model.Comic;
 
 @Repository
@@ -21,7 +22,7 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
 
     Page<Comic> findBySlugContainingOrNameContaining(String slug, String name, Pageable pageable);
 
-    Page<Comic> findByStatus(String status, Pageable pageable);
+    Page<Comic> findByStatus(ComicStatus status, Pageable pageable);
 
     @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
     Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);

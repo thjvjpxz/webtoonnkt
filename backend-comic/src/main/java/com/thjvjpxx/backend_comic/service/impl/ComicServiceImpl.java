@@ -16,6 +16,7 @@ import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
@@ -55,7 +56,8 @@ public class ComicServiceImpl implements ComicService {
         if (search != null && !search.isEmpty()) {
             comics = comicRepository.findBySlugContainingOrNameContaining(search, search, pageable);
         } else if (status != null && !status.isEmpty()) {
-            comics = comicRepository.findByStatus(status, pageable);
+            ComicStatus comicStatus = ComicStatus.valueOf(status.toUpperCase());
+            comics = comicRepository.findByStatus(comicStatus, pageable);
         } else if (category != null && !category.isEmpty()) {
             comics = comicRepository.findByCategory(category, pageable);
         } else {

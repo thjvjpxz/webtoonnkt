@@ -1,16 +1,13 @@
-import { login } from "@/services/authService";
 import { LoginRequest } from "@/types/auth";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthState } from "@/hooks/useAuthState";
 
 export default function useLogin(onClose: () => void) {
-  const { login: authLogin } = useAuth();
+  const { login, isSubmitting } = useAuthState();
   const [formData, setFormData] = useState<LoginRequest>({
     username: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,7 +41,7 @@ export default function useLogin(onClose: () => void) {
   };
 
   const handleClose = () => {
-    if (isLoading) return; // Không cho phép đóng khi đang loading
+    if (isSubmitting) return; // Không cho phép đóng khi đang loading
     setFormData({ username: "", password: "" });
     setErrors({});
     setShowPassword(false);
@@ -55,28 +52,14 @@ export default function useLogin(onClose: () => void) {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    try {
-      const response = await login(formData);
-      if (response.status === 200 && response.data) {
-        // Lưu thông tin user vào AuthContext
-        authLogin(response.data);
-        toast.success("Đăng nhập thành công!");
-        // Đóng modal sau khi đăng nhập thành công
-        handleClose();
-      } else {
-        toast.error(response.message || "Đã xảy ra lỗi");
-      }
-    } catch (error: unknown) {
-      console.log(error);
-      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
-    } finally {
-      setIsLoading(false);
+    const success = await login(formData);
+    if (success) {
+      handleClose();
     }
   };
 
   return {
-    isLoading,
+    isLoading: isSubmitting,
     errors,
     handleLogin,
     handleInputChange,
