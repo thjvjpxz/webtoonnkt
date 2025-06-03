@@ -34,13 +34,6 @@ export const getComic = async (
   return await fetchApi<ComicResponse>(`/comics/${id}`);
 };
 
-// Lấy chi tiết một truyện theo slug cho page chi tiết truyện
-export const getComicBySlug = async (
-  slug: string
-): Promise<ApiResponse<ComicDetailResponse>> => {
-  return await fetchApi<ComicDetailResponse>(`/comic/${slug}`);
-};
-
 // Xóa truyện
 export const deleteComic = async (id: string) => {
   return await fetchApi<ApiResponse<null>>(`/comics/${id}`, {

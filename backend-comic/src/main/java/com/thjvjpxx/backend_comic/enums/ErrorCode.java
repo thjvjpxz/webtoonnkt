@@ -88,6 +88,10 @@ public enum ErrorCode {
     EMAIL_TEMPLATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi xử lý template email!"),
     VERIFICATION_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Token xác thực đã hết hạn!"),
 
+    // User Follow
+    USER_FOLLOW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Người dùng đã theo dõi truyện này!"),
+    USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "Người dùng không theo dõi truyện này!"),
+
     // Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi máy chủ!");
     ;

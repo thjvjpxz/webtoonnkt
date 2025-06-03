@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <head>
-        {/* <link rel="stylesheet" href="/css/scrollbar.css" type="text/css" media="all" /> */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {/* Logo */}
-        <link rel="icon" href="/images/icon_logo.ico" />
+        <link rel="icon" href="/images/icon_logo.ico" type="image/x-icon" />
       </head>
       <body className={`${inter.className}`}>
         <ThemeProvider>
