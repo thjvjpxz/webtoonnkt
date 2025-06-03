@@ -53,11 +53,9 @@ export function clearAuthData(): void {
 // Redirect về trang chủ
 export function redirectToHome(): void {
   if (typeof window !== 'undefined') {
-    // Bỏ qua redirect nếu đang ở trang public
-    if (AUTH_PUBLIC_PATHS.includes(window.location.pathname)) {
+    if (AUTH_PUBLIC_PATHS.some(path => window.location.pathname.startsWith(path))) {
       return;
     }
-
     // Nếu không phải đang ở trang chủ thì redirect về trang chủ
     if (window.location.pathname !== '/') {
       window.location.href = '/';

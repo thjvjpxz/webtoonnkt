@@ -1,4 +1,4 @@
-import { Chapter, DetailChapter } from "@/types/chapter";
+import { Chapter, ChapterWithComicDetail, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 interface ViewChapterModalProps {
   isOpen: boolean;
-  chapter: Chapter | null;
+  chapter: ChapterWithComicDetail | null;
   onClose: () => void;
 }
 

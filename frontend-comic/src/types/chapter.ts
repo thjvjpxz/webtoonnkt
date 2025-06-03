@@ -4,14 +4,17 @@ export interface Chapter {
   title: string;
   status: ChapterStatus;
   price?: number;
-  comicId: string;
-  comicName: string;
   detailChapters: DetailChapter[];
   domainCdn: string;
   chapterPath: string;
   imageCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ChapterWithComicDetail extends Chapter {
+  comicId: string;
+  comicName: string;
 }
 
 export interface ChapterCreateUpdate {

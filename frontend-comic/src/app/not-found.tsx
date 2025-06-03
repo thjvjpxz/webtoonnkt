@@ -10,7 +10,7 @@ import { useState } from "react";
 export default function NotFound() {
   return (
     <Main>
-      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-background select-none">
         <div className="max-w-2xl mx-auto text-center space-y-8">
           {/* 404 Illustration */}
           <div className="relative">

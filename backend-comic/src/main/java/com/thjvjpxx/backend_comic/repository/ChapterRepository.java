@@ -26,6 +26,8 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 
 	Page<Chapter> findByComicIdAndStatus(String comicId, String status, Pageable pageable);
 
+	List<Chapter> findByComicId(String comicId);
+
 	@Query("SELECT c FROM chapters c JOIN c.comic com WHERE com.id = :comicId AND c.title LIKE %:title%")
 	Page<Chapter> findByTitleContainingAndComicId(@Param("title") String title, @Param("comicId") String comicId,
 			Pageable pageable);
@@ -50,7 +52,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 				c.price,
 				c.chapter_number,
 				c.updated_at
-				
+
 			FROM
 				chapters c
 			WHERE

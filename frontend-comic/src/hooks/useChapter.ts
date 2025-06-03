@@ -1,4 +1,4 @@
-import { Chapter, ChapterCreateUpdate } from "@/types/chapter";
+import { Chapter, ChapterCreateUpdate, ChapterWithComicDetail } from "@/types/chapter";
 import { createChapter, deleteChapter, getChapters, updateChapter } from "@/services/chapterService";
 import { useCallback, useEffect, useState } from "react";
 import { getComics } from "@/services/comicService";
@@ -6,7 +6,7 @@ import { ComicResponse } from "@/types/comic";
 import toast from "react-hot-toast";
 
 export const useChapter = (initialPage = 1, pageSize = 5) => {
-  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chapters, setChapters] = useState<ChapterWithComicDetail[]>([]);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +15,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
-  const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
+  const [selectedChapter, setSelectedChapter] = useState<ChapterWithComicDetail | null>(null);
   const [comicOptions, setComicOptions] = useState<ComicResponse[]>([]);
 
   const [comicSearchTerm, setComicSearchTerm] = useState("");
@@ -175,13 +175,13 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
   };
 
   // Xử lý mở modal xem chi tiết
-  const handleOpenViewModal = (chapter: Chapter) => {
+  const handleOpenViewModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsViewModalOpen(true);
   };
 
   // Xử lý mở modal xóa
-  const handleOpenDeleteModal = (chapter: Chapter) => {
+  const handleOpenDeleteModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsDeleteModalOpen(true);
   };
@@ -193,7 +193,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
   };
 
   // Xử lý mở modal chỉnh sửa
-  const handleOpenEditModal = (chapter: Chapter) => {
+  const handleOpenEditModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsAddEditModalOpen(true);
   };

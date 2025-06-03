@@ -1,4 +1,5 @@
 import { CategoryResponse } from "./category";
+import { Chapter } from "./chapter";
 
 export interface ComicCreateUpdate {
   name: string;
@@ -16,15 +17,20 @@ export interface ComicResponse {
   id: string;
   name: string;
   slug: string;
-  description: string;
-  author: string;
-  thumbUrl: string;
-  status: string;
   originName: string;
-  viewsCount: number;
-  rating: number;
+  thumbUrl: string;
+  author: string;
+  status: string;
   followersCount: number;
+  viewsCount: number;
+  description: string;
+  lastChapterId: string;
   categories: CategoryResponse[];
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ComicDetailResponse extends ComicResponse {
+  chapters: Chapter[];
+}
+
