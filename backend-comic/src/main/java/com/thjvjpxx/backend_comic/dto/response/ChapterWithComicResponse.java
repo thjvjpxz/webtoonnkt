@@ -24,7 +24,6 @@ public class ChapterWithComicResponse {
     String status;
     int followersCount;
     int viewsCount;
-    double rating;
     String description;
     List<ChapterResponse> chapters;
 }

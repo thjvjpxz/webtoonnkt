@@ -3,6 +3,7 @@ export interface Chapter {
   chapterNumber: number;
   title: string;
   status: ChapterStatus;
+  price?: number;
   comicId: string;
   comicName: string;
   detailChapters: DetailChapter[];
@@ -19,6 +20,7 @@ export interface ChapterCreateUpdate {
   title: string;
   comicId: string;
   status: ChapterStatus;
+  price?: number;
   detailChapters: DetailChapterCreateUpdate[];
 }
 
@@ -42,8 +44,8 @@ export interface ChapterListResponse {
 }
 
 export enum ChapterStatus {
-  FEE,
-  FREE
+  FEE = "FEE",
+  FREE = "FREE"
 }
 
 export interface DetailChapterCreateUpdate {

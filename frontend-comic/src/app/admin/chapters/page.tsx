@@ -237,6 +237,12 @@ export default function Chapters() {
                       Chương
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
+                      Trạng thái
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Giá
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -284,6 +290,20 @@ export default function Chapters() {
                       </TableCell>
                       <TableCell className="text-center text-foreground font-medium">
                         {chapter.chapterNumber}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          }`}>
+                          {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center text-foreground">
+                        {chapter.status === 'FEE' && chapter.price
+                          ? `${chapter.price.toLocaleString('vi-VN')} VNĐ`
+                          : '-'
+                        }
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.createdAt)}

@@ -16,6 +16,7 @@ export const useChapterModal = (
   const [chapterNumber, setChapterNumber] = useState<string>("");
   const [comicId, setComicId] = useState<string>("");
   const [status, setStatus] = useState<ChapterStatus>(ChapterStatus.FREE);
+  const [price, setPrice] = useState<number | undefined>(undefined);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -51,6 +52,7 @@ export const useChapterModal = (
         setTitle(chapter.title);
         setChapterNumber(chapter.chapterNumber.toString());
         setStatus(chapter.status !== undefined ? chapter.status : ChapterStatus.FREE);
+        setPrice(chapter.price);
 
         // Set comic ID
         const comic = comicOptions.find(comic => comic.name === chapter.comicName);
@@ -82,6 +84,7 @@ export const useChapterModal = (
         setChapterNumber("");
         setComicId("");
         setStatus(ChapterStatus.FREE);
+        setPrice(undefined);
         setImages([]);
         setPreviewUrls([]);
         setExistingImageUrls([]);
@@ -321,6 +324,12 @@ export const useChapterModal = (
       return;
     }
 
+    // Validate price nếu chapter là trả phí
+    if (status === ChapterStatus.FEE && (!price || price <= 0)) {
+      toast.error("Vui lòng nhập giá hợp lệ cho chương trả phí");
+      return;
+    }
+
     // Nếu đang chỉnh sửa, không cần validate có ảnh hay không
     if (!isEditMode && images.length === 0) {
       toast.error("Vui lòng thêm ít nhất một ảnh");
@@ -336,6 +345,7 @@ export const useChapterModal = (
       chapterNumber: parseFloat(chapterNumber),
       comicId,
       status,
+      price,
       detailChapters: []
     };
 
@@ -394,6 +404,7 @@ export const useChapterModal = (
     chapterNumber,
     comicId,
     status,
+    price,
     images,
     previewUrls,
     isUploading,
@@ -414,6 +425,7 @@ export const useChapterModal = (
     setChapterNumber,
     setComicId,
     setStatus,
+    setPrice,
     setComicSearchTerm,
     setIsComicDropdownOpen,
 

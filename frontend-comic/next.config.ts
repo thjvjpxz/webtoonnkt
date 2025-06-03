@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
       "sv1.otruyencdn.com",
       "img.otruyen.xyz",
       "img.otruyenapi.com",
-      "cdn.kimthi1708.id.vn"
+      "cdn.kimthi1708.id.vn",
+      "example.com",
+      "images.unsplash.com"
     ],
     remotePatterns: [
       {

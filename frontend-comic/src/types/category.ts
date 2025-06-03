@@ -3,7 +3,7 @@ export interface CategoryResponse {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  description?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -12,5 +12,5 @@ export interface CategoryResponse {
 export interface CategoryCreateUpdate {
   name: string;
   slug: string;
-  description: string;
+  description?: string;
 }
