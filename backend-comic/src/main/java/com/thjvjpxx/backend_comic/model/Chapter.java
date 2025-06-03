@@ -50,7 +50,10 @@ public class Chapter {
     String chapterPath;
 
     @Column(name = "chapter_number")
-    double chapterNumber;
+    Double chapterNumber;
+
+    @Column(name = "price")
+    Double price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -27,5 +27,7 @@ public class ChapterRequest {
     @NotBlank(message = "CHAPTER_COMIC_ID_NOT_EMPTY")
     String comicId;
 
+    Double price;
+
     List<DetailChapterRequest> detailChapters;
 }

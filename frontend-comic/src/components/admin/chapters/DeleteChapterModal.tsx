@@ -16,7 +16,7 @@ interface DeleteChapterModalProps {
   onConfirm: () => void;
   comicName: string;
   chapterTitle: string;
-  chapterNumber: string;
+  chapterNumber: number;
 };
 
 export default function DeleteChapterModal({

@@ -216,7 +216,6 @@ export default function ChapterModal({
                 >
                   <option value={ChapterStatus.FREE}>Miễn phí</option>
                   <option value={ChapterStatus.FEE}>Trả phí</option>
-                  <option value={ChapterStatus.VIP}>VIP</option>
                 </select>
               </div>
 

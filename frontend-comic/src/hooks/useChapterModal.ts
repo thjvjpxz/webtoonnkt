@@ -336,6 +336,7 @@ export const useChapterModal = (
       chapterNumber: parseFloat(chapterNumber),
       comicId,
       status,
+      detailChapters: []
     };
 
     // Thêm id nếu đang ở chế độ chỉnh sửa
