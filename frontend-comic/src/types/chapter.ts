@@ -1,10 +1,9 @@
-import { ComicResponse } from "./comic";
-
 export interface Chapter {
   id: string;
-  chapterNumber: string;
+  chapterNumber: number;
   title: string;
-  viewCount: number;
+  status: ChapterStatus;
+  price?: number;
   comicId: string;
   comicName: string;
   detailChapters: DetailChapter[];
@@ -17,9 +16,12 @@ export interface Chapter {
 
 export interface ChapterCreateUpdate {
   id?: string;
-  chapterNumber: string;
+  chapterNumber: number;
   title: string;
   comicId: string;
+  status: ChapterStatus;
+  price?: number;
+  detailChapters: DetailChapterCreateUpdate[];
 }
 
 export interface ChapterImage {
@@ -42,9 +44,8 @@ export interface ChapterListResponse {
 }
 
 export enum ChapterStatus {
-  FEE,
-  FREE,
-  VIP
+  FEE = "FEE",
+  FREE = "FREE"
 }
 
 export interface DetailChapterCreateUpdate {

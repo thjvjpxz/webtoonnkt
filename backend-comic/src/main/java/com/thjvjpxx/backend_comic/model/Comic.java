@@ -64,9 +64,6 @@ public class Comic {
     @Column(name = "views_count")
     int viewsCount;
 
-    @Column(name = "rating")
-    double rating;
-
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 

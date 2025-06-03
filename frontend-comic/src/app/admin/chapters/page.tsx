@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Chapters() {
 
@@ -83,18 +84,23 @@ export default function Chapters() {
 
           {/* Comic Filter */}
           <div className="relative w-full sm:w-80">
-            <div
-              className="pl-10 pr-4 py-2 border border-border rounded-lg w-full flex justify-between items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
+            <Input
+              type="text"
+              value={comicFilter ? comicOptions.find(c => c.id === comicFilter)?.name || "Tất cả truyện" : "Tất cả truyện"}
+              placeholder="Chọn truyện..."
+              className="pl-10 pr-10 w-full border-border focus:border-primary cursor-pointer"
               onClick={() => setIsComicDropdownOpen(!isComicDropdownOpen)}
-            >
-              <span className="truncate">
-                {comicFilter ? comicOptions.find(c => c.id === comicFilter)?.name || "Tất cả truyện" : "Tất cả truyện"}
-              </span>
-              <svg className={`w-5 h-5 transition-transform text-muted-foreground ${isComicDropdownOpen ? "transform rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
+              readOnly
+            />
             <FiBookOpen className="h-5 w-5 text-primary absolute left-3 top-2" />
+            <svg
+              className={`w-5 h-5 transition-transform text-muted-foreground absolute right-3 top-2 ${isComicDropdownOpen ? "transform rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
 
             {isComicDropdownOpen && (
               <div
@@ -161,8 +167,7 @@ export default function Chapters() {
                   {/* Loading indicator */}
                   {isLoadingComics && (
                     <div className="px-4 py-3 text-center">
-                      <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                      <span className="ml-2 text-sm text-muted-foreground">Đang tải...</span>
+                      <LoadingSpinner />
                     </div>
                   )}
                 </div>
@@ -191,9 +196,7 @@ export default function Chapters() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <div className="p-8 text-center flex flex-col items-center">
               <FiAlertCircle size={40} className="mb-2 text-destructive" />
@@ -234,6 +237,12 @@ export default function Chapters() {
                       Chương
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
+                      Trạng thái
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      Giá
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -250,39 +259,51 @@ export default function Chapters() {
                       key={chapter.id}
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
-                      <TableCell className="py-4">
-                        <div className="flex items-center justify-center">
-                          <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
-                            {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
-                              <Image
-                                src={constructImageUrl(chapter, chapter.detailChapters[0].imgUrl)}
-                                alt={`Ảnh bìa ${chapter.comicName}`}
-                                fill
-                                sizes="100px"
-                                loading="lazy"
-                                className="object-cover rounded-md shadow-soft border border-border/30"
-                              />
-                            ) : (
-                              <div className="h-[120px] w-[100px] bg-muted rounded-md flex items-center justify-center shadow-soft border border-border/30">
-                                <div className="text-center">
-                                  <svg className="w-8 h-8 text-muted-foreground mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                  <span className="text-xs text-muted-foreground">No Img</span>
-                                </div>
+                      <TableCell className="py-4 flex items-center w-[100px]">
+                        <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
+                          {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
+                            <Image
+                              src={constructImageUrl(chapter, chapter.detailChapters[0].imgUrl)}
+                              alt={`Ảnh bìa ${chapter.comicName}`}
+                              fill
+                              sizes="100px"
+                              loading="lazy"
+                              className="object-cover rounded-md shadow-soft border border-border/30"
+                            />
+                          ) : (
+                            <div className="h-[120px] w-[100px] bg-muted rounded-md flex items-center justify-center shadow-soft border border-border/30">
+                              <div className="text-center">
+                                <svg className="w-8 h-8 text-muted-foreground mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span className="text-xs text-muted-foreground">No Img</span>
                               </div>
-                            )}
-                          </div>
-
-                          <div className="ml-4">
-                            <div className="font-medium text-foreground max-w-[150px] truncate">
-                              {chapter.comicName}
                             </div>
+                          )}
+                        </div>
+
+                        <div className="ml-4">
+                          <div className="font-medium text-foreground max-w-[150px] truncate">
+                            {chapter.comicName}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center text-foreground font-medium">
                         {chapter.chapterNumber}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          }`}>
+                          {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center text-foreground">
+                        {chapter.status === 'FEE' && chapter.price
+                          ? `${chapter.price.toLocaleString('vi-VN')} VNĐ`
+                          : '-'
+                        }
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.createdAt)}

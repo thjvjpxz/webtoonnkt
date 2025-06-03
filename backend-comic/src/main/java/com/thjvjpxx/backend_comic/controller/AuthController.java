@@ -1,9 +1,12 @@
 package com.thjvjpxx.backend_comic.controller;
 
 import java.util.Map;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thjvjpxx.backend_comic.dto.request.LoginRequest;
@@ -29,7 +32,7 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/refresh")
     public BaseResponse<?> refreshToken(@RequestBody Map<String, String> payload) {
         String refreshToken = payload.get("refreshToken");
         return authService.refreshToken(refreshToken);
@@ -44,5 +47,10 @@ public class AuthController {
     @PostMapping("/register")
     public BaseResponse<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
+    }
+
+    @GetMapping("/verify")
+    public BaseResponse<?> verify(@RequestParam String token) {
+        return authService.verify(token);
     }
 }

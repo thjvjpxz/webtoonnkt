@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useAuthState } from "./useAuthState";
 
 export function useAuthModals() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
 
   const openLogin = () => {
     setIsRegisterOpen(false);
@@ -28,6 +30,8 @@ export function useAuthModals() {
     setIsRegisterOpen(false);
     setTimeout(() => setIsLoginOpen(true), 100);
   };
+
+
 
   return {
     isLoginOpen,

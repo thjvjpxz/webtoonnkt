@@ -1,7 +1,9 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,9 @@ import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.RoleRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.AuthService;
+import com.thjvjpxx.backend_comic.service.EmailService;
 import com.thjvjpxx.backend_comic.service.LevelService;
+import com.thjvjpxx.backend_comic.utils.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +30,21 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthServiceImpl implements AuthService {
 
-    UserRepository userRepository;
-    RoleRepository roleRepository;
-    JwtConfig jwtConfig;
-    BCryptPasswordEncoder passwordEncoder;
-    LevelService levelService;
+    final UserRepository userRepository;
+    final RoleRepository roleRepository;
+    final JwtConfig jwtConfig;
+    final BCryptPasswordEncoder passwordEncoder;
+    final LevelService levelService;
+    final EmailService emailService;
+
+    @Value("${app.frontend-url}")
+    String frontendUrl;
+
+    @Value("${app.verification-token-expiration}")
+    Long verificationTokenExpiration;
 
     @Override
     public BaseResponse<?> login(LoginRequest loginRequest) {
@@ -69,7 +80,6 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken)
                 .id(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .imgUrl(user.getImgUrl())
                 .vip(user.getVip())
                 .role(user.getRole())
@@ -103,7 +113,6 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken)
                 .id(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .imgUrl(user.getImgUrl())
                 .vip(user.getVip())
                 .role(user.getRole())
@@ -135,7 +144,6 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(token)
                 .id(user.getId())
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .imgUrl(user.getImgUrl())
                 .vip(user.getVip())
                 .role(user.getRole())
@@ -161,6 +169,8 @@ public class AuthServiceImpl implements AuthService {
         Role role = roleRepository.findByName("READER").orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
         Level level = levelService.getLevelDefaultUser();
 
+        String verificationToken = StringUtils.generateVerificationToken();
+
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
@@ -169,7 +179,34 @@ public class AuthServiceImpl implements AuthService {
         user.setLevel(level);
         user.setVip(false);
         user.setActive(false);
+        user.setVerificationToken(verificationToken);
 
+        String verificationUrl = frontendUrl + "/verify?token=" + verificationToken;
+        emailService.sendVerificationEmail(user.getEmail(), verificationUrl);
+
+        userRepository.save(user);
+
+        return BaseResponse.success(user);
+    }
+
+    @Override
+    public BaseResponse<?> verify(String token) {
+        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+
+        if (!userOpt.isPresent()) {
+            throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        User user = userOpt.get();
+
+        long veriSeconds = verificationTokenExpiration / 1000;
+
+        if (user.getCreatedAt().plusSeconds(veriSeconds).isBefore(LocalDateTime.now())) {
+            throw new BaseException(ErrorCode.VERIFICATION_TOKEN_EXPIRED);
+        }
+
+        user.setActive(true);
+        user.setVerificationToken(null);
         userRepository.save(user);
 
         return BaseResponse.success(user);

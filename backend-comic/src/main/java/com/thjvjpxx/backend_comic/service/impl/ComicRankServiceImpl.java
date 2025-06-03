@@ -158,10 +158,10 @@ public class ComicRankServiceImpl implements ComicRankService {
         int originalPage = page;
 
         // Sắp xếp theo thời gian cập nhật giảm dần (mới nhất lên đầu)
-        Sort sort = Sort.by(Sort.Direction.DESC, "rating", "followersCount", "viewsCount");
+        Sort sort = Sort.by(Sort.Direction.DESC, "followersCount", "viewsCount");
         PageRequest pageWithSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        Page<Comic> comics = comicRepository.findByStatus(ComicStatus.COMPLETED.name(), pageWithSort);
+        Page<Comic> comics = comicRepository.findByStatus(ComicStatus.COMPLETED, pageWithSort);
 
         return BaseResponse.success(
                 comics.getContent(),

@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCategory } from "@/hooks/useCategory";
 import { formatDate } from "@/utils/helpers";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Categories() {
   const {
@@ -63,8 +64,8 @@ export default function Categories() {
         </form>
 
         <Button
+          variant="default"
           onClick={handleOpenAddModal}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
           aria-label="Thêm thể loại mới"
           title="Thêm thể loại mới"
         >
@@ -83,9 +84,7 @@ export default function Categories() {
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-8 flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
+            <LoadingSpinner />
           ) : error ? (
             <div className="p-8 text-center flex flex-col items-center">
               <FiAlertCircle size={40} className="mb-2 text-destructive" />
@@ -149,7 +148,7 @@ export default function Categories() {
                       </TableCell>
                       <TableCell className="text-center py-4 text-muted-foreground max-w-xs">
                         <div className="truncate" title={category.description}>
-                          {category.description}
+                          {category.description || "Không có mô tả"}
                         </div>
                       </TableCell>
                       <TableCell className="text-center py-4 text-muted-foreground">

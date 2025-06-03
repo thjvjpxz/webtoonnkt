@@ -47,6 +47,24 @@ export default function ViewChapterModal({
                 <p className="font-medium text-gray-900 dark:text-white">{chapter.chapterNumber}</p>
               </div>
               <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Trạng thái</p>
+                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                  }`}>
+                  {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Giá</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {chapter.status === 'FEE' && chapter.price
+                    ? `${chapter.price.toLocaleString('vi-VN')} VNĐ`
+                    : 'Miễn phí'
+                  }
+                </p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Ngày tạo</p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formatDate(chapter.createdAt)}

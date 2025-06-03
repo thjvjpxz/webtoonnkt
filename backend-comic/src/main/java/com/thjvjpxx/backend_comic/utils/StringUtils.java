@@ -1,6 +1,7 @@
 package com.thjvjpxx.backend_comic.utils;
 
 import java.text.Normalizer;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class StringUtils {
@@ -36,5 +37,9 @@ public class StringUtils {
         result = result.replaceAll("^-|-$", "");
 
         return result;
+    }
+
+    public static String generateVerificationToken() {
+        return UUID.randomUUID().toString();
     }
 }

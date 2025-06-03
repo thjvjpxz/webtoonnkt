@@ -174,6 +174,8 @@ public class ChapterServiceImpl implements ChapterService {
         // Cập nhật thông tin cơ bản
         chapter.setTitle(chapterRequest.getTitle());
         chapter.setChapterNumber(chapterRequest.getChapterNumber());
+        chapter.setStatus(chapterRequest.getStatus());
+        chapter.setPrice(chapterRequest.getPrice());
         chapterRepository.save(chapter);
 
         // Nếu không có thông tin chi tiết chương, không cần xử lý ảnh

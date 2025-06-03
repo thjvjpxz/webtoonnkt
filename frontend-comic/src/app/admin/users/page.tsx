@@ -19,10 +19,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
 import { useUser } from "@/hooks/useUser";
 import UserModal from "@/components/admin/users/UserModal";
 import DeleteUserModal from "@/components/admin/users/DeleteUserModal";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Users() {
   const {
@@ -60,37 +62,102 @@ export default function Users() {
     fetchLevelsByType,
   } = useUser();
 
-  // Hiển thị VIP
+  // Hiển thị VIP với hiệu ứng đẹp
   const renderVipStatus = (isVip: boolean) => {
     if (isVip) {
       return (
-        <div className="status-warning">
+        <Badge
+          variant="default"
+          className="text-xs bg-yellow-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
           VIP
-        </div>
+        </Badge>
       );
     }
     return (
-      <Badge variant="secondary" className="text-xs">
-        Standard
+      <Badge
+        variant="secondary"
+        className="text-xs bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+      >
+        Thường
       </Badge>
     );
   };
 
-  // Hiển thị trạng thái kích hoạt
+  // Hiển thị trạng thái kích hoạt với hiệu ứng
   const renderActiveStatus = (isActive: boolean) => {
     if (isActive) {
       return (
-        <div className="status-success">
-          <FiCheck className="mr-1" size={12} /> Đã kích hoạt
-        </div>
+        <Badge
+          variant="default"
+          className="text-xs bg-emerald-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Đã kích hoạt
+        </Badge>
       );
     }
     return (
-      <div className="status-error">
-        <FiX className="mr-1" size={12} /> Chưa kích hoạt
-      </div>
+      <Badge
+        variant="destructive"
+        className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium"
+      >
+        Chưa kích hoạt
+      </Badge>
     );
   };
+
+  const renderBlockStatus = (isBlocked: boolean) => {
+    if (isBlocked) {
+      return (
+        <Badge
+          variant="destructive"
+          className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Đã khóa
+        </Badge>
+      );
+    }
+  };
+
+  // Hiển thị vai trò với màu sắc và icon đẹp
+  const renderRole = (role: string) => {
+    if (role === "ADMIN") {
+      return (
+        <Badge
+          variant="default"
+          className="text-xs bg-purple-600 text-white border-0 shadow-md hover:shadow-lg hover:bg-purple-700 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Quản trị viên
+        </Badge>
+      )
+    } else if (role === "READER") {
+      return (
+        <Badge
+          variant="secondary"
+          className="text-xs bg-blue-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Độc giả
+        </Badge>
+      )
+    } else if (role === "PUBLISHER") {
+      return (
+        <Badge
+          variant="destructive"
+          className="text-xs bg-orange-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Nhà xuất bản
+        </Badge>
+      )
+    }
+    return (
+      <Badge
+        variant="outline"
+        className="text-xs border-gray-300 text-gray-600 hover:bg-gray-50 transition-all duration-200"
+      >
+        {role}
+      </Badge>
+    );
+  }
 
   // Format số dư thành tiền VND
   const formatCurrency = (amount: number) => {
@@ -99,6 +166,17 @@ export default function Users() {
       currency: "VND",
     }).format(amount);
   };
+
+  const formatRole = (role: string) => {
+    if (role === "ADMIN") {
+      return "Quản trị viên";
+    } else if (role === "READER") {
+      return "Độc giả";
+    } else if (role === "PUBLISHER") {
+      return "Nhà xuất bản";
+    }
+    return role; // Trả về giá trị gốc nếu không khớp
+  }
 
   return (
     <DashboardLayout title="Quản lý người dùng">
@@ -120,38 +198,29 @@ export default function Users() {
           </form>
 
           {/* Role Filter */}
-          <div className="relative w-full sm:w-80">
-            <select
-              value={roleFilter}
-              onChange={(e) => {
-                setRoleFilter(e.target.value);
+          <div className="w-full sm:w-80">
+            <Select
+              value={roleFilter || "all"}
+              onValueChange={(value) => {
+                setRoleFilter(value === "all" ? "" : value);
                 setCurrentPage(1);
               }}
-              className="pl-10 pr-4 py-2 border border-border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground appearance-none cursor-pointer"
             >
-              <option value="">Tất cả vai trò</option>
-              {roles.map((role) => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
-                </option>
-              ))}
-            </select>
-            <FiUsers className="h-5 w-5 text-primary absolute left-3 top-2" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                ></path>
-              </svg>
-            </div>
+              <SelectTrigger className="w-full">
+                <div className="flex items-center">
+                  <FiUsers className="h-4 w-4 mr-2 text-primary" />
+                  <SelectValue placeholder="Tất cả vai trò" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả vai trò</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.id}>
+                    {formatRole(role.name)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -165,50 +234,45 @@ export default function Users() {
       </div>
 
       {/* Hiển thị danh sách */}
-      {isLoading ? (
-        <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </CardContent>
-        </Card>
-      ) : error ? (
-        <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-8 text-center flex flex-col items-center">
-            <FiAlertCircle size={40} className="mb-2 text-destructive" />
-            <p className="mb-4 text-destructive">{error}</p>
-            <Button onClick={fetchUsers} className="bg-primary hover:bg-primary/90">
-              Thử lại
-            </Button>
-          </CardContent>
-        </Card>
-      ) : users.length === 0 ? (
-        <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <FiUser className="w-16 h-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-foreground">
-              Không có người dùng nào
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Chưa có người dùng nào được thêm vào hệ thống.
-            </p>
-            <Button
-              onClick={handleOpenAddModal}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <FiPlus className="mr-2" size={18} />
-              Thêm người dùng mới
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="border-b border-border/50">
-            <CardTitle className="text-foreground flex items-center gap-2">
-              <FiUsers className="text-primary" size={20} />
-              Danh sách người dùng
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
+      <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-border/50">
+          <CardTitle className="text-foreground flex items-center gap-2">
+            <FiUsers className="text-primary" size={20} />
+            Danh sách người dùng
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : error ? (
+            <div className="p-8 text-center flex flex-col items-center">
+              <FiAlertCircle size={40} className="mb-2 text-destructive" />
+              <p className="text-destructive">{error}</p>
+              <Button
+                onClick={fetchUsers}
+                className="mt-4 bg-primary hover:bg-primary/90"
+              >
+                Thử lại
+              </Button>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="p-12 text-center">
+              <FiUser className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                Không có người dùng nào
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Chưa có người dùng nào được thêm vào hệ thống.
+              </p>
+              <Button
+                onClick={handleOpenAddModal}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                <FiPlus className="mr-2" size={18} />
+                Thêm người dùng mới
+              </Button>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -301,15 +365,13 @@ export default function Users() {
                         {user.email}
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="status-info">
-                          {user.role.name}
-                        </div>
+                        {renderRole(user.role.name)}
                       </TableCell>
                       <TableCell className="text-center">
                         {renderVipStatus(user.vip)}
                       </TableCell>
                       <TableCell className="text-center">
-                        {renderActiveStatus(user.active)}
+                        {user.blocked ? renderBlockStatus(user.blocked) : renderActiveStatus(user.active)}
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground font-medium">
                         {formatCurrency(user.balance)}
@@ -346,20 +408,20 @@ export default function Users() {
                 </TableBody>
               </Table>
             </div>
+          )}
 
-            {/* Phân trang */}
-            {!isLoading && !error && users.length > 0 && (
-              <div className="p-4 border-t border-border/50">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+          {/* Phân trang */}
+          {!isLoading && !error && users.length > 0 && (
+            <div className="p-4 border-t border-border/50">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Modals */}
       {isModalOpen && (

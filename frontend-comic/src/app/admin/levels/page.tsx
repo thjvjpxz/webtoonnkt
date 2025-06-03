@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Levels() {
   const {
@@ -136,7 +137,7 @@ export default function Levels() {
             <CardContent className="p-0">
               {isLoading ? (
                 <div className="p-8 flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <LoadingSpinner />
                 </div>
               ) : error ? (
                 <div className="p-8 text-center flex flex-col items-center">
@@ -339,9 +340,7 @@ export default function Levels() {
             </CardHeader>
             <CardContent className="p-0">
               {isLoading ? (
-                <div className="p-8 flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
+                <LoadingSpinner />
               ) : error ? (
                 <div className="p-8 text-center flex flex-col items-center">
                   <FiAlertCircle size={40} className="mb-2 text-destructive" />
