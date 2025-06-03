@@ -5,6 +5,7 @@ server:
 spring:
   application:
     name: backend-comic
+
   datasource:
     url: jdbc:mysql://localhost:3307/webtoon
     username: webtoon
@@ -14,6 +15,26 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  mail:
+    host: smtp.zeptomail.com
+    port: 587
+    username: emailapikey
+    password: wSsVR61z+RDwC6t8zjatJe84n1xcA1inFB98jQf07nT1HKjLpsdtxBbKAQbzSvMcGWRvQmcTp+ohmB8A22EJ29Qvm19UDyiF9mqRe1U4J3x17qnvhDzIWWlckBCILYwMxwlrnmJiFMEn+g==
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            protocols: TLSv1.2
+          from: noreply@kimthi1708.id.vn
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+    protocol: smtp
+    default-encoding: UTF-8
+
   servlet:
     multipart:
       enabled: true
@@ -22,8 +43,11 @@ spring:
 
 # Cấu hình CORS
 app:
+  frontend-url: http://localhost:3000
   cors:
     allowed-origins: http://localhost:3000
+  verification-token-expiration: 1800000 # 30p
+  forgot-password-token-expiration: 1800000 # 30p
 
 crawler:
   otruyen:

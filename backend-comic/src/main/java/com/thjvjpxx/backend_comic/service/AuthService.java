@@ -12,4 +12,6 @@ public interface AuthService {
     BaseResponse<?> validateToken(String token);
 
     BaseResponse<?> register(RegisterRequest registerRequest);
+
+    BaseResponse<?> verify(String token);
 }

@@ -57,8 +57,8 @@ export default function Header() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200 select-none"
+          variant="default"
+          className="relative h-10 w-10 rounded-full transition-all duration-200 select-none"
         >
           {user?.imgUrl ? (
             <Image
@@ -69,9 +69,7 @@ export default function Header() {
               className="rounded-full object-cover border-2 border-primary/20"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <FiUser className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <FiUser className="w-6 h-6 text-primary-foreground" />
           )}
           {user?.vip && (
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
@@ -166,7 +164,7 @@ export default function Header() {
           <span className="font-medium text-red-600 dark:text-red-400">Đăng xuất</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu >
   );
 
   return (

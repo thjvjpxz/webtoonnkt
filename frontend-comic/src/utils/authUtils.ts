@@ -2,6 +2,8 @@
  * Utility functions cho xử lý authentication
  */
 
+import { AUTH_PUBLIC_PATHS } from '@/config/app.config';
+
 // Kiểm tra token có hợp lệ không (format và không expired)
 export function isValidToken(token: string | null): boolean {
   if (!token) return false;
@@ -51,6 +53,11 @@ export function clearAuthData(): void {
 // Redirect về trang chủ
 export function redirectToHome(): void {
   if (typeof window !== 'undefined') {
+    // Bỏ qua redirect nếu đang ở trang public
+    if (AUTH_PUBLIC_PATHS.includes(window.location.pathname)) {
+      return;
+    }
+
     // Nếu không phải đang ở trang chủ thì redirect về trang chủ
     if (window.location.pathname !== '/') {
       window.location.href = '/';

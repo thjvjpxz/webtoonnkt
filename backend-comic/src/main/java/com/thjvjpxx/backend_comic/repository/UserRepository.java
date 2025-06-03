@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM users u WHERE u.role = :role AND (u.username LIKE %:searchTerm% OR u.email LIKE %:searchTerm%)")
     Page<User> findByRoleAndUsernameOrEmailContaining(@Param("role") Role role, @Param("searchTerm") String searchTerm,
             Pageable pageable);
+
+    Optional<User> findByVerificationToken(String token);
 }

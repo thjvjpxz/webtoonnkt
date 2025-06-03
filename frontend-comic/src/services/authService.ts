@@ -21,3 +21,12 @@ export const register = async (request: RegisterRequest) => {
 
   return response;
 }
+
+export const verifyEmail = async (token: string) => {
+  let url = `/auth/verify?token=${token}`;
+  const response = await fetchApi<UserResponse>(url, {
+    method: 'GET',
+  });
+
+  return response;
+};

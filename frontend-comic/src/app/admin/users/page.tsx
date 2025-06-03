@@ -106,6 +106,19 @@ export default function Users() {
     );
   };
 
+  const renderBlockStatus = (isBlocked: boolean) => {
+    if (isBlocked) {
+      return (
+        <Badge
+          variant="destructive"
+          className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Đã khóa
+        </Badge>
+      );
+    }
+  };
+
   // Hiển thị vai trò với màu sắc và icon đẹp
   const renderRole = (role: string) => {
     if (role === "ADMIN") {
@@ -358,7 +371,7 @@ export default function Users() {
                         {renderVipStatus(user.vip)}
                       </TableCell>
                       <TableCell className="text-center">
-                        {renderActiveStatus(user.active)}
+                        {user.blocked ? renderBlockStatus(user.blocked) : renderActiveStatus(user.active)}
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground font-medium">
                         {formatCurrency(user.balance)}
