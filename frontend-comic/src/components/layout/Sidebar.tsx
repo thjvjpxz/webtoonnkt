@@ -38,7 +38,7 @@ export default function Sidebar({ populerWeek, populerMonth, populerAll, categor
         </h2>
         <div className="p-4 space-y-3">
           {/* Tab chọn thời gian */}
-          <div className="flex border bg-gray-200 dark:bg-gray-700 rounded">
+          <div className="flex border bg-background border-border rounded">
             <button
               onClick={() => setActiveTab('week')}
               className={`text-sm rounded w-full py-1 m-1 font-medium transition-colors duration-200 ${activeTab === 'week'
@@ -77,19 +77,20 @@ export default function Sidebar({ populerWeek, populerMonth, populerAll, categor
                   <span className='w-6 h-6 self-center text-[13px] font-medium rounded border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 flex items-center justify-center'>
                     {index + 1}
                   </span>
-                  {comic.thumbUrl ? <Image
-                    src={comic.thumbUrl}
-                    alt={comic.name}
-                    width={60}
-                    height={100}
-                    className='rounded h-[70px] object-cover group-hover:opacity-80 transition-opacity'
-                    loading="lazy"
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/placeholder.svg';
-                    }}
-                  /> :
+                  {comic.thumbUrl ?
+                    <Image
+                      src={comic.thumbUrl}
+                      alt={comic.name}
+                      width={60}
+                      height={100}
+                      className='rounded h-[70px] object-cover group-hover:opacity-80 transition-opacity'
+                      loading="lazy"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/placeholder.svg';
+                      }}
+                    /> :
                     <Image
                       src="/images/placeholder.svg"
                       alt={comic.name}
