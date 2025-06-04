@@ -33,3 +33,9 @@ export interface ChapterHome {
 export interface ComicLastUpdate extends PopulerToday {
   chapters: ChapterHome[];
 }
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}

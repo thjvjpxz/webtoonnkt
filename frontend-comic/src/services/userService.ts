@@ -11,7 +11,7 @@ export const getUsers = async (
   limit: number = 5,
   search?: string,
   role?: string,
-): Promise<ApiResponse<UserResponse[]>> => {
+) => {
   let fullEndpoint = `${endpoint}?page=${page}&limit=${limit}`;
 
   if (search) {
@@ -28,14 +28,14 @@ export const getUsers = async (
 // Lấy thông tin chi tiết một người dùng
 export const getUser = async (
   id: string
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   return await fetchApi<UserResponse>(`${endpoint}/${id}`);
 };
 
 // Tạo người dùng mới
 export const createUser = async (
   data: UserCreateUpdate
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   return await fetchApi<UserResponse>(endpoint, {
     method: "POST",
     data: data,
@@ -46,7 +46,7 @@ export const createUser = async (
 export const createUserWithAvatar = async (
   data: UserCreateUpdate,
   file?: File
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   const formData = new FormData();
   formData.append(
     "data",
@@ -68,7 +68,7 @@ export const createUserWithAvatar = async (
 export const updateUser = async (
   id: string,
   data: UserCreateUpdate
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   return await fetchApi<UserResponse>(`${endpoint}/${id}`, {
     method: "PUT",
     data: data,
@@ -80,7 +80,7 @@ export const updateUserWithAvatar = async (
   id: string,
   data: UserCreateUpdate,
   file?: File
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   const formData = new FormData();
   formData.append(
     "data",
@@ -101,24 +101,24 @@ export const updateUserWithAvatar = async (
 // Xóa người dùng
 export const deleteUser = async (
   id: string
-): Promise<ApiResponse<UserResponse>> => {
+) => {
   return await fetchApi<UserResponse>(`${endpoint}/${id}`, {
     method: "DELETE",
   });
 };
 
 // Lấy danh sách vai trò
-export const getRoles = async (): Promise<ApiResponse<Role[]>> => {
+export const getRoles = async () => {
   return await fetchApi<Role[]>('/roles');
 };
 
 // Lấy danh sách loại level
-export const getAllLevelTypes = async (): Promise<ApiResponse<LevelTypeResponse[]>> => {
+export const getAllLevelTypes = async () => {
   return await fetchApi<LevelTypeResponse[]>('/level-types');
 };
 
 // Lấy danh sách level theo loại level
-export const getLevelsByTypeId = async (levelTypeId: string): Promise<ApiResponse<LevelResponse[]>> => {
+export const getLevelsByTypeId = async (levelTypeId: string) => {
   if (!levelTypeId) {
     // Trả về mảng rỗng nếu không có levelTypeId
     return {
@@ -128,4 +128,4 @@ export const getLevelsByTypeId = async (levelTypeId: string): Promise<ApiRespons
     };
   }
   return await fetchApi<LevelResponse[]>(`/levels/by-type?levelTypeId=${levelTypeId}`);
-}; 
+};

@@ -9,7 +9,7 @@ export const getComics = async (
   search?: string,
   status?: string,
   category?: string
-): Promise<ApiResponse<ComicResponse[]>> => {
+) => {
   let endpoint = `/comics?page=${page}&limit=${limit}`;
 
   if (search) {
@@ -30,13 +30,13 @@ export const getComics = async (
 // Lấy chi tiết một truyện
 export const getComic = async (
   id: string
-): Promise<ApiResponse<ComicResponse>> => {
+) => {
   return await fetchApi<ComicResponse>(`/comics/${id}`);
 };
 
 // Xóa truyện
 export const deleteComic = async (id: string) => {
-  return await fetchApi<ApiResponse<null>>(`/comics/${id}`, {
+  return await fetchApi(`/comics/${id}`, {
     method: "DELETE",
   });
 };
@@ -55,7 +55,7 @@ export const createComicWithCover = async (
     formData.append("cover", file);
   }
 
-  return await fetchApiWithFormData<ApiResponse<ComicResponse>>("/comics", {
+  return await fetchApiWithFormData<ComicResponse>("/comics", {
     method: "POST",
     data: formData,
   });
@@ -76,7 +76,7 @@ export const updateComicWithCover = async (
     formData.append("cover", file);
   }
 
-  return await fetchApiWithFormData<ApiResponse<ComicResponse>>(
+  return await fetchApiWithFormData<ComicResponse>(
     `/comics/${id}`,
     {
       method: "PUT",
