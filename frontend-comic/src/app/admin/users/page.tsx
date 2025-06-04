@@ -12,7 +12,7 @@ import {
   FiX,
   FiUsers,
 } from "react-icons/fi";
-import Pagination from "@/components/admin/Pagination";
+import Pagination from "@/components/ui/pagination";
 import { formatDate } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

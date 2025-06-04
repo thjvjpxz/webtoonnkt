@@ -11,7 +11,7 @@ import {
 } from "react-icons/fi";
 import CategoryModal from "@/components/admin/categories/CategoryModal";
 import DeleteCategoryModal from "@/components/admin/categories/DeleteCategoryModal";
-import Pagination from "@/components/admin/Pagination";
+import Pagination from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

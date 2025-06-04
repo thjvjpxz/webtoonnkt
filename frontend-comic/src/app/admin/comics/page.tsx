@@ -4,7 +4,7 @@ import ComicModal from "@/components/admin/comics/ComicModal";
 import DeleteComicModal from "@/components/admin/comics/DeleteComicModal";
 import ViewComic from "@/components/admin/comics/ViewComic";
 import DashboardLayout from "@/components/admin/DashboardLayout";
-import Pagination from "@/components/admin/Pagination";
+import Pagination from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

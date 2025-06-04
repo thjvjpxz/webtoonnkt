@@ -119,7 +119,7 @@ export default function Sidebar({ populerWeek, populerMonth, populerAll, categor
       {/* Thể loại hot */}
       <div className="mb-4 sm:mb-6 lg:mb-8 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
         <h2 className="text-lg font-bold p-4 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
-          Thể loại
+          Thể loại phổ biến
         </h2>
         <div className="p-4">
           <div className="flex flex-wrap gap-2">

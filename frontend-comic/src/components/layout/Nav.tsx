@@ -27,32 +27,8 @@ const navItems: NavItem[] = [
   },
   {
     label: "Thể loại",
-    href: "/categories",
+    href: "/category",
     icon: <FiGrid className="w-4 h-4" />,
-    isDropdown: true,
-    dropdownItems: [
-      { label: "Hành động", href: "/categories/action" },
-      { label: "Lãng mạn", href: "/categories/romance" },
-      { label: "Kinh dị", href: "/categories/horror" },
-      { label: "Hài hước", href: "/categories/comedy" },
-      { label: "Phiêu lưu", href: "/categories/adventure" },
-      { label: "Học đường", href: "/categories/school" },
-    ],
-  },
-  {
-    label: "Truyện hot",
-    href: "/hot",
-    icon: <FiTrendingUp className="w-4 h-4" />,
-  },
-  {
-    label: "Truyện mới cập nhật",
-    href: "/new",
-    icon: <FiClock className="w-4 h-4" />,
-  },
-  {
-    label: "Đã hoàn thành",
-    href: "/completed",
-    icon: <FiCheck className="w-4 h-4" />,
   },
 ];
 
@@ -64,37 +40,6 @@ export default function Nav() {
   };
 
   const NavLink = ({ item }: { item: NavItem }) => {
-    if (item.isDropdown && item.dropdownItems) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-2 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground transition-all duration-200 px-3 py-2 rounded-lg group"
-            >
-              {item.icon}
-              <span className="font-medium">{item.label}</span>
-              <FiChevronDown className="w-3 h-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            className="w-48 mt-2 bg-background border border-border shadow-lg rounded-lg"
-          >
-            {item.dropdownItems.map((dropdownItem) => (
-              <DropdownMenuItem key={dropdownItem.href} asChild>
-                <Link
-                  href={dropdownItem.href}
-                  className="flex items-center px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-200 cursor-pointer"
-                >
-                  {dropdownItem.label}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
     return (
       <Link
         href={item.href}

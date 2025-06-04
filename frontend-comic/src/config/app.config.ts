@@ -1,1 +1,1 @@
-export const AUTH_PUBLIC_PATHS = ['/verify', '/comic'];
+export const AUTH_PUBLIC_PATHS = ['/verify', '/comic', '/category'];

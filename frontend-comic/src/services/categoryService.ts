@@ -14,21 +14,21 @@ export const getCategories = async (
     endpoint += `&search=${encodeURIComponent(search)}`;
   }
 
-  return await fetchApi<ApiResponse<CategoryResponse[]>>(endpoint);
+  return await fetchApi<CategoryResponse[]>(endpoint);
 };
 
 // Lấy chi tiết một thể loại
 export const getCategory = async (
   id: number
 ): Promise<ApiResponse<CategoryResponse>> => {
-  return await fetchApi<ApiResponse<CategoryResponse>>(`/categories/${id}`);
+  return await fetchApi<CategoryResponse>(`/categories/${id}`);
 };
 
 // Tạo thể loại mới
 export const createCategory = async (
   data: CategoryCreateUpdate
 ): Promise<ApiResponse<CategoryResponse>> => {
-  return await fetchApi<ApiResponse<CategoryResponse>>("/categories", {
+  return await fetchApi<CategoryResponse>("/categories", {
     method: "POST",
     data: data,
   });
@@ -39,7 +39,7 @@ export const updateCategory = async (
   id: string,
   data: CategoryCreateUpdate
 ): Promise<ApiResponse<CategoryResponse>> => {
-  return await fetchApi<ApiResponse<CategoryResponse>>(`/categories/${id}`, {
+  return await fetchApi<CategoryResponse>(`/categories/${id}`, {
     method: "PUT",
     data: data,
   });
@@ -49,7 +49,12 @@ export const updateCategory = async (
 export const deleteCategory = async (
   id: string
 ): Promise<ApiResponse<null>> => {
-  return await fetchApi<ApiResponse<null>>(`/categories/${id}`, {
+  return await fetchApi<null>(`/categories/${id}`, {
     method: "DELETE",
   });
+};
+
+// Lấy tất cả thể loại không phân trang
+export const getAllCategories = async (): Promise<ApiResponse<CategoryResponse[]>> => {
+  return await fetchApi<CategoryResponse[]>('/category');
 };

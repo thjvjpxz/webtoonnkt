@@ -185,17 +185,17 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                   <div className="flex items-center gap-2 mb-3">
                     <FiTag className="text-primary text-sm sm:text-base" />
                     <h3 className="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base">Thể loại:</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {comicDetailResponse.categories.map((category) => (
-                      <Badge
-                        key={category.id}
-                        variant="outline"
-                        className="hover:bg-primary/10 hover:border-primary/50 transition-colors duration-200 cursor-pointer text-xs sm:text-sm"
-                      >
-                        {category.name}
-                      </Badge>
-                    ))}
+                    <div className="flex flex-wrap gap-2">
+                      {comicDetailResponse.categories.map((category) => (
+                        <Link
+                          key={category.id}
+                          href={`/category/${category.slug}`}
+                          className="px-2 py-1 rounded-md text-xs border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                        >
+                          {category.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

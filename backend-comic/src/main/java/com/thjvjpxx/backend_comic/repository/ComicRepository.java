@@ -27,6 +27,31 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
 
     Page<Comic> findByStatus(ComicStatus status, Pageable pageable);
 
+    @Query(value = """
+            SELECT
+                c.*
+            FROM
+                comics c
+            JOIN
+                comic_categories cc ON c.id = cc.comic_id
+            JOIN
+                categories cat ON cc.category_id = cat.id
+            WHERE
+                cat.slug = :slugCategory
+            ORDER BY c.views_count DESC
+            """, countQuery = """
+            SELECT COUNT(c.id)
+            FROM
+                comics c
+            JOIN
+                comic_categories cc ON c.id = cc.comic_id
+            JOIN
+                categories cat ON cc.category_id = cat.id
+            WHERE
+                cat.slug = :slugCategory
+            """, nativeQuery = true)
+    Page<Comic> findBySlugCategory(@Param("slugCategory") String slugCategory, Pageable pageable);
+
     @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
     Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);
 

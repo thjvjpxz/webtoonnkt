@@ -49,7 +49,10 @@ public class SecurityConfig {
 								"/auth/verify",
 								"/comic/*",
 								"/comic/*/*",
-								"/")
+								"/",
+								"/category",
+								"/search",
+								"/category/*")
 						.permitAll()
 
 						// Các API cần xác thực với vai trò ADMIN

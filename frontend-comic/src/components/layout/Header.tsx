@@ -16,16 +16,17 @@ import {
   FiSearch,
   FiUser,
   FiBookmark,
-  FiHeart,
   FiLogOut,
   FiX,
-  FiSettings
+  FiSettings,
+  FiBookOpen
 } from "react-icons/fi";
 import { useState } from "react";
 import LoginModal from "../auth/LoginModal";
 import RegisterModal from "../auth/RegisterModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -33,6 +34,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { user, isAuthenticated, logout, isAdmin } = useAuthState();
+  const router = useRouter();
 
   // Auth modals
   const {
@@ -48,8 +50,7 @@ export default function Header() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Implement search logic here
-      console.log("Searching for:", searchQuery);
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -123,20 +124,20 @@ export default function Header() {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/bookmarks" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+          <Link href="/favorites" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
             <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiBookmark className="w-4 h-4 text-green-600 dark:text-green-400" />
             </div>
-            <span className="font-medium">Truyện đã lưu</span>
+            <span className="font-medium">Truyện theo dõi</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/favorites" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
-            <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <FiHeart className="w-4 h-4 text-red-600 dark:text-red-400" />
+          <Link href="/history" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+              <FiBookOpen className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <span className="font-medium">Yêu thích</span>
+            <span className="font-medium">Truyện đã đọc</span>
           </Link>
         </DropdownMenuItem>
 
@@ -196,12 +197,12 @@ export default function Header() {
                   }`}>
                   <Input
                     type="search"
-                    placeholder="Tìm kiếm truyện, tác giả..."
+                    placeholder="Tìm kiếm truyện..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setIsSearchFocused(false)}
-                    className={`pl-12 pr-4 py-2 w-full border-2 transition-all duration-300 ${isSearchFocused
+                    className={`pl-12 pr-4 py-2 w-full focus:bg-white dark:focus:bg-gray-700 border-2 transition-all duration-300 ${isSearchFocused
                       ? 'border-primary shadow-lg shadow-primary/20'
                       : 'border-border hover:border-primary/50'
                       }`}

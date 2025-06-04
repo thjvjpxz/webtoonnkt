@@ -10,7 +10,7 @@ import {
   FiAward,
   FiLayers,
 } from "react-icons/fi";
-import Pagination from "@/components/admin/Pagination";
+import Pagination from "@/components/ui/pagination";
 import LevelModal from "@/components/admin/levels/LevelModal";
 import LevelTypeModal from "@/components/admin/levels/LevelTypeModal";
 import { formatDate } from "@/utils/helpers";

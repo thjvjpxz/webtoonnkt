@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -12,10 +14,12 @@ import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ChapterHome;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicLastUpdate;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.PopulerToday;
 import com.thjvjpxx.backend_comic.model.Category;
+import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.HomeService;
+import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +53,42 @@ public class HomeServiceImpl implements HomeService {
                 .build();
 
         return BaseResponse.success(homeResponse);
+    }
+
+    @Override
+    public BaseResponse<?> getAllCategory() {
+        List<Category> categories = categoryRepo.findAll();
+        return BaseResponse.success(categories);
+    }
+
+    @Override
+    public BaseResponse<?> getComicByCategory(String slug, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageable(page, size);
+        Page<Comic> comics = comicRepo.findBySlugCategory(slug, pageable);
+
+        List<PopulerToday> populerToday = new ArrayList<>();
+
+        for (Comic comic : comics.getContent()) {
+            Double latestChapter = chapterRepo.findMaxChapterNumberByComicId(comic.getId());
+            populerToday.add(PopulerToday.builder()
+                    .id(comic.getId())
+                    .thumbUrl(comic.getThumbUrl())
+                    .slug(comic.getSlug())
+                    .name(comic.getName())
+                    .viewCount((long) comic.getViewsCount())
+                    .latestChapter(latestChapter)
+                    .build());
+        }
+
+        return BaseResponse.success(populerToday);
+    }
+
+    @Override
+    public BaseResponse<?> searchComic(String query, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageable(page, size);
+        Page<Comic> comics = comicRepo.findBySlugContainingOrNameContaining(query, query, pageable);
+
+        return BaseResponse.success(comics.getContent());
     }
 
     private List<Category> getPopulerCategories() {

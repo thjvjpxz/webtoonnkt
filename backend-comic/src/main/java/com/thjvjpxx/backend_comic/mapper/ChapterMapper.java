@@ -15,6 +15,7 @@ public interface ChapterMapper {
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "updatedAt", source = "updatedAt", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "comicName", source = "comic.name")
+    @Mapping(target = "chapterSummaries", ignore = true)
     ChapterResponse toChapterResponse(Chapter chapter);
 
     @Named("localDateTimeToString")

@@ -2,7 +2,7 @@
 
 import { FiPlus, FiEdit, FiTrash2, FiSearch, FiAlertCircle, FiBookOpen, FiEye } from "react-icons/fi";
 import DashboardLayout from "@/components/admin/DashboardLayout";
-import Pagination from "@/components/admin/Pagination";
+import Pagination from "@/components/ui/pagination";
 import { useChapter } from "@/hooks/useChapter";
 import Image from "next/image";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
@@ -293,8 +293,8 @@ export default function Chapters() {
                       </TableCell>
                       <TableCell className="text-center">
                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                           }`}>
                           {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
                         </span>

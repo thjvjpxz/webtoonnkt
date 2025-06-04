@@ -1,6 +1,8 @@
 package com.thjvjpxx.backend_comic.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -19,5 +21,24 @@ public class HomeController {
     @GetMapping
     public BaseResponse<?> getHomeComic() {
         return homeService.getHomeComic();
+    }
+
+    @GetMapping("category")
+    public BaseResponse<?> getAllCategory() {
+        return homeService.getAllCategory();
+    }
+
+    @GetMapping("category/{slug}")
+    public BaseResponse<?> getComicByCategory(@PathVariable String slug,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return homeService.getComicByCategory(slug, page, size);
+    }
+
+    @GetMapping("search")
+    public BaseResponse<?> searchComic(@RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return homeService.searchComic(query, page, size);
     }
 }
