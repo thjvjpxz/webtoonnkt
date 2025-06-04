@@ -27,7 +27,7 @@ export default function DashboardLayout({
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Topbar title={title} isSidebarOpen={isSidebarOpen} />
+          <Topbar title={title} />
 
           <main className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             {children}

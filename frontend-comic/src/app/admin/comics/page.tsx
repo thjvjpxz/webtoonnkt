@@ -4,27 +4,27 @@ import ComicModal from "@/components/admin/comics/ComicModal";
 import DeleteComicModal from "@/components/admin/comics/DeleteComicModal";
 import ViewComic from "@/components/admin/comics/ViewComic";
 import DashboardLayout from "@/components/admin/DashboardLayout";
-import Pagination from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import Pagination from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useComic } from "@/hooks/useComic";
+import { CategoryResponse } from "@/types/category";
+import { formatDate } from "@/utils/helpers";
 import Image from "next/image";
 import {
   FiAlertCircle,
+  FiBook,
   FiEdit,
   FiEye,
   FiFilter,
   FiPlus,
   FiSearch,
   FiTrash2,
-  FiBook,
 } from "react-icons/fi";
-import { formatDate } from "@/utils/helpers";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
 export default function Comics() {
   const {
     categories,
@@ -85,7 +85,7 @@ export default function Comics() {
   };
 
   // Hiển thị thể loại với hiệu ứng đẹp
-  const renderCategory = (category: any) => {
+  const renderCategory = (category: CategoryResponse) => {
     return (
       <span
         key={category.id}

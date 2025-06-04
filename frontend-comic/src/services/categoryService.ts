@@ -1,5 +1,4 @@
 import { CategoryCreateUpdate, CategoryResponse } from "@/types/category";
-import { ApiResponse } from "@/types/api";
 import { fetchApi } from "./api";
 
 // Lấy danh sách thể loại có phân trang

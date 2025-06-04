@@ -1,4 +1,4 @@
-import { Chapter, ChapterCreateUpdate, ChapterWithComicDetail } from "@/types/chapter";
+import { ChapterCreateUpdate, ChapterWithComicDetail } from "@/types/chapter";
 import { createChapter, deleteChapter, getChapters, updateChapter } from "@/services/chapterService";
 import { useCallback, useEffect, useState } from "react";
 import { getComics } from "@/services/comicService";

@@ -1,4 +1,3 @@
-import { ApiResponse } from "@/types/api";
 import { LevelRequest, LevelResponse } from "@/types/level";
 import { fetchApi, fetchApiWithFormData } from "./api";
 

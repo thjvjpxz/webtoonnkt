@@ -314,7 +314,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                     <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
                       <FiSearch className="text-sm flex-shrink-0" />
                       <span className="text-sm font-medium">
-                        Tìm thấy {filteredChapters.length} chapter cho "{searchTerm}"
+                        Tìm thấy {filteredChapters.length} chapter cho &quot;{searchTerm}&quot;
                       </span>
                     </div>
                     <Button
@@ -332,7 +332,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
 
               {/* Chapter List */}
               <div className="space-y-2">
-                {displayedChapters.map((chapter, index) => (
+                {displayedChapters.map((chapter) => (
                   <Link
                     key={chapter.id}
                     href={`/comic/${comicDetailResponse.slug}/${chapter.id}`}

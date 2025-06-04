@@ -1,5 +1,4 @@
-import { ApiResponse } from '@/types/api';
-import { Chapter, ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
+import { ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
 import { fetchApi, fetchApiWithFormData } from './api';
 
 export const getChapters = async (

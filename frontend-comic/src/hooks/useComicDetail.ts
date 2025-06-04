@@ -28,7 +28,7 @@ export default function useComicDetail(comicDetailResponse: ComicDetailResponse)
     }
 
     checkFollow();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, comicDetailResponse.id]);
 
   useEffect(() => {
     setFollowersCount(comicDetailResponse.followersCount);

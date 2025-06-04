@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Main from "@/components/layout/Main";
-import { FiHome, FiSearch, FiBookOpen, FiArrowLeft } from "react-icons/fi";
-import { useState } from "react";
+import { FiHome, FiArrowLeft } from "react-icons/fi";
 
 export default function NotFound() {
   return (

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { PopulerToday } from "@/types/home";
 import CategoryComicsGrid from "@/components/layout/ComicsGrid";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FiSearch, FiX, FiHome } from "react-icons/fi";
+import { FiSearch, FiHome } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { getComicBySearch } from "@/services/homeService";
 import Main from "@/components/layout/Main";
@@ -18,7 +18,8 @@ import useHome from "@/hooks/useHome";
 import Pagination from "@/components/ui/pagination";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default function SearchPage() {
+// Component con chứa logic sử dụng useSearchParams
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("query") || "";
@@ -54,19 +55,7 @@ export default function SearchPage() {
       const response = await getComicBySearch(searchTerm, page, limit);
 
       if (response.status === 200 && response.data) {
-        // Chuyển đổi dữ liệu từ ComicResponse sang PopulerToday
-        const transformedComics: PopulerToday[] = response.data.map((comic: any) => ({
-          id: comic.id,
-          slug: comic.slug,
-          name: comic.name,
-          thumbUrl: comic.thumbUrl,
-          viewCount: comic.viewCount || 0,
-          latestChapter: comic.latestChapter || 0,
-        }));
-
-        setComics(transformedComics);
-
-        // Tính toán số trang (giả sử response có thông tin pagination)
+        setComics(response.data);
         const total = response.data.length;
         setTotalPages(Math.ceil(total / limit));
         setCurrentPage(page);
@@ -77,6 +66,7 @@ export default function SearchPage() {
     } catch (err) {
       setError("Đã xảy ra lỗi khi tìm kiếm");
       setComics([]);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -186,7 +176,7 @@ export default function SearchPage() {
                 {/* Hiển thị từ khóa đang tìm */}
                 {query && (
                   <p className="mt-3 text-gray-600 dark:text-gray-400">
-                    Kết quả tìm kiếm cho: <span className="font-semibold text-primary">"{query}"</span>
+                    Kết quả tìm kiếm cho: <span className="font-semibold text-primary">&quot;{query}&quot;</span>
                   </p>
                 )}
               </div>
@@ -230,7 +220,7 @@ export default function SearchPage() {
                         Không tìm thấy kết quả
                       </h3>
                       <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
-                        Không có truyện nào phù hợp với từ khóa <strong>"{query}"</strong>.
+                        Không có truyện nào phù hợp với từ khóa <strong>&quot;{query}&quot;</strong>.
                         Hãy thử tìm kiếm với từ khóa khác!
                       </p>
                       <Button variant="outline" onClick={clearSearch}>
@@ -305,5 +295,25 @@ export default function SearchPage() {
         </div>
       </div>
     </Main>
+  );
+}
+
+// Component chính với Suspense boundary
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <Main>
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <LoadingSpinner size="lg" />
+              <p className="text-gray-600 dark:text-gray-400 mt-4">Đang tải trang tìm kiếm...</p>
+            </div>
+          </div>
+        </Main>
+      }
+    >
+      <SearchPageContent />
+    </Suspense>
   );
 } 

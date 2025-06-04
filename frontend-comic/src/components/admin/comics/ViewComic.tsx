@@ -89,11 +89,6 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
                 <span className="text-gray-600 dark:text-gray-400">{comic.followersCount.toLocaleString()}</span>
               </div>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Đánh giá:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">{comic.rating.toFixed(1)}/5</span>
-              </div>
-
               <div className="mb-4">
                 <div className="flex flex-wrap gap-1 mt-1">
                   <span className="font-medium text-gray-700 dark:text-gray-300">Thể loại:</span>{" "}

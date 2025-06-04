@@ -8,8 +8,6 @@ import {
   FiSearch,
   FiAlertCircle,
   FiUser,
-  FiCheck,
-  FiX,
   FiUsers,
 } from "react-icons/fi";
 import Pagination from "@/components/ui/pagination";

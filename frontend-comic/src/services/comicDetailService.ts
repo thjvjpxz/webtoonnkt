@@ -1,4 +1,3 @@
-import { ApiResponse } from "@/types/api";
 import { fetchApi } from "./api";
 import { ComicDetailResponse } from "@/types/comic";
 import { Chapter } from "@/types/chapter";
@@ -20,7 +19,7 @@ export const checkFollowComic = async (
 export const followComic = async (
   comicId: string,
 ) => {
-  let url = `/comic/${comicId}/follow`;
+  const url = `/comic/${comicId}/follow`;
   return await fetchApi(
     url,
     {
@@ -33,7 +32,7 @@ export const followComic = async (
 export const unfollowComic = async (
   comicId: string,
 ) => {
-  let url = `/comic/${comicId}/unfollow`;
+  const url = `/comic/${comicId}/unfollow`;
   return await fetchApi(
     url,
     {

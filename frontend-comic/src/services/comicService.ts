@@ -1,5 +1,4 @@
-import { ComicCreateUpdate, ComicDetailResponse, ComicResponse } from "@/types/comic";
-import { ApiResponse } from "@/types/api";
+import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { fetchApi, fetchApiWithFormData } from "./api";
 
 // Lấy danh sách truyện có phân trang

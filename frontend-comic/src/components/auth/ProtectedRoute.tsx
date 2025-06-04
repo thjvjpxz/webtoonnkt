@@ -21,7 +21,7 @@ export function ProtectedRoute({
   fallback
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, hasRole, isVIP, user } = useAuthState();
+  const { isAuthenticated, isLoading, hasRole, isVIP } = useAuthState();
 
   useEffect(() => {
     if (!isLoading) {

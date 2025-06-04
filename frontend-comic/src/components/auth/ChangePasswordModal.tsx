@@ -27,7 +27,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   // Xử lý submit form
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await handleSubmit(() => {
+    await handleSubmit(() => {
       onClose();
     });
   };

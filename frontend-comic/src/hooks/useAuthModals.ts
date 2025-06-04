@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAuthState } from "./useAuthState";
 
 export function useAuthModals() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);

@@ -1,4 +1,3 @@
-import { ApiResponse } from "@/types/api";
 import { UserCreateUpdate, UserResponse, Role } from "@/types/user";
 import { LevelResponse, LevelTypeResponse } from "@/types/level";
 import { fetchApi, fetchApiWithFormData } from "./api";
