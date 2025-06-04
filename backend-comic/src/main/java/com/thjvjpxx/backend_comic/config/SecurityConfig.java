@@ -52,7 +52,14 @@ public class SecurityConfig {
 								"/",
 								"/category",
 								"/search",
-								"/category/*")
+								"/category/*",
+								"/comments/comic/*/count",
+								"/comments/chapter/*/count",
+								"/comments/comic/*/latest",
+								"/comments/comic/*",
+								"/comments/comic/*/parents",
+								"/comments/chapter/*",
+								"/comments/*/replies")
 						.permitAll()
 
 						// Các API cần xác thực với vai trò ADMIN
@@ -60,6 +67,12 @@ public class SecurityConfig {
 						.requestMatchers("/categories/**").hasRole("ADMIN")
 						.requestMatchers("/comics/**").hasRole("ADMIN")
 						.requestMatchers("/chapters/**").hasRole("ADMIN")
+
+						// Các API Comment chỉ dành cho ADMIN
+						.requestMatchers("/comments/*/block").hasRole("ADMIN")
+						.requestMatchers("/comments/*/unblock").hasRole("ADMIN")
+						.requestMatchers("/comments/user/*").hasRole("ADMIN")
+						.requestMatchers("/comments?*").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
 						.requestMatchers("/publisher/**").hasAnyRole("ADMIN", "PUBLISHER")

@@ -81,7 +81,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div>
       {/* Breadcrumb Navigation */}
       <div className="mb-4 sm:mb-6">
         <Breadcrumb>
@@ -105,7 +105,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
       </div>
 
       {/* Header Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-4 sm:mb-6 lg:mb-8">
+      <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm mb-4 sm:mb-6 lg:mb-8">
         <div className="p-0">
           <div className="flex flex-col lg:flex-row">
             {/* Ảnh bìa */}
@@ -235,7 +235,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
       </div>
 
       {/* Mô tả */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-4 sm:mb-6 lg:mb-8">
+      <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm mb-4 sm:mb-6 lg:mb-8">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">Nội dung truyện</h2>
         </div>
@@ -252,7 +252,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
       </div>
 
       {/* Danh sách Chapter */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 gap-4">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex-shrink-0">
             Danh sách chapter ({filteredChapters.length}{searchTerm && ` / ${comicDetailResponse.chapters.length}`})

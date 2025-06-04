@@ -95,6 +95,16 @@ public enum ErrorCode {
     USER_FOLLOW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Người dùng đã theo dõi truyện này!"),
     USER_FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "Người dùng không theo dõi truyện này!"),
 
+    // Comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Bình luận không tồn tại!"),
+    COMMENT_CONTENT_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Nội dung bình luận không được trống!"),
+    COMMENT_COMIC_ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "ID truyện không được trống!"),
+    COMMENT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "Không có quyền thực hiện thao tác này!"),
+    COMMENT_PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Bình luận cha không tồn tại!"),
+    COMMENT_PARENT_INVALID(HttpStatus.BAD_REQUEST, "Bình luận cha không hợp lệ!"),
+    COMMENT_ALREADY_BLOCKED(HttpStatus.BAD_REQUEST, "Bình luận đã bị chặn!"),
+    COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Bình luận đã bị xóa!"),
+
     // Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi máy chủ!");
     ;

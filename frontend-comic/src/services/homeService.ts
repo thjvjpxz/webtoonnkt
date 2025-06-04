@@ -34,7 +34,7 @@ export const getProfile = async () => {
 
 // Cập nhật thông tin profile
 export const updateProfile = async (data: { levelTypeId: string }) => {
-  const response = await fetchApi<UserResponse>('/profile', {
+  const response = await fetchApi('/profile', {
     method: 'PUT',
     data: data
   });
@@ -42,7 +42,7 @@ export const updateProfile = async (data: { levelTypeId: string }) => {
 }
 
 export const changePassword = async (data: ChangePasswordRequest) => {
-  const response = await fetchApi<UserResponse>('/change-password', {
+  const response = await fetchApi('/change-password', {
     method: 'POST',
     data: data
   });

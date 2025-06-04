@@ -36,7 +36,7 @@ export default function ComicDetailPage({ params }: ComicDetailPageProps) {
   if (isLoading) {
     return (
       <Main>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <LoadingSpinner size="lg" />
             <p className="text-gray-600 dark:text-gray-400">Đang tải thông tin truyện...</p>
@@ -53,7 +53,7 @@ export default function ComicDetailPage({ params }: ComicDetailPageProps) {
   return (
     <div>
       <Main>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen">
           <div className="container mx-auto px-4 py-8">
             <ComicDetailContent comicDetailResponse={comicDetailResponse} />
           </div>
