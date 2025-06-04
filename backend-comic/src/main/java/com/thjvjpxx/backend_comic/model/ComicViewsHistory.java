@@ -12,10 +12,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "comic_views_history")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ComicViewsHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -30,7 +38,7 @@ public class ComicViewsHistory {
     LocalDateTime viewDate;
 
     @Column(name = "view_count", nullable = false)
-    int viewCount = 0;
+    int viewCount;
 
     @Column(name = "created_at")
     @CreationTimestamp

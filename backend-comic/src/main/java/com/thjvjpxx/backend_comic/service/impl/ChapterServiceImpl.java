@@ -81,7 +81,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         List<ChapterResponse> chapterResponses = chapterList.stream()
                 .map(chapterMapper::toChapterResponse)
-                .sorted((a, b) -> Integer.compare(a.getChapterNumber(), b.getChapterNumber()))
+                .sorted((a, b) -> Double.compare(a.getChapterNumber(), b.getChapterNumber()))
                 .collect(Collectors.toList());
 
         return BaseResponse.success(

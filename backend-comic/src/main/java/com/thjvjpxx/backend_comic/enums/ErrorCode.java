@@ -48,8 +48,9 @@ public enum ErrorCode {
     CHAPTER_NUMBER_EXISTS(HttpStatus.BAD_REQUEST, "Số chương đã tồn tại!"),
 
     // Detail Chapter
-    DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh chapter không được trống!"),
-    DETAIL_CHAPTER_IMAGE_URL_NOT_EMPTY(HttpStatus.BAD_REQUEST, "URL ảnh chapter không được trống!"),
+    DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh không được trống!"),
+    DETAIL_CHAPTER_IMAGE_URL_NOT_EMPTY(HttpStatus.BAD_REQUEST, "URL ảnh không được trống!"),
+    DETAIL_CHAPTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Chương không tồn tại!"),
 
     // User và Authentication
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Người dùng không tồn tại!"),

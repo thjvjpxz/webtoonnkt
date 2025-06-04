@@ -127,7 +127,7 @@
 .dark {
   /* Dark theme - Softer dark palette with proper gray-800 base */
   /* Warm gray backgrounds using correct oklch values */
-  --background: oklch(0.278 0.033 256.848);
+  --background: oklch(0.21 0.034 264.665);
   --foreground: oklch(0.95 0.003 160);
 
   /* Card system - Elevated gray surfaces */

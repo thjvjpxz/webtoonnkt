@@ -1,24 +1,29 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/AuthContext";
 import useComicDetail from "@/hooks/useComicDetail";
-import { checkFollowComic, followComic, unfollowComic } from "@/services/comicDetailService";
 import { ChapterStatus } from "@/types/chapter";
 import { ComicDetailResponse } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
 import {
   FiBookmark,
   FiBookOpen,
   FiCalendar,
   FiEye,
   FiHeart,
+  FiHome,
   FiPlay,
   FiSearch,
   FiStar,
@@ -77,6 +82,28 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Breadcrumb Navigation */}
+      <div className="mb-4 sm:mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/" className="flex items-center gap-1">
+                  <FiHome className="w-4 h-4" />
+                  Trang chủ
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="line-clamp-1 max-w-[200px] sm:max-w-none">
+                {comicDetailResponse.name}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Header Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-4 sm:mb-6 lg:mb-8">
         <div className="p-0">

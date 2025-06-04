@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/types/api";
 import { fetchApi } from "./api";
 import { ComicDetailResponse } from "@/types/comic";
+import { Chapter } from "@/types/chapter";
 
 // Lấy chi tiết một truyện theo slug cho page chi tiết truyện
 export const getComicBySlug = async (
@@ -40,3 +41,12 @@ export const unfollowComic = async (
     }
   );
 }
+
+// Lấy danh sách chapter của truyện
+export const getChaptersByComicId = async (
+  slug: string,
+  chapterId: string
+): Promise<ApiResponse<Chapter>> => {
+  return await fetchApi<Chapter>(`/comic/${slug}/${chapterId}`);
+};
+

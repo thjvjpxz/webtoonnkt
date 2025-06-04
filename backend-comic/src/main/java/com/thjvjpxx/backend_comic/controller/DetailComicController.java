@@ -45,4 +45,9 @@ public class DetailComicController {
         String currentUserId = securityUtils.getCurrentUserId();
         return detailComicService.checkFollowStatus(comicId, currentUserId);
     }
+
+    @GetMapping("/{slug}/{chapterId}")
+    public BaseResponse<?> getChapterDetail(@PathVariable String chapterId) {
+        return detailComicService.getChapterDetail(chapterId);
+    }
 }

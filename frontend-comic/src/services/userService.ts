@@ -22,21 +22,21 @@ export const getUsers = async (
     fullEndpoint += `&roleId=${role}`;
   }
 
-  return await fetchApi<ApiResponse<UserResponse[]>>(fullEndpoint);
+  return await fetchApi<UserResponse[]>(fullEndpoint);
 };
 
 // Lấy thông tin chi tiết một người dùng
 export const getUser = async (
   id: string
 ): Promise<ApiResponse<UserResponse>> => {
-  return await fetchApi<ApiResponse<UserResponse>>(`${endpoint}/${id}`);
+  return await fetchApi<UserResponse>(`${endpoint}/${id}`);
 };
 
 // Tạo người dùng mới
 export const createUser = async (
   data: UserCreateUpdate
 ): Promise<ApiResponse<UserResponse>> => {
-  return await fetchApi<ApiResponse<UserResponse>>(endpoint, {
+  return await fetchApi<UserResponse>(endpoint, {
     method: "POST",
     data: data,
   });
@@ -58,7 +58,7 @@ export const createUserWithAvatar = async (
     formData.append('avatar', file);
   }
 
-  return await fetchApiWithFormData<ApiResponse<UserResponse>>(endpoint, {
+  return await fetchApiWithFormData<UserResponse>(endpoint, {
     method: "POST",
     data: formData,
   });
@@ -69,7 +69,7 @@ export const updateUser = async (
   id: string,
   data: UserCreateUpdate
 ): Promise<ApiResponse<UserResponse>> => {
-  return await fetchApi<ApiResponse<UserResponse>>(`${endpoint}/${id}`, {
+  return await fetchApi<UserResponse>(`${endpoint}/${id}`, {
     method: "PUT",
     data: data,
   });
@@ -92,7 +92,7 @@ export const updateUserWithAvatar = async (
     formData.append('avatar', file);
   }
 
-  return await fetchApiWithFormData<ApiResponse<UserResponse>>(`${endpoint}/${id}`, {
+  return await fetchApiWithFormData<UserResponse>(`${endpoint}/${id}`, {
     method: "PUT",
     data: formData,
   });
@@ -102,19 +102,19 @@ export const updateUserWithAvatar = async (
 export const deleteUser = async (
   id: string
 ): Promise<ApiResponse<UserResponse>> => {
-  return await fetchApi<ApiResponse<UserResponse>>(`${endpoint}/${id}`, {
+  return await fetchApi<UserResponse>(`${endpoint}/${id}`, {
     method: "DELETE",
   });
 };
 
 // Lấy danh sách vai trò
 export const getRoles = async (): Promise<ApiResponse<Role[]>> => {
-  return await fetchApi<ApiResponse<Role[]>>('/roles');
+  return await fetchApi<Role[]>('/roles');
 };
 
 // Lấy danh sách loại level
 export const getAllLevelTypes = async (): Promise<ApiResponse<LevelTypeResponse[]>> => {
-  return await fetchApi<ApiResponse<LevelTypeResponse[]>>('/level-types');
+  return await fetchApi<LevelTypeResponse[]>('/level-types');
 };
 
 // Lấy danh sách level theo loại level
@@ -127,5 +127,5 @@ export const getLevelsByTypeId = async (levelTypeId: string): Promise<ApiRespons
       timestamp: new Date().toISOString()
     };
   }
-  return await fetchApi<ApiResponse<LevelResponse[]>>(`/levels/by-type?levelTypeId=${levelTypeId}`);
+  return await fetchApi<LevelResponse[]>(`/levels/by-type?levelTypeId=${levelTypeId}`);
 }; 

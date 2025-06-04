@@ -110,7 +110,7 @@ export default function Nav() {
 
   return (
     <nav className="bg-primary text-primary-foreground border-b border-primary-foreground/10">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center py-2">
           <ul className="flex items-center gap-1">

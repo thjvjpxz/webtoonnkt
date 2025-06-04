@@ -22,13 +22,14 @@ public class ChapterResponse {
 
     String id;
     String title;
-    Integer chapterNumber;
+    Double chapterNumber;
     String comicName;
     ChapterStatus status;
     Double price;
     String domainCdn;
     String chapterPath;
     List<DetailChapterResponse> detailChapters;
+    List<ChapterResponseSummary> chapterSummaries;
     String createdAt;
     String updatedAt;
 
@@ -41,5 +42,16 @@ public class ChapterResponse {
         String id;
         String imgUrl;
         int orderNumber;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class ChapterResponseSummary {
+        String id;
+        String title;
+        Double chapterNumber;
     }
 }

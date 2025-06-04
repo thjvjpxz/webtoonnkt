@@ -10,4 +10,6 @@ public interface DetailComicService {
     BaseResponse<?> unfollowComic(String comicId, String userId);
 
     BaseResponse<?> checkFollowStatus(String comicId, String userId);
+
+    BaseResponse<?> getChapterDetail(String chapterId);
 }

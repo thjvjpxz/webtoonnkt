@@ -169,8 +169,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="container mx-auto px-4">
+      <header className="top-0 z-50 bg-background dark:bg-dark-900 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <div className="container mx-auto">
           <div className="flex items-center justify-between py-3 gap-4">
             {/* Logo */}
             <div className="flex items-center gap-4">

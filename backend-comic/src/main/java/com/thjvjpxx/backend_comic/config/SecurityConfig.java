@@ -48,6 +48,7 @@ public class SecurityConfig {
 								"/auth/refresh-token",
 								"/auth/verify",
 								"/comic/*",
+								"/comic/*/*",
 								"/")
 						.permitAll()
 

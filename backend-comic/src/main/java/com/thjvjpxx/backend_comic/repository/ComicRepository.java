@@ -35,25 +35,34 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
     @Query(value = """
             SELECT
                 c.id,
-                c.thumb_url,
-                c.slug,
-                c.name,
-                CAST(COALESCE(SUM(cvh.view_count), 0) AS SIGNED) AS viewCount,
+                COALESCE(c.thumb_url, '') AS thumb_url,
+                COALESCE(c.slug, '') AS slug,
+                COALESCE(c.name, '') AS name,
+                CAST(COALESCE(v.viewCount, 0) AS SIGNED) AS viewCount,
                 MAX(ch.chapter_number) AS latestChapter
             FROM
                 comics c
             LEFT JOIN
-                comic_views_history cvh
-                ON c.id = cvh.comic_id
-                AND DATE(cvh.view_date) BETWEEN :startDate AND :endDate
+                (
+                    SELECT
+                        comic_id,
+                        CAST(COALESCE(SUM(view_count), 0) AS SIGNED) AS viewCount
+                    FROM
+                        comic_views_history
+                    WHERE
+                        DATE(view_date) BETWEEN :startDate AND :endDate
+                    GROUP BY
+                        comic_id
+                ) v
+                ON c.id = v.comic_id
             INNER JOIN
                 chapters ch
                 ON c.id = ch.comic_id
             GROUP BY
-                c.id, c.thumb_url, c.slug, c.name
+                c.id, c.thumb_url, c.slug, c.name, v.viewCount
             ORDER BY
                 viewCount DESC, c.updated_at DESC
-            LIMIT 10
+            LIMIT 10;
             """, nativeQuery = true)
     List<PopulerToday> findTopComicsByStartAndEndDate(LocalDate startDate, LocalDate endDate);
 
