@@ -20,6 +20,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Chapter } from '@/types/chapter';
 import { constructImageUrl } from '@/utils/helpers';
+import { useAuth } from '@/contexts/AuthContext';
+import CommentSection from './CommentSection';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -37,14 +39,17 @@ import {
 interface ReadComicProps {
   chapter: Chapter;
   comicSlug: string;
+  comicId: string;
 }
 
 type ReadingMode = 'horizontal' | 'vertical';
 
 export default function ReadComic({
   chapter,
-  comicSlug
+  comicSlug,
+  comicId
 }: ReadComicProps) {
+  const { user } = useAuth();
   const router = useRouter();
   const [readingMode, setReadingMode] = useState<ReadingMode>('vertical');
   const [autoRead, setAutoRead] = useState(false);
@@ -413,6 +418,21 @@ export default function ReadComic({
                 </Button>
               ) : <div />}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phần bình luận - chỉ hiển thị ở chế độ dọc */}
+      {readingMode === 'vertical' && (
+        <div className="bg-gray-50 dark:bg-gray-900 py-6">
+          <div className="container mx-auto px-4">
+            <CommentSection
+              comicId={comicId}
+              chapterId={chapter.id}
+              currentUserId={user?.id}
+              mode="chapter"
+              title={`Bình luận Chapter ${chapter.chapterNumber}`}
+            />
           </div>
         </div>
       )}

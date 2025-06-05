@@ -103,11 +103,13 @@ export default function Header() {
             <p className="font-semibold text-foreground truncate">
               {user?.username || 'Admin'}
             </p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                Quản trị viên
-              </span>
-            </div>
+            {isAdmin() && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                  Quản trị viên
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

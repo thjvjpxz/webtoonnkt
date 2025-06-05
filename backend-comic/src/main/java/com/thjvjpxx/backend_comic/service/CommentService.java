@@ -14,9 +14,6 @@ public interface CommentService {
             String comicId, String chapterId,
             String userId, CommentStatus status);
 
-    // Lấy comment theo comic với phân trang
-    BaseResponse<List<CommentResponse>> getCommentsByComic(String comicId, int page, int limit);
-
     // Lấy comment theo chapter với phân trang
     BaseResponse<List<CommentResponse>> getCommentsByChapter(String chapterId, int page, int limit);
 
@@ -35,9 +32,6 @@ public interface CommentService {
     // Tạo comment mới
     BaseResponse<CommentResponse> createComment(CommentRequest request, String userId);
 
-    // Cập nhật comment
-    BaseResponse<CommentResponse> updateComment(String id, CommentRequest request, String userId);
-
     // Xóa comment (soft delete - chuyển status thành DELETED)
     BaseResponse<String> deleteComment(String id, String userId);
 
@@ -52,7 +46,4 @@ public interface CommentService {
 
     // Đếm số comment theo chapter
     BaseResponse<Long> countCommentsByChapter(String chapterId);
-
-    // Lấy comment mới nhất theo comic
-    BaseResponse<List<CommentResponse>> getLatestCommentsByComic(String comicId, int limit);
 }

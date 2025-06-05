@@ -15,6 +15,8 @@ import useComicDetail from "@/hooks/useComicDetail";
 import { ChapterStatus } from "@/types/chapter";
 import { ComicDetailResponse } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
+import { useAuth } from "@/contexts/AuthContext";
+import CommentSection from "./CommentSection";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -37,6 +39,7 @@ interface ComicDetailContentProps {
 }
 
 export default function ComicDetailContent({ comicDetailResponse }: ComicDetailContentProps) {
+  const { user } = useAuth();
   const {
     isFollowing,
     showAllChapters,
@@ -110,7 +113,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
           <div className="flex flex-col lg:flex-row">
             {/* Ảnh bìa */}
             <div className="lg:w-1/3 xl:w-1/4 p-4 sm:p-6 flex justify-center lg:justify-start">
-              <div className="relative w-40 h-56 sm:w-48 sm:h-64 md:w-56 md:h-80 lg:w-64 lg:h-96 rounded-md overflow-hidden shadow-lg group">
+              <div className="relative w-40 h-56 sm:w-48 sm:h-64 md:w-56 md:h-80 lg:w-64 lg:h-96 rounded overflow-hidden shadow-lg group">
                 <Image
                   src={comicDetailResponse.thumbUrl || "/images/placeholder.svg"}
                   alt={comicDetailResponse.name}
@@ -190,7 +193,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                         <Link
                           key={category.id}
                           href={`/category/${category.slug}`}
-                          className="px-2 py-1 rounded-md text-xs border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
+                          className="px-2 py-1 rounded text-xs border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50"
                         >
                           {category.name}
                         </Link>
@@ -309,7 +312,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
             <>
               {/* Hiển thị thông tin kết quả tìm kiếm */}
               {searchTerm && (
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
                       <FiSearch className="text-sm flex-shrink-0" />
@@ -336,7 +339,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                   <Link
                     key={chapter.id}
                     href={`/comic/${comicDetailResponse.slug}/${chapter.id}`}
-                    className="group block p-3 sm:p-4 rounded-md border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-primary/50 transition-all duration-200"
+                    className="group block p-3 sm:p-4 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-primary/50 transition-all duration-200"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                       <div className="flex-1 min-w-0">
@@ -390,6 +393,16 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
             </>
           )}
         </div>
+      </div>
+
+      {/* Phần bình luận */}
+      <div className="mt-4 sm:mt-6 lg:mt-8">
+        <CommentSection
+          comicId={comicDetailResponse.id}
+          currentUserId={user?.id}
+          mode="comic"
+          title="Bình luận truyện"
+        />
       </div>
     </div>
   );

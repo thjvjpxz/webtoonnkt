@@ -1,7 +1,7 @@
 'use client'
 import Main from "@/components/layout/Main";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { getChaptersByComicId } from "@/services/comicDetailService";
+import { getChaptersByComicId, getComicBySlug } from "@/services/comicDetailService";
 import { Chapter } from "@/types/chapter";
 import { notFound } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -15,27 +15,35 @@ interface ReadComicPageProps {
 export default function ReadComicPage({ params }: ReadComicPageProps) {
   const { slug, id } = use(params);
   const [chapter, setChapter] = useState<Chapter>();
+  const [comicId, setComicId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchChapters = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getChaptersByComicId(slug, id);
+        // Lấy thông tin comic để có comicId
+        const comicResponse = await getComicBySlug(slug);
 
-        if (response.status === 200 && response.data) {
-          setChapter(response.data);
+        if (comicResponse.status === 200 && comicResponse.data) {
+          setComicId(comicResponse.data.id);
         }
-        else {
-          toast.error(response.message || "Lỗi khi lấy thông tin chapter");
+
+        // Lấy thông tin chapter
+        const chapterResponse = await getChaptersByComicId(slug, id);
+
+        if (chapterResponse.status === 200 && chapterResponse.data) {
+          setChapter(chapterResponse.data);
+        } else {
+          toast.error(chapterResponse.message || "Lỗi khi lấy thông tin chapter");
         }
       } catch (error) {
-        console.error("Lỗi khi lấy thông tin chapter:", error);
-        toast.error("Có lỗi xảy ra khi tải chapter");
+        console.error("Lỗi khi lấy thông tin:", error);
+        toast.error("Có lỗi xảy ra khi tải dữ liệu");
       } finally {
         setIsLoading(false);
       }
     }
-    fetchChapters();
+    fetchData();
   }, [slug, id]);
 
   if (isLoading) {
@@ -51,7 +59,7 @@ export default function ReadComicPage({ params }: ReadComicPageProps) {
     );
   }
 
-  if (!chapter) {
+  if (!chapter || !comicId) {
     notFound();
   }
 
@@ -60,6 +68,7 @@ export default function ReadComicPage({ params }: ReadComicPageProps) {
       <ReadComic
         chapter={chapter}
         comicSlug={slug}
+        comicId={comicId}
       />
     </Main>
   );
