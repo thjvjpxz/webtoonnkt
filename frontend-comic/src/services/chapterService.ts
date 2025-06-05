@@ -57,3 +57,23 @@ export const updateChapter = async (
   });
 }
 
+// API riêng cho publisher để lấy chapters của mình
+export const getMyChapters = async (
+  page: number,
+  limit: number,
+  search?: string,
+  comicId?: string
+) => {
+  let endpoint = `/publisher/chapters?page=${page}&limit=${limit}`;
+
+  if (search) {
+    endpoint += `&search=${encodeURIComponent(search)}`;
+  }
+
+  if (comicId) {
+    endpoint += `&comicId=${comicId}`;
+  }
+
+  return await fetchApi<ChapterWithComicDetail[]>(endpoint);
+}
+

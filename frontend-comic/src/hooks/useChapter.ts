@@ -1,11 +1,15 @@
 import { ChapterCreateUpdate, ChapterWithComicDetail } from "@/types/chapter";
-import { createChapter, deleteChapter, getChapters, updateChapter } from "@/services/chapterService";
+import { createChapter, deleteChapter, getChapters, getMyChapters, updateChapter } from "@/services/chapterService";
 import { useCallback, useEffect, useState } from "react";
-import { getComics } from "@/services/comicService";
+import { getComics, getMyComics } from "@/services/comicService";
 import { ComicResponse } from "@/types/comic";
+import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 
 export const useChapter = (initialPage = 1, pageSize = 5) => {
+  const { user, isLoading: authLoading } = useAuth();
+  const isPublisher = user?.role?.name === "PUBLISHER";
+
   const [chapters, setChapters] = useState<ChapterWithComicDetail[]>([]);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
@@ -32,7 +36,9 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     setError(null);
 
     try {
-      const response = await getChapters(currentPage, pageSize, searchTerm, comicFilter || undefined);
+      const response = isPublisher
+        ? await getMyChapters(currentPage, pageSize, searchTerm, comicFilter || undefined)
+        : await getChapters(currentPage, pageSize, searchTerm, comicFilter || undefined);
 
       if (response.status === 200 && response.data) {
         setTotalPages(response.totalPages || 1);
@@ -47,7 +53,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, comicFilter, pageSize]);
+  }, [currentPage, searchTerm, comicFilter, pageSize, isPublisher]);
 
   // Fetch comic options
   const fetchComicOptions = useCallback(async (
@@ -57,7 +63,9 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
   ) => {
     setIsLoadingComics(true);
     try {
-      const response = await getComics(page, limit, searchTerm);
+      const response = isPublisher
+        ? await getMyComics(searchTerm, page - 1, limit)
+        : await getComics(searchTerm, page - 1, limit);
       if (response.status === 200 && response.data) {
         if (page === 1) {
           setComicOptions(response.data);
@@ -80,16 +88,22 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoadingComics(false);
     }
-  }, [comicSearchTerm]);
+  }, [comicSearchTerm, isPublisher]);
 
   useEffect(() => {
-    setComicPage(1);
-    fetchComicOptions(1);
-  }, [comicSearchTerm, fetchComicOptions]);
+    // Chỉ gọi API khi auth đã load xong
+    if (!authLoading) {
+      setComicPage(1);
+      fetchComicOptions(1);
+    }
+  }, [comicSearchTerm, fetchComicOptions, authLoading]);
 
   useEffect(() => {
-    fetchChapters();
-  }, [fetchChapters]);
+    // Chỉ gọi API khi auth đã load xong và không đang loading
+    if (!authLoading) {
+      fetchChapters();
+    }
+  }, [fetchChapters, authLoading]);
 
   // Xử lý xóa chương
   const handleDeleteChapter = async () => {

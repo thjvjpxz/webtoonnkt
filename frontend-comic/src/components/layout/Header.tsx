@@ -33,7 +33,7 @@ export default function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { user, isAuthenticated, logout, isAdmin } = useAuthState();
+  const { user, isAuthenticated, logout, isAdmin, isPublisher } = useAuthState();
   const router = useRouter();
 
   // Auth modals
@@ -151,6 +151,16 @@ export default function Header() {
                 <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               </div>
               <span className="font-medium">Quản lý Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isPublisher() && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/comics" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="font-medium">Quản lý truyện</span>
             </Link>
           </DropdownMenuItem>
         )}

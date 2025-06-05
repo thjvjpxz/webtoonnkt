@@ -49,10 +49,10 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
             <div className="w-full md:w-1/3 flex justify-center">
               <div className="relative w-48 h-72">
                 <Image
-                  src={comic.thumbUrl || "https://placehold.co/100x150/4ade80/fff?text=NA"}
+                  src={comic.thumbUrl || "/images/placeholder.svg"}
                   alt={comic.name}
                   fill
-                  className="object-cover rounded-lg shadow-md"
+                  className="object-cover rounded shadow-md"
                 />
               </div>
             </div>

@@ -4,6 +4,7 @@ import { FiPlus, FiEdit, FiTrash2, FiSearch, FiAlertCircle, FiBookOpen, FiEye } 
 import DashboardLayout from "@/components/admin/DashboardLayout";
 import Pagination from "@/components/ui/pagination";
 import { useChapter } from "@/hooks/useChapter";
+import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
@@ -16,6 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function Chapters() {
+  const { user } = useAuth();
+  const isPublisher = user?.role?.name === "PUBLISHER";
 
   const {
     chapters,
@@ -64,7 +67,7 @@ export default function Chapters() {
   } = useChapter();
 
   return (
-    <DashboardLayout title="Quản lý Chương">
+    <DashboardLayout title={isPublisher ? "Chapter của tôi" : "Quản lý Chương"} isPublisher={isPublisher}>
       {/* Search and Add Button */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -182,7 +185,7 @@ export default function Chapters() {
           className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <FiPlus className="mr-2" size={18} />
-          Thêm chương mới
+          {isPublisher ? "Tạo chương mới" : "Thêm chương mới"}
         </Button>
       </div>
 
@@ -191,7 +194,7 @@ export default function Chapters() {
         <CardHeader className="border-b border-border/50">
           <CardTitle className="text-foreground flex items-center gap-2">
             <FiBookOpen className="text-primary" size={20} />
-            Danh sách chương
+            {isPublisher ? "Chapter của tôi" : "Danh sách chương"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

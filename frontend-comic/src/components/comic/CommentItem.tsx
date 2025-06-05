@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/helpers";
 import { FiMessageCircle, FiTrash2, FiChevronDown, FiChevronRight, FiBookOpen, FiUser } from "react-icons/fi";
 import { getFirstColorFromGradient } from "@/utils/string";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CommentItemProps {
   comment: CommentResponse;
@@ -152,15 +153,19 @@ export default function CommentItem({
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onStartReply}
-              className="text-primary hover:text-primary/80 hover:bg-primary/10 h-8 px-2 text-xs sm:text-sm"
-            >
-              <FiMessageCircle className="mr-1 text-xs sm:text-sm" />
-              Phản hồi
-            </Button>
+            {
+              canDelete && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onStartReply}
+                  className="text-primary hover:text-primary/80 hover:bg-primary/10 h-8 px-2 text-xs sm:text-sm"
+                >
+                  <FiMessageCircle className="mr-1 text-xs sm:text-sm" />
+                  Phản hồi
+                </Button>
+              )
+            }
 
             {hasReplies && (
               <Button

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ChapterHome;
 import com.thjvjpxx.backend_comic.model.Chapter;
+import com.thjvjpxx.backend_comic.model.Comic;
 
 @Repository
 public interface ChapterRepository extends JpaRepository<Chapter, String> {
@@ -62,4 +63,11 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 			LIMIT 4
 			""", nativeQuery = true)
 	List<ChapterHome> findTop4LatestChapter(@Param("comicId") String comicId);
+
+	// Publisher specific methods
+	boolean existsByComicAndChapterNumber(Comic comic, Double chapterNumber);
+
+	Page<Chapter> findByComicOrderByChapterNumberAsc(Comic comic, Pageable pageable);
+
+	Page<Chapter> findByComicOrderByChapterNumberDesc(Comic comic, Pageable pageable);
 }

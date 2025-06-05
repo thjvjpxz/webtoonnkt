@@ -25,6 +25,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -48,7 +49,9 @@ import lombok.experimental.FieldDefaults;
         // Composite index cho sắp xếp trong các truy vấn phức tạp
         @Index(name = "idx_comic_views_updated", columnList = "views_count, updated_at"),
         // Index cho tìm kiếm text search
-        @Index(name = "idx_comic_slug_name", columnList = "slug, name")
+        @Index(name = "idx_comic_slug_name", columnList = "slug, name"),
+        // Index cho tìm truyện theo publisher
+        @Index(name = "idx_comic_publisher", columnList = "publisher_id")
 })
 public class Comic {
 
@@ -91,6 +94,11 @@ public class Comic {
     @Column(name = "folder_id", columnDefinition = "VARCHAR(50)")
     @JsonIgnore
     String folderId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id")
+    @JsonIgnore
+    User publisher;
 
     @Column(name = "created_at")
     @CreationTimestamp

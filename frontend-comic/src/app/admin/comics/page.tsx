@@ -41,6 +41,7 @@ export default function Comics() {
     totalPages,
     isViewModalOpen,
     isDeleting,
+    isPublisher,
 
     setSearchTerm,
     setStatusFilter,
@@ -113,7 +114,7 @@ export default function Comics() {
   };
 
   return (
-    <DashboardLayout title="Quản lý truyện">
+    <DashboardLayout title={isPublisher ? "Truyện của tôi" : "Quản lý truyện"} isPublisher={isPublisher}>
       {/* Search and Add Button */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <form onSubmit={handleSearch} className="relative">
@@ -133,11 +134,11 @@ export default function Comics() {
         <Button
           onClick={handleOpenAddModal}
           className="bg-primary hover:bg-primary/90 text-primary-foreground"
-          aria-label="Thêm truyện mới"
-          title="Thêm truyện mới"
+          aria-label={isPublisher ? "Tạo truyện mới" : "Thêm truyện mới"}
+          title={isPublisher ? "Tạo truyện mới" : "Thêm truyện mới"}
         >
           <FiPlus className="mr-2" size={18} />
-          Thêm truyện mới
+          {isPublisher ? "Tạo truyện mới" : "Thêm truyện mới"}
         </Button>
       </div>
 
@@ -196,7 +197,7 @@ export default function Comics() {
         <CardHeader className="border-b border-border/50">
           <CardTitle className="text-foreground flex items-center gap-2">
             <FiBook className="text-primary" size={20} />
-            Danh sách truyện
+            {isPublisher ? "Truyện của tôi" : "Danh sách truyện"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -268,7 +269,7 @@ export default function Comics() {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-12 w-12 relative">
                             <Image
-                              src={comic.thumbUrl || "https://placehold.co/100x150/05df72/fff?text=Comic"}
+                              src={comic.thumbUrl || "/images/placeholder.svg"}
                               alt={comic.name}
                               fill
                               sizes="48px"
@@ -369,6 +370,7 @@ export default function Comics() {
         <ComicModal
           comic={currentComic}
           categories={categories}
+          isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSave={currentComic ? handleUpdateComic : handleAddComic}
         />

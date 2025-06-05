@@ -1,17 +1,46 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { CategoryResponse } from "@/types/category";
 import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { generateSlug } from "@/utils/string";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { FiCheck, FiImage, FiUpload, FiX } from "react-icons/fi";
 
 interface ComicModalProps {
   comic: ComicResponse | null;
   categories: CategoryResponse[];
+  isOpen: boolean;
   onClose: () => void;
   onSave: (comic: ComicCreateUpdate, file?: File) => Promise<void>;
 }
@@ -19,24 +48,21 @@ interface ComicModalProps {
 export default function ComicModal({
   comic,
   categories,
+  isOpen,
   onClose,
   onSave,
 }: ComicModalProps) {
-  const [formData, setFormData] = useState<ComicCreateUpdate>({
-    name: "",
-    slug: "",
-    description: "",
-    author: "",
-    status: "ONGOING",
-    categories: [],
-    thumbUrl: "",
-    originName: "",
-  });
-
-  const [errors, setErrors] = useState({
-    name: "",
-    slug: "",
-    categories: "",
+  const form = useForm<ComicCreateUpdate>({
+    defaultValues: {
+      name: "",
+      slug: "",
+      description: "",
+      author: "",
+      status: "ONGOING",
+      categories: [],
+      thumbUrl: "",
+      originName: "",
+    },
   });
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -53,7 +79,7 @@ export default function ComicModal({
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
     if (comic) {
-      setFormData({
+      const formData = {
         name: comic.name || "",
         slug: comic.slug || "",
         description: comic.description || "",
@@ -62,7 +88,9 @@ export default function ComicModal({
         status: comic.status || "ONGOING",
         originName: comic.originName || "",
         categories: comic.categories?.map((cat) => cat.id) || [],
-      });
+      };
+
+      form.reset(formData);
       setPreviewImage(comic.thumbUrl || "");
 
       // Nếu có thumbUrl, đặt phương thức tải lên là URL
@@ -70,46 +98,50 @@ export default function ComicModal({
         setImageUrl(comic.thumbUrl);
         setUploadMethod("url");
       }
+    } else {
+      // Reset form khi tạo mới
+      form.reset({
+        name: "",
+        slug: "",
+        description: "",
+        author: "",
+        status: "ONGOING",
+        categories: [],
+        thumbUrl: "",
+        originName: "",
+      });
+      setPreviewImage(null);
+      setImageUrl("");
+      setSelectedFile(null);
+      setUploadMethod("file");
     }
-  }, [comic]);
+  }, [comic, form]);
 
-  // Xử lý thay đổi input
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Tự động tạo slug khi thay đổi tên
-    if (name === "name") {
-      setFormData((prev) => ({
-        ...prev,
-        slug: generateSlug(value),
-      }));
+  // Tự động tạo slug khi thay đổi tên
+  const watchName = form.watch("name");
+  useEffect(() => {
+    if (watchName) {
+      form.setValue("slug", generateSlug(watchName));
     }
-  };
+  }, [watchName, form]);
 
   // Xử lý thêm thể loại
   const handleAddCategory = (categoryId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      categories: [...prev.categories, categoryId],
-    }));
+    console.log("categoryId", categoryId);
+    const currentCategories = form.getValues("categories");
+    if (!currentCategories.includes(categoryId)) {
+      form.setValue("categories", [...currentCategories, categoryId]);
+    }
     setCategorySearchTerm("");
   };
 
   // Xử lý xóa thể loại
   const handleRemoveCategory = (categoryId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      categories: prev.categories.filter((id) => id !== categoryId),
-    }));
+    const currentCategories = form.getValues("categories");
+    form.setValue(
+      "categories",
+      currentCategories.filter((id) => id !== categoryId)
+    );
   };
 
   // Đóng dropdown khi click ra ngoài hoặc focus vào input khác
@@ -151,44 +183,10 @@ export default function ComicModal({
     fileInputRef.current?.click();
   };
 
-  // Xác thực form
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = {
-      name: "",
-      slug: "",
-      categories: "",
-    };
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Tên truyện không được để trống";
-      valid = false;
-    }
-
-    if (!formData.slug.trim()) {
-      newErrors.slug = "Slug không được để trống";
-      valid = false;
-    }
-
-    if (formData.categories.length === 0) {
-      newErrors.categories = "Vui lòng chọn ít nhất một thể loại";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
   // Xử lý lưu
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    // Cập nhật formData với URL ảnh nếu đang sử dụng phương thức URL
-    const dataToSubmit = { ...formData };
+  const handleSubmit = async (data: ComicCreateUpdate) => {
+    // Cập nhật data với URL ảnh nếu đang sử dụng phương thức URL
+    const dataToSubmit = { ...data };
     if (uploadMethod === "url" && imageUrl.trim()) {
       dataToSubmit.thumbUrl = imageUrl;
     }
@@ -201,6 +199,7 @@ export default function ComicModal({
         dataToSubmit,
         uploadMethod === "file" && selectedFile ? selectedFile : undefined
       );
+      onClose();
     } catch (error: unknown) {
       const errorMessage =
         error && typeof error === "object" && "error" in error
@@ -224,10 +223,7 @@ export default function ComicModal({
     img.crossOrigin = "anonymous";
     img.onload = () => {
       setPreviewImage(imageUrl);
-      setFormData((prev) => ({
-        ...prev,
-        thumbUrl: imageUrl,
-      }));
+      form.setValue("thumbUrl", imageUrl);
       setIsUploading(false);
       toast.success("Đã thêm ảnh bìa từ URL");
     };
@@ -269,7 +265,7 @@ export default function ComicModal({
       return;
     }
 
-    // Kiểm tra kích thước file (giới hạn 2MB)
+    // Kiểm tra kích thước file (giới hạn 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("Kích thước file không được vượt quá 10MB");
       return;
@@ -286,403 +282,373 @@ export default function ComicModal({
     reader.readAsDataURL(file);
   };
 
+  const selectedCategories = form.watch("categories");
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto custom-scrollbar">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
             {comic ? "Sửa thông tin truyện" : "Thêm truyện mới"}
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
-          >
-            <FiX size={20} />
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit}
-          className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar relative"
-        >
-          {/* Overlay khi đang submit */}
-          {isSubmitting && (
-            <div className="absolute inset-0 bg-gray-900/20 dark:bg-gray-900/40 flex items-center justify-center rounded-xl z-10">
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg flex items-center space-x-3">
-                <div className="h-6 w-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  {comic
-                    ? "Đang cập nhật truyện..."
-                    : "Đang thêm truyện mới..."}
-                </p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            {/* Overlay khi đang submit */}
+            {isSubmitting && (
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded z-50">
+                <Card className="p-6">
+                  <CardContent className="flex items-center space-x-3 p-0">
+                    <LoadingSpinner size="md" />
+                    <p className="font-medium">
+                      {comic
+                        ? "Đang cập nhật truyện..."
+                        : "Đang thêm truyện mới..."}
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <div className="flex flex-col border-2 border-dashed border-green-200 rounded-lg p-6 dark:border-gray-700">
-                <div className="flex flex-col md:flex-row gap-6">
+            {/* Phần upload ảnh */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Phần xem trước ảnh */}
-                  <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="flex flex-col items-center justify-center">
                     {previewImage ? (
                       <div className="relative w-full h-64 mb-4">
                         <NextImage
                           src={previewImage}
                           alt="Ảnh bìa truyện"
                           fill
-                          className="object-cover rounded-lg"
+                          className="object-cover rounded"
                         />
-                        <button
+                        <Button
                           type="button"
+                          variant="destructive"
+                          size="sm"
                           onClick={() => {
                             setPreviewImage(null);
                             setSelectedFile(null);
-                            setFormData((prev) => ({
-                              ...prev,
-                              thumbUrl: "",
-                            }));
+                            form.setValue("thumbUrl", "");
                           }}
-                          className="absolute top-2 right-2 bg-gray-800/70 text-white p-1.5 rounded-full hover:bg-gray-900/70 transition-colors cursor-pointer"
+                          className="absolute top-2 right-2"
                         >
                           <FiX size={16} />
-                        </button>
+                        </Button>
                       </div>
                     ) : (
-                      <div className="text-green-500 mb-4 dark:text-green-400 flex items-center justify-center w-full h-64 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <FiImage size={64} />
+                      <div className="flex items-center justify-center w-full h-64 bg-muted rounded">
+                        <FiImage size={64} className="text-muted-foreground" />
                       </div>
                     )}
                   </div>
 
                   {/* Phần tùy chọn tải lên */}
-                  <div className="flex-1 flex flex-col">
-                    <div className="mb-4">
-                      <div className="flex space-x-4 mb-4">
-                        <button
-                          type="button"
-                          onClick={() => setUploadMethod("file")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "file"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                            }`}
-                        >
-                          Tải lên từ máy tính
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setUploadMethod("url")}
-                          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors cursor-pointer ${uploadMethod === "url"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                            }`}
-                        >
-                          Nhập URL ảnh
-                        </button>
-                      </div>
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex space-x-2">
+                      <Button
+                        type="button"
+                        variant={uploadMethod === "file" ? "default" : "outline"}
+                        onClick={() => setUploadMethod("file")}
+                        className="flex-1"
+                      >
+                        Tải lên từ máy tính
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={uploadMethod === "url" ? "default" : "outline"}
+                        onClick={() => setUploadMethod("url")}
+                        className="flex-1"
+                      >
+                        Nhập URL ảnh
+                      </Button>
+                    </div>
 
-                      {uploadMethod === "file" ? (
-                        <div className="space-y-4">
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleImageUpload}
-                            accept="image/*"
-                            className="hidden"
-                          />
-                          <div
-                            className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging
-                              ? "border-green-500 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
-                              : "border-gray-300 hover:border-green-400 dark:border-gray-600 dark:hover:border-green-500"
-                              }`}
-                            onClick={handleOpenFileDialog}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                          >
+                    {uploadMethod === "file" ? (
+                      <div className="space-y-4">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageUpload}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <Card
+                          className={`border-2 border-dashed cursor-pointer transition-colors ${isDragging
+                            ? "border-primary bg-primary/5"
+                            : "border-muted-foreground/25 hover:border-primary/50"
+                            }`}
+                          onClick={handleOpenFileDialog}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <CardContent className="flex flex-col items-center justify-center py-8">
                             {isUploading ? (
-                              <div className="flex flex-col items-center justify-center py-4">
-                                <div className="h-10 w-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                                <p className="text-gray-600 dark:text-gray-300">
-                                  Đang tải lên...
-                                </p>
+                              <div className="flex flex-col items-center space-y-2">
+                                <LoadingSpinner size="lg" />
+                                <p className="text-muted-foreground">Đang tải lên...</p>
                               </div>
                             ) : (
                               <>
-                                <FiUpload className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-3" />
-                                <p className="text-gray-600 dark:text-gray-300 mb-1">
+                                <FiUpload className="h-12 w-12 text-muted-foreground mb-3" />
+                                <p className="text-muted-foreground mb-1">
                                   Kéo thả file ảnh vào đây hoặc
                                 </p>
-                                <p className="text-green-600 font-medium dark:text-green-400">
+                                <p className="text-primary font-medium">
                                   Nhấn để chọn file
                                 </p>
                               </>
                             )}
-                          </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa:
-                            2MB
-                          </p>
+                          </CardContent>
+                        </Card>
+                        <p className="text-xs text-muted-foreground text-center">
+                          Hỗ trợ định dạng: JPG, PNG, GIF. Kích thước tối đa: 10MB
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <Input
+                          type="text"
+                          placeholder="Nhập URL ảnh..."
+                          value={imageUrl}
+                          onChange={(e) => setImageUrl(e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleImageUrlSubmit}
+                          disabled={!imageUrl.trim() || isUploading}
+                          className="w-full"
+                        >
+                          <FiCheck className="mr-2" size={16} />
+                          Sử dụng URL này
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Form fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="name"
+                rules={{ required: "Tên truyện không được để trống" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tên truyện</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nhập tên truyện" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="slug"
+                rules={{ required: "Slug không được để trống" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Slug sẽ tự động tạo" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="author"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tác giả</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nhập tên tác giả" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trạng thái</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Chọn trạng thái" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="ONGOING">Đang cập nhật</SelectItem>
+                        <SelectItem value="COMPLETED">Đã hoàn thành</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="originName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tên gốc</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nhập tên gốc" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mô tả</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Nhập mô tả truyện"
+                      className="min-h-[100px]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Categories */}
+            <FormField
+              control={form.control}
+              name="categories"
+              rules={{
+                validate: (value) =>
+                  value.length > 0 || "Vui lòng chọn ít nhất một thể loại"
+              }}
+              render={() => (
+                <FormItem>
+                  <FormLabel>Thể loại</FormLabel>
+                  <FormControl>
+                    <div className="relative category-dropdown-container">
+                      <Card className="p-2">
+                        <div className="flex flex-wrap gap-2">
+                          {/* Hiển thị các thể loại đã chọn */}
+                          {selectedCategories.length > 0 &&
+                            categories
+                              .filter((cat) => selectedCategories.includes(cat.id))
+                              .map((category) => (
+                                <Badge
+                                  key={category.id}
+                                  variant="secondary"
+                                  className="flex items-center gap-1"
+                                >
+                                  {category.name}
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleRemoveCategory(category.id)}
+                                    className="h-4 w-4 p-0 hover:bg-transparent"
+                                  >
+                                    <FiX size={12} />
+                                  </Button>
+                                </Badge>
+                              ))}
+
+                          {/* Input tìm kiếm */}
+                          <Input
+                            type="text"
+                            placeholder={
+                              selectedCategories.length === 0
+                                ? "Chọn thể loại..."
+                                : "Thêm thể loại..."
+                            }
+                            className="flex-1 min-w-[120px] border-0 shadow-none p-1 h-8 focus-visible:ring-0 category-search-input"
+                            onFocus={() => setIsCategoryDropdownOpen(true)}
+                            onChange={(e) => setCategorySearchTerm(e.target.value)}
+                            value={categorySearchTerm}
+                          />
                         </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div className="relative">
-                            <input
-                              type="text"
-                              placeholder="Nhập URL ảnh..."
-                              value={imageUrl}
-                              onChange={(e) => setImageUrl(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white pr-10"
-                            />
-                            {imageUrl && (
-                              <button
-                                type="button"
-                                onClick={() => setImageUrl("")}
-                                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
-                              >
-                                <FiX size={16} />
-                              </button>
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="default"
-                            onClick={handleImageUrlSubmit}
-                            disabled={!imageUrl.trim() || isUploading}
-                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                          >
-                            <FiCheck className="mr-2" size={16} />
-                            Sử dụng URL này
-                          </Button>
-                        </div>
+                      </Card>
+
+                      {/* Dropdown danh sách thể loại */}
+                      {isCategoryDropdownOpen && (
+                        <Card className="absolute z-50 mt-1 w-full max-h-60 overflow-auto">
+                          <CardContent className="p-1">
+                            {categories
+                              .filter(
+                                (cat) =>
+                                  cat.name
+                                    .toLowerCase()
+                                    .includes(categorySearchTerm.toLowerCase()) &&
+                                  !selectedCategories.includes(cat.id)
+                              )
+                              .map((category) => (
+                                <button
+                                  key={category.id}
+                                  className="px-3 py-2 cursor-pointer hover:bg-accent rounded transition-colors flex w-full"
+                                  onClick={() => handleAddCategory(category.id)}
+                                >
+                                  {category.name}
+                                </button>
+                              ))
+                            }
+                            {
+                              categories.filter(
+                                (cat) =>
+                                  cat.name
+                                    .toLowerCase()
+                                    .includes(categorySearchTerm.toLowerCase()) &&
+                                  !selectedCategories.includes(cat.id)
+                              ).length === 0 && (
+                                <div className="px-3 py-2 text-muted-foreground text-sm">
+                                  Không tìm thấy thể loại phù hợp
+                                </div>
+                              )
+                            }
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
-                Tên truyện
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.name ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
 
-            <div>
-              <label
-                htmlFor="slug"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting}
               >
-                Slug
-              </label>
-              <input
-                type="text"
-                id="slug"
-                name="slug"
-                value={formData.slug}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border ${errors.slug ? "border-rose-500" : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-              />
-              {errors.slug && (
-                <p className="mt-1 text-sm text-rose-500">{errors.slug}</p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="author"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
-                Tác giả
-              </label>
-              <input
-                type="text"
-                id="author"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="status"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
-                Trạng thái
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-pointer"
-              >
-                <option value="ONGOING">Đang cập nhật</option>
-                <option value="COMPLETED">Đã hoàn thành</option>
-                <option value="COMING_SOON">Sắp ra mắt</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="status"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
-                Tên gốc
-              </label>
-              <input
-                type="text"
-                id="originName"
-                name="originName"
-                value={formData.originName}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
-              >
-                Mô tả
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={4}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
-                Thể loại
-              </label>
-              {errors.categories && (
-                <p className="mb-2 text-sm text-rose-500">
-                  {errors.categories}
-                </p>
-              )}
-              <div className="relative category-dropdown-container">
-                <div
-                  className={`w-full border ${errors.categories ? "border-rose-500" : "border-gray-300"
-                    } rounded-md focus-within:ring-2 focus-within:ring-green-500 focus-within:border-transparent dark:bg-gray-700 dark:border-gray-600`}
-                >
-                  <div className="flex flex-wrap gap-2 p-2">
-                    {/* Hiển thị các thể loại đã chọn */}
-                    {formData.categories.length > 0 &&
-                      categories
-                        .filter((cat) => formData.categories.includes(cat.id))
-                        .map((category) => (
-                          <span
-                            key={category.id}
-                            className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                          >
-                            {category.name}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveCategory(category.id)}
-                              className="ml-1.5 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 cursor-pointer"
-                            >
-                              <FiX size={16} />
-                            </button>
-                          </span>
-                        ))}
-
-                    {/* Input tìm kiếm */}
-                    <input
-                      type="text"
-                      placeholder={
-                        formData.categories.length === 0
-                          ? "Chọn thể loại..."
-                          : ""
-                      }
-                      className="flex-grow min-w-[120px] p-1 outline-none bg-transparent dark:text-white category-search-input"
-                      onFocus={() => setIsCategoryDropdownOpen(true)}
-                      onChange={(e) => setCategorySearchTerm(e.target.value)}
-                      value={categorySearchTerm}
-                    />
-                  </div>
-                </div>
-
-                {/* Dropdown danh sách thể loại */}
-                {isCategoryDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg max-h-60 overflow-auto dark:bg-gray-800 border border-gray-200 dark:border-gray-700 custom-scrollbar text-white">
-                    {categories
-                      .filter(
-                        (cat) =>
-                          cat.name
-                            .toLowerCase()
-                            .includes(categorySearchTerm.toLowerCase()) &&
-                          !formData.categories.includes(cat.id)
-                      )
-                      .map((category) => (
-                        <div
-                          key={category.id}
-                          className="px-4 py-2 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20"
-                          onClick={() => handleAddCategory(category.id)}
-                        >
-                          {category.name}
-                        </div>
-                      ))}
-                    {categories.filter(
-                      (cat) =>
-                        cat.name
-                          .toLowerCase()
-                          .includes(categorySearchTerm.toLowerCase()) &&
-                        !formData.categories.includes(cat.id)
-                    ).length === 0 && (
-                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">
-                          Không tìm thấy thể loại phù hợp
-                        </div>
-                      )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-3 mt-6">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              variant="default"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              {comic ? "Cập nhật" : "Thêm mới"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+                Hủy
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {comic ? "Cập nhật" : "Thêm mới"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

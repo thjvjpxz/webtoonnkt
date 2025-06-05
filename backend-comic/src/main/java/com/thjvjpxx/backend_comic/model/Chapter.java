@@ -65,7 +65,7 @@ public class Chapter {
     Double chapterNumber;
 
     @Column(name = "price")
-    Double price;
+    Double price; // Giá chapter tính bằng linh thạch
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -67,15 +67,13 @@ public class SecurityConfig {
 						.requestMatchers("/categories/**").hasRole("ADMIN")
 						.requestMatchers("/comics/**").hasRole("ADMIN")
 						.requestMatchers("/chapters/**").hasRole("ADMIN")
-
-						// Các API Comment chỉ dành cho ADMIN
 						.requestMatchers("/comments/*/block").hasRole("ADMIN")
 						.requestMatchers("/comments/*/unblock").hasRole("ADMIN")
 						.requestMatchers("/comments/user/*").hasRole("ADMIN")
 						.requestMatchers("/comments?*").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
-						.requestMatchers("/publisher/**").hasAnyRole("ADMIN", "PUBLISHER")
+						.requestMatchers("/publisher/**").hasRole("PUBLISHER")
 
 						// Các API khác cần xác thực
 						.anyRequest().authenticated())

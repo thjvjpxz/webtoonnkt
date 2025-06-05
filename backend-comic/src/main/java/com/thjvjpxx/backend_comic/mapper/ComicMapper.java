@@ -17,5 +17,6 @@ public interface ComicMapper {
     @Mapping(target = "viewsCount", ignore = true)
     @Mapping(target = "folderId", ignore = true)
     @Mapping(target = "lastChapterId", ignore = true)
+    @Mapping(target = "publisher", ignore = true)
     Comic toComic(ComicRequest comicRequest);
 }

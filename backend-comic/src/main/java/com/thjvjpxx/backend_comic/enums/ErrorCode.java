@@ -105,6 +105,40 @@ public enum ErrorCode {
     COMMENT_ALREADY_BLOCKED(HttpStatus.BAD_REQUEST, "Bình luận đã bị chặn!"),
     COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Bình luận đã bị xóa!"),
 
+    // Publisher
+    PUBLISHER_COMIC_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên truyện không được để trống!"),
+    PUBLISHER_COMIC_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên truyện không được vượt quá 255 ký tự!"),
+    PUBLISHER_COMIC_ORIGIN_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên gốc không được vượt quá 255 ký tự!"),
+    PUBLISHER_COMIC_AUTHOR_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tác giả không được để trống!"),
+    PUBLISHER_COMIC_AUTHOR_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên tác giả không được vượt quá 255 ký tự!"),
+    PUBLISHER_COMIC_DESCRIPTION_TOO_LONG(HttpStatus.BAD_REQUEST, "Mô tả không được vượt quá 1000 ký tự!"),
+    PUBLISHER_COMIC_CATEGORIES_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Danh sách thể loại không được để trống!"),
+    PUBLISHER_COMIC_CATEGORIES_MIN_ONE(HttpStatus.BAD_REQUEST, "Phải chọn ít nhất 1 thể loại!"),
+    PUBLISHER_COMIC_NOT_OWNER(HttpStatus.FORBIDDEN, "Bạn không có quyền thao tác với truyện này!"),
+
+    PUBLISHER_CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được để trống!"),
+    PUBLISHER_CHAPTER_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được vượt quá 255 ký tự!"),
+    PUBLISHER_CHAPTER_NUMBER_INVALID(HttpStatus.BAD_REQUEST, "Số chapter phải lớn hơn 0!"),
+    PUBLISHER_CHAPTER_PRICE_INVALID(HttpStatus.BAD_REQUEST, "Giá chapter phải lớn hơn hoặc bằng 0!"),
+    PUBLISHER_CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chapter không được trống!"),
+    PUBLISHER_CHAPTER_IMAGES_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Danh sách ảnh không được để trống!"),
+    PUBLISHER_CHAPTER_IMAGES_MIN_ONE(HttpStatus.BAD_REQUEST, "Phải có ít nhất 1 ảnh!"),
+
+    // Transaction & Payment
+    TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Giao dịch không tồn tại!"),
+    TRANSACTION_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "Số tiền không hợp lệ!"),
+    TRANSACTION_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "Số dư không đủ!"),
+    CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "Chapter đã được mua!"),
+    CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "Chapter này miễn phí!"),
+
+    // Withdrawal
+    WITHDRAWAL_AMOUNT_INVALID(HttpStatus.BAD_REQUEST, "Số tiền rút không hợp lệ!"),
+    WITHDRAWAL_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "Số dư không đủ để rút!"),
+    WITHDRAWAL_PENDING_EXISTS(HttpStatus.BAD_REQUEST, "Bạn đã có yêu cầu rút tiền đang chờ xử lý!"),
+    WITHDRAWAL_BANK_INFO_REQUIRED(HttpStatus.BAD_REQUEST, "Thông tin ngân hàng là bắt buộc!"),
+    WITHDRAWAL_NOT_FOUND(HttpStatus.NOT_FOUND, "Yêu cầu rút tiền không tồn tại!"),
+    WITHDRAWAL_NOT_PENDING(HttpStatus.BAD_REQUEST, "Yêu cầu rút tiền không ở trạng thái chờ xử lý!"),
+
     // Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi máy chủ!");
     ;

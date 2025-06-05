@@ -1,7 +1,7 @@
 // Service cơ bản để gọi API
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@/types/api';
-import { handleInvalidToken, getAccessToken } from '@/utils/authUtils';
+import { getAccessToken } from '@/utils/authUtils';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -114,10 +114,6 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Token hết hạn hoặc không hợp lệ, xử lý logout và redirect
-      handleInvalidToken();
-    }
     return Promise.reject(error);
   }
 );

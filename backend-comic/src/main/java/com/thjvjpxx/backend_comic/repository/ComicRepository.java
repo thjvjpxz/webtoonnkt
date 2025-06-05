@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.PopulerToday;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.model.Comic;
+import com.thjvjpxx.backend_comic.model.User;
 
 @Repository
 public interface ComicRepository extends JpaRepository<Comic, String> {
@@ -133,4 +134,20 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
             LIMIT 20
             """, nativeQuery = true)
     List<PopulerToday> findLastUpdateComics();
+
+    // Publisher specific methods
+    Page<Comic> findByPublisher(User publisher, Pageable pageable);
+
+    Page<Comic> findByPublisherAndStatus(User publisher, ComicStatus status, Pageable pageable);
+
+    long countByPublisher(User publisher);
+
+    @Query("SELECT c FROM comics c WHERE c.publisher = :publisher AND (c.name LIKE %:searchTerm% OR c.slug LIKE %:searchTerm%)")
+    Page<Comic> findByPublisherAndSearchTerm(@Param("publisher") User publisher, @Param("searchTerm") String searchTerm,
+            Pageable pageable);
+
+    // Tìm kiếm comic theo publisher và category
+    @Query("SELECT c FROM comics c JOIN c.categories cat WHERE c.publisher = :publisher AND cat.id = :categoryId")
+    Page<Comic> findByPublisherAndCategory(@Param("publisher") User publisher, @Param("categoryId") String categoryId,
+            Pageable pageable);
 }

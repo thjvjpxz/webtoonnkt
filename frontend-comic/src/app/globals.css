@@ -55,7 +55,8 @@
 
   /* Light theme - Professional color palette based on #05df72 */
   /* Neutral backgrounds - Warm whites with subtle green undertones */
-  --background: #eef0f2;
+  /* --background: #eef0f2; */
+  --background: #fff;
   --foreground: #333;
 
   /* Card system - Clean whites with micro-tints */
