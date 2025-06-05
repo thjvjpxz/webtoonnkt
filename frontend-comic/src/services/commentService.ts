@@ -47,14 +47,6 @@ export const createComment = async (data: CommentRequest) => {
   });
 };
 
-// Cập nhật comment
-export const updateComment = async (id: string, data: CommentRequest) => {
-  return await fetchApi<CommentResponse>(`${endpoint}/${id}`, {
-    method: "PUT",
-    data: data,
-  });
-};
-
 // Xóa comment (soft delete)
 export const deleteComment = async (id: string) => {
   return await fetchApi<string>(`${endpoint}/${id}`, {
@@ -76,17 +68,6 @@ export const unblockComment = async (id: string) => {
   });
 };
 
-// Lấy comment theo comic
-export const getCommentsByComic = async (
-  comicId: string,
-  page: number = 1,
-  limit: number = 10
-) => {
-  return await fetchApi<CommentResponse[]>(
-    `${endpoint}/comic/${comicId}?page=${page - 1}&limit=${limit}`
-  );
-};
-
 // Lấy comment theo chapter
 export const getCommentsByChapter = async (
   chapterId: string,
@@ -98,17 +79,6 @@ export const getCommentsByChapter = async (
   );
 };
 
-// Lấy comment theo user
-export const getCommentsByUser = async (
-  userId: string,
-  page: number = 1,
-  limit: number = 10
-) => {
-  return await fetchApi<CommentResponse[]>(
-    `${endpoint}/user/${userId}?page=${page - 1}&limit=${limit}`
-  );
-};
-
 // Đếm comment theo comic
 export const countCommentsByComic = async (comicId: string) => {
   return await fetchApi<number>(`${endpoint}/comic/${comicId}/count`);
@@ -117,4 +87,30 @@ export const countCommentsByComic = async (comicId: string) => {
 // Đếm comment theo chapter
 export const countCommentsByChapter = async (chapterId: string) => {
   return await fetchApi<number>(`${endpoint}/chapter/${chapterId}/count`);
-}; 
+};
+
+// Lấy parent comments theo comic (bao gồm replies)
+export const getParentCommentsByComic = async (
+  comicId: string,
+  page: number = 1,
+  limit: number = 10
+) => {
+  return await fetchApi<CommentResponse[]>(
+    `${endpoint}/comic/${comicId}/parents?page=${page - 1}&limit=${limit}`
+  );
+};
+
+// Lấy replies theo parent comment ID
+export const getRepliesByParentId = async (parentId: string) => {
+  return await fetchApi<CommentResponse[]>(`${endpoint}/${parentId}/replies`);
+};
+
+// Lấy comment của user hiện tại
+export const getMyComments = async (
+  page: number = 1,
+  limit: number = 10
+) => {
+  return await fetchApi<CommentResponse[]>(
+    `${endpoint}/my-comments?page=${page - 1}&limit=${limit}`
+  );
+};

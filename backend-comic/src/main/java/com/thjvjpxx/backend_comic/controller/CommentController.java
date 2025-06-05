@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,18 +49,6 @@ public class CommentController {
     }
 
     /**
-     * Lấy comment theo comic ID
-     * GET /comments/comic/{comicId}?page=0&limit=10
-     */
-    @GetMapping("/comic/{comicId}")
-    public BaseResponse<List<CommentResponse>> getCommentsByComic(
-            @PathVariable String comicId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
-        return commentService.getCommentsByComic(comicId, page, limit);
-    }
-
-    /**
      * Lấy comment cha (parent comments) theo comic ID - bao gồm reply
      * GET /comments/comic/{comicId}/parents?page=0&limit=10
      */
@@ -83,18 +70,6 @@ public class CommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
         return commentService.getCommentsByChapter(chapterId, page, limit);
-    }
-
-    /**
-     * Lấy comment theo user ID
-     * GET /comments/user/{userId}?page=0&limit=10
-     */
-    @GetMapping("/user/{userId}")
-    public BaseResponse<List<CommentResponse>> getCommentsByUser(
-            @PathVariable String userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
-        return commentService.getCommentsByUser(userId, page, limit);
     }
 
     /**
@@ -125,17 +100,6 @@ public class CommentController {
         return commentService.createComment(request, currentUserId);
     }
 
-    /**
-     * Cập nhật comment
-     * PUT /comments/{id}
-     */
-    @PutMapping("/{id}")
-    public BaseResponse<CommentResponse> updateComment(
-            @PathVariable String id,
-            @Valid @RequestBody CommentRequest request) {
-        String currentUserId = securityUtils.getCurrentUserId();
-        return commentService.updateComment(id, request, currentUserId);
-    }
 
     /**
      * Xóa comment (soft delete)
@@ -181,17 +145,6 @@ public class CommentController {
     @GetMapping("/chapter/{chapterId}/count")
     public BaseResponse<Long> countCommentsByChapter(@PathVariable String chapterId) {
         return commentService.countCommentsByChapter(chapterId);
-    }
-
-    /**
-     * Lấy comment mới nhất theo comic
-     * GET /comments/comic/{comicId}/latest?limit=5
-     */
-    @GetMapping("/comic/{comicId}/latest")
-    public BaseResponse<List<CommentResponse>> getLatestCommentsByComic(
-            @PathVariable String comicId,
-            @RequestParam(defaultValue = "5") int limit) {
-        return commentService.getLatestCommentsByComic(comicId, limit);
     }
 
     /**

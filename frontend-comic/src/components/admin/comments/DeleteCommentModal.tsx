@@ -43,15 +43,6 @@ export default function DeleteCommentModal({
               <FiAlertTriangle className="h-5 w-5 text-destructive" />
               Xác nhận xóa bình luận
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-              disabled={isDeleting}
-            >
-              <FiX size={16} />
-            </Button>
           </div>
         </DialogHeader>
 

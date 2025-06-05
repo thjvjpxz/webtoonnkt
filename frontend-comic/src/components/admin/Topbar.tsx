@@ -128,15 +128,6 @@ export default function Topbar({ title }: TopbarProps) {
         <div className="flex items-center space-x-4 select-none">
           {/* Toggle Change Theme */}
           <ThemeToggle />
-          {/* Notification Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-2 h-auto rounded-full bg-primary/10 hover:bg-primary/20 text-primary"
-            aria-label="Thông báo"
-          >
-            <FiBell size={20} />
-          </Button>
 
           {/* User Profile Menu */}
           <div className="flex items-center">

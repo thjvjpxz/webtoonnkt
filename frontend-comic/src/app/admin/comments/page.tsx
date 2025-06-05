@@ -229,9 +229,6 @@ export default function Comments() {
                       Trạng thái
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      Phản hồi
-                    </TableHead>
-                    <TableHead className="font-semibold text-foreground text-center">
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -323,13 +320,6 @@ export default function Comments() {
                         </Badge>
                       </TableCell>
 
-                      {/* Số phản hồi */}
-                      <TableCell className="text-center py-4 text-muted-foreground">
-                        <span className="text-sm">
-                          {comment.repliesCount || 0}
-                        </span>
-                      </TableCell>
-
                       {/* Ngày tạo */}
                       <TableCell className="text-center py-4 text-muted-foreground">
                         <span className="text-sm">
@@ -377,16 +367,18 @@ export default function Comments() {
                             </Button>
                           )}
 
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenDeleteModal(comment)}
-                            className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            aria-label="Xóa bình luận"
-                            title="Xóa bình luận"
-                          >
-                            <FiTrash2 size={14} />
-                          </Button>
+                          {comment.status !== CommentStatus.DELETED && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenDeleteModal(comment)}
+                              className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              aria-label="Xóa bình luận"
+                              title="Xóa bình luận"
+                            >
+                              <FiTrash2 size={14} />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

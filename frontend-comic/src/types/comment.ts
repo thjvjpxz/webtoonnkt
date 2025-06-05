@@ -17,6 +17,15 @@ export interface UserInfo {
   username: string;
   imgUrl?: string;
   vip?: boolean;
+  level?: LevelInfo;
+}
+
+export interface LevelInfo {
+  id: string;
+  levelNumber: number;
+  name: string;
+  color: string;
+  urlGif: string;
 }
 
 export interface ComicInfo {
@@ -40,7 +49,7 @@ export interface ParentCommentInfo {
 
 export enum CommentStatus {
   ACTIVE = "ACTIVE",
-  BLOCKED = "BLOCKED", 
+  BLOCKED = "BLOCKED",
   DELETED = "DELETED"
 }
 

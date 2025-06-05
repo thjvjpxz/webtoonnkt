@@ -265,7 +265,7 @@ export default function ProfilePage() {
                                 className="h-2 rounded-full transition-all duration-300"
                                 style={{
                                   width: `${getExpPercentage()}%`,
-                                  backgroundColor: userProfile.level.color || '#3b82f6'
+                                  backgroundColor: userProfile.level.color
                                 }}
                               ></div>
                             </div>
@@ -350,14 +350,23 @@ export default function ProfilePage() {
                     <div className="p-4">
                       <div className="flex items-center gap-4">
                         {userProfile.level.urlGif && (
-                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-                            <Image
-                              src={userProfile.level.urlGif}
-                              alt={userProfile.level.name}
-                              width={64}
-                              height={64}
-                              className="w-full h-full object-cover"
-                            />
+                          <div className="w-16 h-16 rounded overflow-hidden border border-gray-200 dark:border-gray-700">
+                            {userProfile.level.levelNumber !== 1 ? (
+                              <Image
+                                src={userProfile.level.urlGif}
+                                alt={userProfile.level.name}
+                                width={64}
+                                height={64}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div
+                                className="w-16 h-16 rounded"
+                                style={{
+                                  backgroundColor: userProfile.level.urlGif,
+                                }}
+                              ></div>
+                            )}
                           </div>
                         )}
                         <div className="flex-1">

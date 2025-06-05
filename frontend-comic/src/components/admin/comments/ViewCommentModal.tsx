@@ -66,14 +66,6 @@ export default function ViewCommentModal({
               <FiMessageCircle className="h-5 w-5 text-primary" />
               Chi tiết bình luận
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0"
-            >
-              <FiX size={16} />
-            </Button>
           </div>
         </DialogHeader>
 

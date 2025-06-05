@@ -55,6 +55,20 @@ public class CommentResponse {
         String username;
         String imgUrl;
         Boolean vip;
+        LevelInfo level;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class LevelInfo {
+        String id;
+        Integer levelNumber;
+        String name;
+        String color;
+        String urlGif;
     }
 
     @Data
