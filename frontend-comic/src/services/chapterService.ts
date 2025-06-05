@@ -1,5 +1,4 @@
-import { ApiResponse } from '@/types/api';
-import { Chapter, ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
+import { ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
 import { fetchApi, fetchApiWithFormData } from './api';
 
 export const getChapters = async (
@@ -7,7 +6,7 @@ export const getChapters = async (
   limit: number,
   search?: string,
   comicId?: string
-): Promise<ApiResponse<ChapterWithComicDetail[]>> => {
+) => {
   let endpoint = `/chapters?page=${page}&limit=${limit}`;
 
   if (search) {
@@ -21,7 +20,7 @@ export const getChapters = async (
   return await fetchApi<ChapterWithComicDetail[]>(endpoint);
 }
 
-export const deleteChapter = async (chapterId: string): Promise<ApiResponse<ChapterWithComicDetail>> => {
+export const deleteChapter = async (chapterId: string) => {
   return await fetchApi<ChapterWithComicDetail>(`/chapters/${chapterId}`, {
     method: "DELETE",
   });
@@ -30,7 +29,7 @@ export const deleteChapter = async (chapterId: string): Promise<ApiResponse<Chap
 export const createChapter = async (
   chapterRequest: ChapterCreateUpdate,
   files: File[]
-): Promise<ApiResponse<ChapterWithComicDetail>> => {
+) => {
   const formData = new FormData();
   formData.append("data", new Blob([JSON.stringify(chapterRequest)], { type: "application/json" }));
   files.forEach((file) => {
@@ -46,8 +45,7 @@ export const updateChapter = async (
   chapterId: string,
   chapterRequest: ChapterCreateUpdate,
   files: File[]
-): Promise<ApiResponse<ChapterWithComicDetail>> => {
-  console.log(chapterRequest);
+) => {
   const formData = new FormData();
   formData.append("data", new Blob([JSON.stringify(chapterRequest)], { type: "application/json" }));
   files.forEach((file) => {

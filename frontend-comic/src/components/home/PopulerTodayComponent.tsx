@@ -99,7 +99,7 @@ export default function PopulerTodayComponent({ comics }: PopulerTodayComponentP
             msOverflowStyle: 'none', // IE và Edge
           }}
         >
-          {comics.map((comic, index) => (
+          {comics.map((comic) => (
             <div key={comic.id} className="flex-shrink-0 w-[180px] group">
               <Link href={`/comic/${comic.slug}`} className="block">
                 <div className="relative overflow-hidden rounded mb-3">

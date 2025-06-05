@@ -21,9 +21,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +34,22 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Table(indexes = {
+        // Index cho tìm kiếm theo slug (unique đã tự động tạo index)
+        // Index cho tìm kiếm theo name và slug trong
+        // findBySlugContainingOrNameContaining
+        @Index(name = "idx_comic_name", columnList = "name"),
+        // Index cho findByStatus
+        @Index(name = "idx_comic_status", columnList = "status"),
+        // Index cho sắp xếp theo views_count (ORDER BY c.views_count DESC)
+        @Index(name = "idx_comic_views_count", columnList = "views_count"),
+        // Index cho findByUpdatedAtAfter và sắp xếp theo updated_at
+        @Index(name = "idx_comic_updated_at", columnList = "updated_at"),
+        // Composite index cho sắp xếp trong các truy vấn phức tạp
+        @Index(name = "idx_comic_views_updated", columnList = "views_count, updated_at"),
+        // Index cho tìm kiếm text search
+        @Index(name = "idx_comic_slug_name", columnList = "slug, name")
+})
 public class Comic {
 
     @Id

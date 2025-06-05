@@ -11,12 +11,10 @@ import { FiHome, FiTag } from "react-icons/fi";
 import Link from "next/link";
 
 interface CategoryGridSkeletonComponentProps {
-  title?: string;
   itemCount?: number;
 }
 
 export default function CategoryGridSkeletonComponent({
-  title = "Tất cả thể loại",
   itemCount = 15
 }: CategoryGridSkeletonComponentProps) {
   return (

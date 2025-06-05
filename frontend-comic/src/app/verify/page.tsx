@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,9 @@ import { verifyEmail } from '@/services/authService';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { UserResponse } from '@/types/user';
+import Main from '@/components/layout/Main';
 
-export default function VerifyPage() {
+function VerifyPageContent() {
   const token = useSearchParams().get('token');
 
   const [isLoading, setIsLoading] = useState(true);
@@ -106,5 +107,24 @@ export default function VerifyPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <Main>
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <LoadingSpinner size="lg" />
+              <p className="text-gray-600 dark:text-gray-400 mt-4">Đang tải trang xác minh...</p>
+            </div>
+          </div>
+        </Main>
+      }
+    >
+      <VerifyPageContent />
+    </Suspense>
   );
 }

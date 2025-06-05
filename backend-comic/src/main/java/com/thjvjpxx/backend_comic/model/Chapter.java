@@ -17,9 +17,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +36,16 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Table(indexes = {
+        // Index cho JOIN với comic_id (INNER JOIN chapters ch ON c.id = ch.comic_id)
+        @Index(name = "idx_chapter_comic_id", columnList = "comic_id"),
+        // Index cho MAX(ch.chapter_number) trong findTopComicsByStartAndEndDate
+        @Index(name = "idx_chapter_comic_number", columnList = "comic_id, chapter_number"),
+        // Index cho MAX(ch.updated_at) trong findLastUpdateComics
+        @Index(name = "idx_chapter_comic_updated", columnList = "comic_id, updated_at"),
+        // Index cho sắp xếp theo updated_at DESC
+        @Index(name = "idx_chapter_updated_at", columnList = "updated_at")
+})
 public class Chapter {
 
     @Id

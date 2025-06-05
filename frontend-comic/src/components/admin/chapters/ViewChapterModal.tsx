@@ -1,4 +1,4 @@
-import { Chapter, ChapterWithComicDetail, DetailChapter } from "@/types/chapter";
+import { ChapterWithComicDetail, DetailChapter } from "@/types/chapter";
 import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";

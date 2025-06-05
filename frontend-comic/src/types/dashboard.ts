@@ -28,10 +28,6 @@ export type SidebarProps = {
   toggleSidebar: () => void;
 };
 
-export type TopbarProps = {
-  title: string;
-  isSidebarOpen: boolean;
-};
 
 export type PaginationProps = {
   currentPage: number;

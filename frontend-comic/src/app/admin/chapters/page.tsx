@@ -379,7 +379,7 @@ export default function Chapters() {
           onConfirm={handleDeleteChapter}
           chapterTitle={selectedChapter.title}
           chapterNumber={selectedChapter.chapterNumber}
-          comicName={selectedChapter.comicName}
+          comicName={selectedChapter.comicName || ''}
         />
       )}
 

@@ -10,7 +10,6 @@ import {
   FiTag,
   FiUsers,
   FiMessageSquare,
-  FiLogOut,
   FiChevronLeft,
   FiChevronRight,
   FiAward,

@@ -6,18 +6,30 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ChapterHome;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicLastUpdate;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.PopulerToday;
+import com.thjvjpxx.backend_comic.enums.ErrorCode;
+import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Comic;
+import com.thjvjpxx.backend_comic.model.Level;
+import com.thjvjpxx.backend_comic.model.LevelType;
+import com.thjvjpxx.backend_comic.model.User;
+import com.thjvjpxx.backend_comic.model.UserFollow;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
+import com.thjvjpxx.backend_comic.repository.LevelRepository;
+import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
+import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
+import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.HomeService;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 
@@ -33,6 +45,11 @@ public class HomeServiceImpl implements HomeService {
     CategoryRepository categoryRepo;
     ComicRepository comicRepo;
     ChapterRepository chapterRepo;
+    UserFollowRepository userFollowRepo;
+    UserRepository userRepo;
+    PasswordEncoder passwordEncoder;
+    LevelRepository levelRepo;
+    LevelTypeRepository levelTypeRepo;
 
     @Override
     public BaseResponse<?> getHomeComic() {
@@ -89,6 +106,65 @@ public class HomeServiceImpl implements HomeService {
         Page<Comic> comics = comicRepo.findBySlugContainingOrNameContaining(query, query, pageable);
 
         return BaseResponse.success(comics.getContent());
+    }
+
+    @Override
+    public BaseResponse<?> getFavorites(String currentUserId, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageable(page, size);
+        Page<UserFollow> favorites = userFollowRepo.findByUserId(currentUserId, pageable);
+
+        List<PopulerToday> populerToday = new ArrayList<>();
+
+        for (UserFollow favorite : favorites.getContent()) {
+            Comic comic = favorite.getComic();
+            Double latestChapter = chapterRepo.findMaxChapterNumberByComicId(comic.getId());
+
+            populerToday.add(PopulerToday.builder()
+                    .id(comic.getId())
+                    .thumbUrl(comic.getThumbUrl())
+                    .slug(comic.getSlug())
+                    .name(comic.getName())
+                    .viewCount((long) comic.getViewsCount())
+                    .latestChapter(latestChapter)
+                    .build());
+        }
+        return BaseResponse.success(populerToday);
+    }
+
+    @Override
+    public BaseResponse<?> getProfile(String currentUserId) {
+        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
+        return BaseResponse.success(user);
+    }
+
+    @Override
+    public BaseResponse<?> changePassword(String currentUserId, ChangePassRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BaseException(ErrorCode.PASSWORD_AND_CONFIRM_NOT_MATCH);
+        }
+        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BaseException(ErrorCode.INVALID_OLD_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepo.save(user);
+        return BaseResponse.success("Đổi mật khẩu thành công");
+    }
+
+    @Override
+    public BaseResponse<?> updateProfile(String currentUserId, String levelTypeId) {
+        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
+        LevelType levelType = levelTypeRepo.findById(levelTypeId)
+                .orElseThrow(() -> new RuntimeException("Level type not found"));
+        Level level = user.getLevel();
+        int levelNumber = level.getLevelNumber();
+
+        Level newLevel = levelRepo.findByLevelNumberAndLevelType(levelNumber, levelType)
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
+
+        user.setLevel(newLevel);
+        userRepo.save(user);
+        return BaseResponse.success("Cập nhật thông tin thành công");
     }
 
     private List<Category> getPopulerCategories() {

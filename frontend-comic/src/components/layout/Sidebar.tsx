@@ -27,7 +27,7 @@ export default function Sidebar({ populerWeek, populerMonth, populerAll, categor
     } else {
       setComics(populerAll);
     }
-  }, [activeTab, populerWeek]);
+  }, [activeTab, populerWeek, populerMonth, populerAll]);
 
   return (
     <aside className="w-full space-y-4 sm:space-y-6">

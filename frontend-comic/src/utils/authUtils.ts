@@ -3,6 +3,7 @@
  */
 
 import { AUTH_PUBLIC_PATHS } from '@/config/app.config';
+import { UserResponse } from '@/types/user';
 
 // Kiểm tra token có hợp lệ không (format và không expired)
 export function isValidToken(token: string | null): boolean {
@@ -73,7 +74,7 @@ export function handleInvalidToken(): void {
 }
 
 // Lấy user data từ localStorage với error handling
-export function getUserFromStorage(): any | null {
+export function getUserFromStorage(): UserResponse | null {
   if (typeof window === 'undefined') return null;
 
   try {

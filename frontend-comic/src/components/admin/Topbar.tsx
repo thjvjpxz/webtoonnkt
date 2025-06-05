@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { FiBell, FiHome, FiLogOut } from "react-icons/fi";
-import { TopbarProps } from "@/types/dashboard";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +14,11 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useAuthState } from "@/hooks/useAuthState";
 import Link from "next/link";
 
-export default function Topbar({ title, isSidebarOpen }: TopbarProps) {
+export type TopbarProps = {
+  title: string;
+};
+
+export default function Topbar({ title }: TopbarProps) {
 
   const { user, logout } = useAuthState();
 

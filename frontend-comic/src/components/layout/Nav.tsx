@@ -8,8 +8,7 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
-import { FiClock, FiCheck, FiTrendingUp, FiHome, FiChevronDown } from "react-icons/fi";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { FiHome } from "react-icons/fi";
 
 interface NavItem {
   label: string;

@@ -54,7 +54,7 @@ export default function CategoryPage() {
 
   if (isLoading) {
     return (
-      <CategoryGridSkeletonComponent title="Tất cả thể loại" itemCount={15} />
+      <CategoryGridSkeletonComponent itemCount={15} />
     )
   }
 
