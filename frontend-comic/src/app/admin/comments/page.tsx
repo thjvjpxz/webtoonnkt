@@ -183,32 +183,33 @@ export default function Comments() {
       </div>
 
       {/* Bảng danh sách comment */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
-            <FiMessageCircle className="h-5 w-5 text-primary" />
+      <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="border-b border-border/50">
+          <CardTitle className="text-foreground flex items-center gap-2">
+            <FiMessageCircle className="text-primary" size={20} />
             Danh sách bình luận
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex justify-center items-center py-8">
-              <LoadingSpinner size="lg" />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <FiAlertCircle size={48} className="mb-4 text-destructive" />
-              <p className="text-lg font-medium mb-2">Không thể tải dữ liệu</p>
-              <p className="text-sm">{error}</p>
+            <div className="p-8 text-center flex flex-col items-center">
+              <FiAlertCircle size={40} className="mb-2 text-destructive" />
+              <p className="text-destructive">{error}</p>
             </div>
           ) : comments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <FiMessageCircle size={48} className="mb-4" />
-              <p className="text-lg font-medium">Không có bình luận nào</p>
-              <p className="text-sm">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+            <div className="p-12 text-center">
+              <FiMessageCircle className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                Không có bình luận nào
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+              </p>
             </div>
           ) : (
-            <div className="overflow-x-auto custom-scrollbar">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border/50 hover:bg-muted/30">

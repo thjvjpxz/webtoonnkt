@@ -27,6 +27,11 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
 
     Page<Comic> findByStatus(ComicStatus status, Pageable pageable);
 
+    Page<Comic> findByUpdatedAtAfter(LocalDateTime date, Pageable pageable);
+
+    @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
+    Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);
+
     @Query(value = """
             SELECT
                 c.*
@@ -51,11 +56,6 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
                 cat.slug = :slugCategory
             """, nativeQuery = true)
     Page<Comic> findBySlugCategory(@Param("slugCategory") String slugCategory, Pageable pageable);
-
-    @Query("SELECT c FROM comics c JOIN c.categories cat WHERE cat.id = :categoryId")
-    Page<Comic> findByCategory(@Param("categoryId") String category, Pageable pageable);
-
-    Page<Comic> findByUpdatedAtAfter(LocalDateTime date, Pageable pageable);
 
     @Query(value = """
             SELECT
