@@ -45,11 +45,11 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
         setChapters(response.data);
       } else {
         setChapters([]);
-        setError(response.message || "Không thể tải danh sách chương");
+        setError(response.message || "Không thể tải danh sách chapter");
       }
     } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      setError(errorMessage || "Đã xảy ra lỗi khi tải danh sách chương");
+      setError(errorMessage || "Đã xảy ra lỗi khi tải danh sách chapter");
     } finally {
       setIsLoading(false);
     }
@@ -105,25 +105,25 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     }
   }, [fetchChapters, authLoading]);
 
-  // Xử lý xóa chương
+  // Xử lý xóa chapter
   const handleDeleteChapter = async () => {
     try {
 
       const response = await deleteChapter(selectedChapter?.id || "");
       if (response.status === 200) {
-        toast.success("Xóa chương thành công chương " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
+        toast.success("Xóa chapter thành công chapter " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
         fetchChapters();
         setIsDeleteModalOpen(false);
       } else {
-        toast.error("Xóa chương thất bại! " + response.message);
+        toast.error("Xóa chapter thất bại! " + response.message);
       }
     } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      toast.error("Xóa chương thất bại! " + errorMessage);
+      toast.error("Xóa chapter thất bại! " + errorMessage);
     }
   };
 
-  // Xử lý thêm hoặc cập nhật chương
+  // Xử lý thêm hoặc cập nhật chapter
   const handleSubmitChapter = async (
     chapterRequest: ChapterCreateUpdate,
     files: File[]
@@ -135,26 +135,26 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
         // Đang cập nhật chapter
         response = await updateChapter(chapterRequest.id, chapterRequest, files);
         if (response.status === 200) {
-          toast.success("Cập nhật chương thành công");
+          toast.success("Cập nhật chapter thành công");
           fetchChapters();
           setIsAddEditModalOpen(false);
         } else {
-          toast.error("Cập nhật chương thất bại! " + response.message);
+          toast.error("Cập nhật chapter thất bại! " + response.message);
         }
       } else {
         // Đang thêm mới chapter
         response = await createChapter(chapterRequest, files);
         if (response.status === 200) {
-          toast.success("Thêm chương thành công");
+          toast.success("Thêm chapter thành công");
           fetchChapters();
           setIsAddEditModalOpen(false);
         } else {
-          toast.error("Thêm chương thất bại! " + response.message);
+          toast.error("Thêm chapter thất bại! " + response.message);
         }
       }
     } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      toast.error(chapterRequest.id ? "Cập nhật chương thất bại! " : "Thêm chương thất bại! " + errorMessage);
+      toast.error(chapterRequest.id ? "Cập nhật chapter thất bại! " : "Thêm chapter thất bại! " + errorMessage);
     }
   };
 

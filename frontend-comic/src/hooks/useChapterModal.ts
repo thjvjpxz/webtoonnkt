@@ -305,12 +305,12 @@ export const useChapterModal = (
 
     // Validate data
     if (!title.trim()) {
-      toast.error("Vui lòng nhập tiêu đề chương");
+      toast.error("Vui lòng nhập tiêu đề chapter");
       return;
     }
 
     if (!chapterNumber || parseFloat(chapterNumber) < 0) {
-      toast.error("Vui lòng nhập số chương hợp lệ");
+      toast.error("Vui lòng nhập số chapter hợp lệ");
       return;
     }
 
@@ -326,7 +326,7 @@ export const useChapterModal = (
 
     // Validate price nếu chapter là trả phí
     if (status === ChapterStatus.FEE && (!price || price <= 0)) {
-      toast.error("Vui lòng nhập giá hợp lệ cho chương trả phí");
+      toast.error("Vui lòng nhập giá hợp lệ cho chapter trả phí");
       return;
     }
 

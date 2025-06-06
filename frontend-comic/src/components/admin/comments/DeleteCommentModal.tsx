@@ -102,7 +102,7 @@ export default function DeleteCommentModal({
               <span className="font-medium">{comment.comic.name}</span>
               {comment.chapter && (
                 <>
-                  <span> - Chương {comment.chapter.chapterNumber}: </span>
+                  <span> - Chapter {comment.chapter.chapterNumber}: </span>
                   <span className="font-medium">{comment.chapter.title}</span>
                 </>
               )}

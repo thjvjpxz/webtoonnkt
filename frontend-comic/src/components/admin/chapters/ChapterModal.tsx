@@ -93,7 +93,7 @@ export default function ChapterModal({
       <DialogContent className="!max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-white dark:bg-gray-800">
         <DialogHeader>
           <DialogTitle className="text-xl">
-            {isEditMode ? "Chỉnh sửa chương" : "Thêm chương mới"}
+            {isEditMode ? "Chỉnh sửa chapter" : "Thêm chapter mới"}
           </DialogTitle>
         </DialogHeader>
 
@@ -190,10 +190,10 @@ export default function ChapterModal({
               </div>
             </div>
 
-            {/* Số chương */}
+            {/* Số chapter */}
             <div className="col-span-2 md:col-span-1">
               <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Số chương <span className="text-red-500">*</span>
+                Số chapter <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="number"
@@ -202,21 +202,21 @@ export default function ChapterModal({
                 required
                 min="0"
                 step="0.1"
-                placeholder="Nhập số chương (ví dụ: 1, 1.5, 2,...)"
+                placeholder="Nhập số chapter (ví dụ: 1, 1.5, 2,...)"
               />
             </div>
 
-            {/* Tiêu đề chương */}
+            {/* Tiêu đề chapter */}
             <div className="col-span-2">
               <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Tiêu đề chương <span className="text-red-500">*</span>
+                Tiêu đề chapter <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                placeholder="Nhập tiêu đề chương"
+                placeholder="Nhập tiêu đề chapter"
               />
             </div>
 

@@ -121,7 +121,7 @@ export default function PopulerTodayComponent({ comics }: PopulerTodayComponentP
                     {comic.name.length > 20 ? comic.name.slice(0, 20) + '...' : comic.name}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Chương {comic.latestChapter}
+                    Chapter {comic.latestChapter}
                   </p>
                 </div>
               </Link>

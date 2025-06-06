@@ -223,7 +223,7 @@ export default function Comments() {
                       Truyện
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      Chương
+                      Chapter
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Trạng thái
@@ -297,12 +297,12 @@ export default function Comments() {
                         </div>
                       </TableCell>
 
-                      {/* Chương */}
+                      {/* Chapter */}
                       <TableCell className="text-center py-4 text-muted-foreground">
                         {comment.chapter ? (
                           <div className="flex flex-col">
                             <span className="text-sm font-medium">
-                              Chương {comment.chapter.chapterNumber}
+                              Chapter {comment.chapter.chapterNumber}
                             </span>
                             <span className="text-xs text-muted-foreground max-w-20 truncate" title={comment.chapter.title}>
                               {comment.chapter.title}

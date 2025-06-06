@@ -48,12 +48,12 @@ export default function DeleteChapterModal({
             <div className="bg-destructive/10 p-2 rounded-full text-destructive">
               <FiAlertTriangle size={20} />
             </div>
-            Xác nhận xóa chương
+            Xác nhận xóa chapter
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
             <p className="text-foreground mb-2">
-              Bạn có chắc chắn muốn xóa chương{" "}
-              <span className="font-semibold text-primary">&quot;{chapterTitle}&quot;</span> - Chương {chapterNumber} của truyện{" "}
+              Bạn có chắc chắn muốn xóa chapter{" "}
+              <span className="font-semibold text-primary">&quot;{chapterTitle}&quot;</span> - Chapter {chapterNumber} của truyện{" "}
               <span className="font-semibold text-primary">&quot;{comicName}&quot;</span> không?
             </p>
             <p className="text-muted-foreground text-sm">

@@ -187,7 +187,7 @@ export default function ViewCommentModal({
                     {comment.chapter && (
                       <div className="mt-3 p-3 bg-muted/50 rounded-lg">
                         <p className="text-sm font-medium">
-                          Chương {comment.chapter.chapterNumber}: {comment.chapter.title}
+                          Chapter {comment.chapter.chapterNumber}: {comment.chapter.title}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           ID: {comment.chapter.id}

@@ -58,7 +58,7 @@ export default function Sidebar({
     {
       path: "/admin/chapters",
       icon: <FiFileText size={20} />,
-      label: "Quản lý chương",
+      label: "Quản lý chapter",
       show: isPublisher
     },
     {

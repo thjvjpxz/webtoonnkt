@@ -40,7 +40,7 @@ export default function DeleteComicModal({
               <span className="font-semibold text-primary"> &quot;{comicTitle}&quot;</span> không?
             </p>
             <p className="text-muted-foreground text-sm">
-              Tất cả chương và dữ liệu liên quan sẽ bị xóa vĩnh viễn.
+              Tất cả chapter và dữ liệu liên quan sẽ bị xóa vĩnh viễn.
             </p>
           </DialogDescription>
         </DialogHeader>

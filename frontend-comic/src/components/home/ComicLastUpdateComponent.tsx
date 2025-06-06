@@ -63,7 +63,7 @@ export default function ComicLastUpdateComponent({ comics }: ComicLastUpdateProp
                       key={chapter.id}
                       className="flex justify-between text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors">
                       <span className="text-sm">
-                        Chương {chapter.chapterNumber}
+                        Chapter {chapter.chapterNumber}
                       </span>
                       <span className="text-sm">
                         {formatDate(chapter.updatedAt)}
