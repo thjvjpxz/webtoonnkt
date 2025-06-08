@@ -10,7 +10,6 @@ import com.thjvjpxx.backend_comic.dto.request.CategoryRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
-import com.thjvjpxx.backend_comic.mapper.CategoryMapper;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.service.CategoryService;
@@ -26,7 +25,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
-    CategoryMapper categoryMapper;
 
     @Override
     public BaseResponse<List<Category>> getAllCategories(int page, int limit, String search) {
@@ -52,9 +50,16 @@ public class CategoryServiceImpl implements CategoryService {
         if (category == null) {
             throw new BaseException(ErrorCode.CATEGORY_INVALID);
         }
+
         validateCategory(category);
-        Category newCategory = categoryMapper.toCategory(category);
+
+        Category newCategory = Category.builder()
+                .name(category.getName())
+                .slug(category.getSlug())
+                .description(category.getDescription())
+                .build();
         Category savedCategory = categoryRepository.save(newCategory);
+
         return BaseResponse.success(savedCategory);
     }
 

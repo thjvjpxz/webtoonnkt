@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,14 +15,11 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
-import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
 import com.thjvjpxx.backend_comic.model.Chapter;
-import com.thjvjpxx.backend_comic.model.Comic;
-import com.thjvjpxx.backend_comic.model.DetailChapter;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ChapterService;
-import com.thjvjpxx.backend_comic.service.GoogleDriveService;
+import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
@@ -38,8 +34,7 @@ import lombok.experimental.FieldDefaults;
 public class ChapterServiceImpl implements ChapterService {
     ChapterRepository chapterRepository;
     ComicRepository comicRepository;
-    ChapterMapper chapterMapper;
-    GoogleDriveService googleDriveService;
+    StorageService b2StorageService;
 
     @Override
     public BaseResponse<?> getAllChapters(int page, int limit, String search, String comicId) {
@@ -72,7 +67,18 @@ public class ChapterServiceImpl implements ChapterService {
 
         // Chuyển đổi entity thành DTO để tránh circular reference
         List<ChapterResponse> chapterResponses = chapterList.stream()
-                .map(chapterMapper::toChapterResponse)
+                .map(chapter -> ChapterResponse.builder()
+                        .id(chapter.getId())
+                        .title(chapter.getTitle())
+                        .chapterNumber(chapter.getChapterNumber())
+                        .comicName(chapter.getComic().getName())
+                        .status(chapter.getStatus())
+                        .price(chapter.getPrice())
+                        .domainCdn(chapter.getDomainCdn())
+                        .chapterPath(chapter.getChapterPath())
+                        .createdAt(chapter.getCreatedAt().toString())
+                        .updatedAt(chapter.getUpdatedAt().toString())
+                        .build())
                 .collect(Collectors.toList());
 
         return BaseResponse.success(
@@ -106,54 +112,60 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files) {
-        validateChapterRequest(chapterRequest);
-        validateChapterNumber(chapterRequest, null);
+        // TODO: Implement create chapter
+        return null;
+        // validateChapterRequest(chapterRequest);
+        // validateChapterNumber(chapterRequest, null);
 
-        Chapter chapter = chapterMapper.toChapter(chapterRequest);
-        Comic comic = comicRepository.findById(chapterRequest.getComicId())
-                .orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
+        // Chapter chapter = chapterMapper.toChapter(chapterRequest);
+        // Comic comic = comicRepository.findById(chapterRequest.getComicId())
+        // .orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
 
-        List<DetailChapter> detailChapters = new ArrayList<>();
+        // List<DetailChapter> detailChapters = new ArrayList<>();
 
-        String folderName = String.format("chapter-%s", chapterRequest.getChapterNumber());
+        // String folderName = String.format("chapter-%s",
+        // chapterRequest.getChapterNumber());
 
-        String folderId = googleDriveService.getFileId(folderName, comic.getFolderId());
-        if (folderId == null) {
-            folderId = googleDriveService.createFolder(folderName, comic.getFolderId());
-        }
+        // String folderId = googleDriveService.getFileId(folderName,
+        // comic.getFolderId());
+        // if (folderId == null) {
+        // folderId = googleDriveService.createFolder(folderName, comic.getFolderId());
+        // }
 
-        String imgUrl = null;
-        int orderNumber = 1;
+        // String imgUrl = null;
+        // int orderNumber = 1;
 
-        for (var file : files) {
-            String fileName = String.valueOf(orderNumber);
-            var response = googleDriveService.uploadFileToFolder(file, fileName, folderId);
+        // for (var file : files) {
+        // String fileName = String.valueOf(orderNumber);
+        // var response = googleDriveService.uploadFileToFolder(file, fileName,
+        // folderId);
 
-            if (response.getStatus() != HttpStatus.OK.value()) {
-                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-            }
+        // if (response.getStatus() != HttpStatus.OK.value()) {
+        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        // }
 
-            imgUrl = response.getMessage();
-            detailChapters.add(DetailChapter.builder()
-                    .imgUrl(imgUrl)
-                    .orderNumber(orderNumber)
-                    .chapter(chapter)
-                    .build());
-            orderNumber++;
-        }
+        // imgUrl = response.getMessage();
+        // detailChapters.add(DetailChapter.builder()
+        // .imgUrl(imgUrl)
+        // .orderNumber(orderNumber)
+        // .chapter(chapter)
+        // .build());
+        // orderNumber++;
+        // }
 
-        chapter.setComic(comic);
-        chapter.setDetailChapters(detailChapters);
+        // chapter.setComic(comic);
+        // chapter.setDetailChapters(detailChapters);
 
-        chapterRepository.save(chapter);
+        // chapterRepository.save(chapter);
 
-        double chapterNumberMax = chapterRepository.findMaxChapterNumberByComicId(chapterRequest.getComicId());
-        if (chapter.getChapterNumber() >= chapterNumberMax) {
-            comic.setLastChapterId(chapter.getId());
-            comicRepository.save(comic);
-        }
+        // double chapterNumberMax =
+        // chapterRepository.findMaxChapterNumberByComicId(chapterRequest.getComicId());
+        // if (chapter.getChapterNumber() >= chapterNumberMax) {
+        // comic.setLastChapterId(chapter.getId());
+        // comicRepository.save(comic);
+        // }
 
-        return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
+        // return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
     }
 
     @Override
@@ -374,17 +386,14 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
 
-        if (chapter.getDetailChapters().size() > 0
-                && (chapter.getDomainCdn() == null || chapter.getChapterPath() == null)) {
-            String folderName = String.format("chapter-%s", chapter.getChapterNumber());
-            String folderId = googleDriveService.getFileId(folderName, chapter.getComic().getFolderId());
-            if (folderId != null) {
-                googleDriveService.remove(folderId);
-            }
-        }
+        // TODO: Remove chapter from b2
+
         chapterRepository.delete(chapter);
 
-        return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
+        return BaseResponse.success(ChapterResponse.builder()
+                .chapterNumber(chapter.getChapterNumber())
+                .comicName(chapter.getComic().getName())
+                .build());
     }
 
 }

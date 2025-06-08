@@ -112,7 +112,7 @@ export const useChapter = () => {
   const handleDeleteChapter = async () => {
     try {
 
-      const response = await deleteChapter(selectedChapter?.id || "");
+      const response = await deleteChapter(selectedChapter!.id);
       if (response.status === 200) {
         toast.success("Xóa chapter thành công chapter " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
         fetchChapters();

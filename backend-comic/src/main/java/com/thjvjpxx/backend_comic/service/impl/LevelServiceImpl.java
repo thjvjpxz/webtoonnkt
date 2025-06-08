@@ -10,18 +10,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
-import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.LevelRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
-import com.thjvjpxx.backend_comic.mapper.LevelMapper;
 import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.LevelType;
 import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.service.LevelService;
-import com.thjvjpxx.backend_comic.service.StorageFactory;
+import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -35,9 +33,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LevelServiceImpl implements LevelService {
     LevelRepository levelRepository;
-    LevelMapper levelMapper;
     LevelTypeRepository levelTypeRepository;
-    StorageFactory storageFactory;
+    StorageService b2StorageService;
 
     private boolean isLevelExists(String levelName) {
         return levelRepository.existsByName(levelName);
@@ -79,14 +76,20 @@ public class LevelServiceImpl implements LevelService {
 
         String urlGif = null;
         if (file != null) {
-            var response = storageFactory.getStorageService().uploadFile(file, GlobalConstants.TYPE_LEVEL,
+            var response = b2StorageService.uploadFile(file, GlobalConstants.TYPE_LEVEL,
                     nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
             urlGif = response.getMessage();
         }
-        Level level = levelMapper.toLevel(request);
+        Level level = Level.builder()
+                .name(request.getName())
+                .levelNumber(request.getLevelNumber())
+                .expRequired(request.getExpRequired())
+                .color(request.getColor())
+                .urlGif(urlGif)
+                .build();
 
         LevelType levelType = levelTypeRepository
                 .findById(request.getLevelTypeId())
@@ -111,7 +114,7 @@ public class LevelServiceImpl implements LevelService {
         String urlGif = level.getUrlGif();
         String nameNormalize = StringUtils.generateSlug(request.getName());
         if (file != null) {
-            var response = storageFactory.getStorageService().uploadFile(file, GlobalConstants.TYPE_LEVEL,
+            var response = b2StorageService.uploadFile(file, GlobalConstants.TYPE_LEVEL,
                     nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -142,10 +145,8 @@ public class LevelServiceImpl implements LevelService {
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
         String urlGif = level.getUrlGif();
-        if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(urlGif));
-        } else if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(B2Constants.URL_PREFIX)) {
-            storageFactory.getStorageService().remove(urlGif);
+        if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(B2Constants.URL_PREFIX)) {
+            b2StorageService.remove(urlGif);
         }
         levelRepository.delete(level);
         return BaseResponse.success(level);
