@@ -54,6 +54,8 @@ public class User {
 
     Boolean blocked = false;
 
+    Boolean deleted = false;
+
     @Column(name = "verification_token")
     String verificationToken;
 

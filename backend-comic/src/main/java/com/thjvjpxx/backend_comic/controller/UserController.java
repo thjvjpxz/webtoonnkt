@@ -36,8 +36,9 @@ public class UserController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "5") Integer limit,
             @RequestParam(required = false) String roleId,
-            @RequestParam(required = false) String search) {
-        return userService.getUsers(page, limit, search, roleId);
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean deleted) {
+        return userService.getUsers(page, limit, search, roleId, deleted);
     }
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })

@@ -9,11 +9,16 @@ import {
   FiAlertCircle,
   FiUser,
   FiUsers,
+  FiShield,
+  FiShieldOff,
+  FiTrash,
 } from "react-icons/fi";
 import Pagination from "@/components/ui/pagination";
 import { formatDate } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +40,7 @@ export default function Users() {
     isLoading,
     searchTerm,
     roleFilter,
+    showDeleted,
     error,
     isModalOpen,
     isDeleteModalOpen,
@@ -45,6 +51,7 @@ export default function Users() {
     setCurrentPage,
     setSearchTerm,
     setRoleFilter,
+    setShowDeleted,
     setIsModalOpen,
     setIsDeleteModalOpen,
 
@@ -56,6 +63,8 @@ export default function Users() {
     handleAddUser,
     handleUpdateUser,
     handleDeleteUser,
+    handleBlockUser,
+    handleUnblockUser,
     fetchUsers,
     fetchLevelsByType,
   } = useUser();
@@ -65,7 +74,6 @@ export default function Users() {
     if (isVip) {
       return (
         <Badge
-          variant="default"
           className="text-xs bg-yellow-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105 font-medium"
         >
           VIP
@@ -74,10 +82,9 @@ export default function Users() {
     }
     return (
       <Badge
-        variant="secondary"
         className="text-xs bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
       >
-        Thường
+        Không
       </Badge>
     );
   };
@@ -96,8 +103,7 @@ export default function Users() {
     }
     return (
       <Badge
-        variant="destructive"
-        className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium"
+        className="text-xs bg-yellow-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105 font-medium"
       >
         Chưa kích hoạt
       </Badge>
@@ -108,13 +114,39 @@ export default function Users() {
     if (isBlocked) {
       return (
         <Badge
-          variant="destructive"
           className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium"
         >
           Đã khóa
         </Badge>
       );
     }
+    return (
+      <Badge
+        className="text-xs bg-emerald-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105 font-medium"
+      >
+        Bình thường
+      </Badge>
+    );
+  };
+
+  // Hiển thị trạng thái đã xóa
+  const renderDeletedStatus = (isDeleted: boolean) => {
+    if (isDeleted) {
+      return (
+        <Badge
+          className="text-xs bg-gray-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-gray-600 transition-all duration-300 hover:scale-105 font-medium"
+        >
+          Đã xóa
+        </Badge>
+      );
+    }
+    return (
+      <Badge
+        className="text-xs bg-emerald-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105 font-medium"
+      >
+        Bình thường
+      </Badge>
+    );
   };
 
   // Hiển thị vai trò với màu sắc và icon đẹp
@@ -196,7 +228,7 @@ export default function Users() {
           </form>
 
           {/* Role Filter */}
-          <div className="w-full sm:w-80">
+          <div className="w-full sm:w-60">
             <Select
               value={roleFilter || "all"}
               onValueChange={(value) => {
@@ -234,9 +266,32 @@ export default function Users() {
       {/* Hiển thị danh sách */}
       <Card className="shadow-medium border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader className="border-b border-border/50">
-          <CardTitle className="text-foreground flex items-center gap-2">
-            <FiUsers className="text-primary" size={20} />
-            Danh sách người dùng
+          <CardTitle className="flex items-center gap-2 justify-between w-full">
+            <div className="flex items-center gap-2">
+              <FiUsers className="text-primary" size={20} />
+              {showDeleted ? "Danh sách người dùng đã xóa" : "Danh sách người dùng"}
+            </div>
+            {/* Toggle hiển thị người dùng đã xóa */}
+            <div className="flex items-center text-sm py-2 justify-cente gap-4">
+              <div className="flex items-center gap-3 flex-1">
+                <FiTrash className={`h-4 w-4 flex-shrink-0 text-muted-foreground`} />
+                <Label
+                  htmlFor="show-deleted-toggle"
+                  className={`text-sm cursor-pointer text-foreground`}
+                >
+                  {showDeleted ? "Danh sách người dùng" : "Danh sách người dùng đã xóa"}
+                </Label>
+              </div>
+              <Switch
+                id="show-deleted-toggle"
+                checked={showDeleted}
+                onCheckedChange={(checked: boolean) => {
+                  setShowDeleted(checked);
+                  setCurrentPage(1);
+                }}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -294,7 +349,7 @@ export default function Users() {
                       Số dư
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      Ngày tạo
+                      {showDeleted ? "Ngày xóa" : "Ngày tạo"}
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Thao tác
@@ -317,6 +372,7 @@ export default function Users() {
                                 fill
                                 sizes="40px"
                                 className="rounded-full object-cover shadow-soft border border-border/30"
+                                unoptimized={true}
                               />
                             ) : (
                               <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground shadow-soft">
@@ -369,36 +425,80 @@ export default function Users() {
                         {renderVipStatus(user.vip)}
                       </TableCell>
                       <TableCell className="text-center">
-                        {user.blocked ? renderBlockStatus(user.blocked) : renderActiveStatus(user.active)}
+                        {showDeleted
+                          ? renderDeletedStatus(user.deleted)
+                          : user.blocked
+                            ? renderBlockStatus(user.blocked)
+                            : renderActiveStatus(user.active)
+                        }
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground font-medium">
                         {formatCurrency(user.balance)}
                       </TableCell>
                       <TableCell className="text-center text-muted-foreground">
-                        {formatDate(user.createdAt)}
+                        {showDeleted ? formatDate(user.updatedAt) : formatDate(user.createdAt)}
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenEditModal(user)}
-                            className="h-8 px-2 text-primary hover:bg-primary/10 hover:text-primary"
-                            aria-label="Sửa"
-                            title="Sửa"
-                          >
-                            <FiEdit size={14} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenDeleteModal(user)}
-                            className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            aria-label="Xóa"
-                            title="Xóa"
-                          >
-                            <FiTrash2 size={14} />
-                          </Button>
+                          {/* Chỉ hiển thị actions cho người dùng chưa bị xóa */}
+                          {!showDeleted && !user.deleted && (
+                            <>
+                              {/* Nút Block/Unblock */}
+                              {user.blocked ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUnblockUser(user)}
+                                  className="h-8 px-2 text-green-600 hover:bg-green-100 hover:text-green-700"
+                                  aria-label="Bỏ chặn"
+                                  title="Bỏ chặn người dùng"
+                                >
+                                  <FiShieldOff size={14} />
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleBlockUser(user)}
+                                  className="h-8 px-2 text-yellow-600 hover:bg-yellow-100 hover:text-yellow-700"
+                                  aria-label="Chặn"
+                                  title="Chặn người dùng"
+                                >
+                                  <FiShield size={14} />
+                                </Button>
+                              )}
+                              {/* Nút Sửa */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenEditModal(user)}
+                                className="h-8 px-2 text-primary hover:bg-primary/10 hover:text-primary"
+                                aria-label="Sửa"
+                                title="Sửa"
+                              >
+                                <FiEdit size={14} />
+                              </Button>
+
+                              {/* Nút Xóa */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenDeleteModal(user)}
+                                className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                aria-label="Xóa"
+                                title="Xóa"
+                              >
+                                <FiTrash2 size={14} />
+                              </Button>
+                            </>
+                          )}
+
+                          {/* Hiển thị thông báo cho người dùng đã xóa */}
+                          {(showDeleted && user.deleted) && (
+                            <div className="text-xs text-muted-foreground italic">
+                              Không thể thao tác
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -422,27 +522,28 @@ export default function Users() {
       </Card>
 
       {/* Modals */}
-      {isModalOpen && (
-        <UserModal
-          user={currentUser}
-          roles={roles}
-          levelTypes={levelTypes}
-          levels={levels}
-          isLoadingLevels={isLoadingLevels}
-          fetchLevelsByType={fetchLevelsByType}
-          onClose={() => setIsModalOpen(false)}
-          onSave={currentUser ? handleUpdateUser : handleAddUser}
-        />
-      )}
+      <UserModal
+        user={currentUser}
+        roles={roles}
+        levelTypes={levelTypes}
+        levels={levels}
+        isLoadingLevels={isLoadingLevels}
+        isOpen={isModalOpen}
+        fetchLevelsByType={fetchLevelsByType}
+        onClose={() => setIsModalOpen(false)}
+        onSave={currentUser ? handleUpdateUser : handleAddUser}
+      />
 
-      {isDeleteModalOpen && currentUser && (
-        <DeleteUserModal
-          username={currentUser.username}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onConfirm={handleDeleteUser}
-          isDeleting={isDeleting}
-        />
-      )}
-    </DashboardLayout>
+      {
+        isDeleteModalOpen && currentUser && (
+          <DeleteUserModal
+            username={currentUser.username}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleDeleteUser}
+            isDeleting={isDeleting}
+          />
+        )
+      }
+    </DashboardLayout >
   );
 }

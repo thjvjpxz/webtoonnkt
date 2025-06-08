@@ -8,4 +8,6 @@ public interface StorageService {
     BaseResponse<?> uploadFile(MultipartFile file, String typeFolder, String fileName);
 
     BaseResponse<?> remove(String url);
+
+    BaseResponse<?> rename(String url, String newName);
 }

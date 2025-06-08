@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -101,5 +102,56 @@ public class StorageServiceImpl implements StorageService {
 
     private String getPublicUrl(String key) {
         return B2Constants.URL_PREFIX + bucketName + "/" + key;
+    }
+
+    @Override
+    public BaseResponse<?> rename(String url, String newName) {
+        try {
+            // Lấy key cũ từ URL
+            String oldKey = url;
+            if (url.startsWith(B2Constants.URL_PREFIX)) {
+                String urlWithoutPrefix = url.substring(B2Constants.URL_PREFIX.length());
+                String expectedPrefix = bucketName + "/";
+                if (urlWithoutPrefix.startsWith(expectedPrefix)) {
+                    oldKey = urlWithoutPrefix.substring(expectedPrefix.length());
+                } else {
+                    throw new BaseException(ErrorCode.INVALID_ARGUMENT);
+                }
+            }
+
+            // Tạo key mới bằng cách thay thế tên file trong đường dẫn
+            String[] pathParts = oldKey.split("/");
+            if (pathParts.length < 2) {
+                throw new BaseException(ErrorCode.INVALID_ARGUMENT);
+            }
+
+            // Giữ nguyên folder path, chỉ thay đổi tên file
+            StringBuilder newKeyBuilder = new StringBuilder();
+            for (int i = 0; i < pathParts.length - 1; i++) {
+                newKeyBuilder.append(pathParts[i]).append("/");
+            }
+            newKeyBuilder.append(newName);
+            String newKey = newKeyBuilder.toString();
+
+            // Copy object với key mới
+            s3Client.copyObject(CopyObjectRequest.builder()
+                    .sourceBucket(bucketName)
+                    .sourceKey(oldKey)
+                    .destinationBucket(bucketName)
+                    .destinationKey(newKey)
+                    .build());
+
+            // Xóa object cũ
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(oldKey)
+                    .build());
+
+            // Trả về URL mới
+            String newUrl = getPublicUrl(newKey);
+            return BaseResponse.success(newUrl);
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
+        }
     }
 }

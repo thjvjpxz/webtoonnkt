@@ -42,7 +42,7 @@ export default function Sidebar({
     {
       path: "/admin/categories",
       icon: <FiTag size={20} />,
-      label: "Thể loại",
+      label: "Quản lý thể loại",
     },
     {
       path: "/admin/comics",
@@ -53,23 +53,23 @@ export default function Sidebar({
     {
       path: "/admin/levels",
       icon: <FiAward size={20} />,
-      label: "Cấp độ",
+      label: "Quản lý cấp độ",
     },
     {
       path: "/admin/chapters",
       icon: <FiFileText size={20} />,
-      label: "Quản lý chapter",
+      label: "Quản lý chương",
       show: isPublisher
     },
     {
       path: "/admin/users",
       icon: <FiUsers size={20} />,
-      label: "Người dùng",
+      label: "Quản lý người dùng",
     },
     {
       path: "/admin/comments",
       icon: <FiMessageSquare size={20} />,
-      label: "Bình luận",
+      label: "Quản lý bình luận",
     },
   ];
 

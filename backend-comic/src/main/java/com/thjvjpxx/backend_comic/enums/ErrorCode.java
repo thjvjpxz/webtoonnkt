@@ -74,6 +74,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "Yêu cầu refresh token!"),
     INVALID_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không chính xác!"),
     PASSWORD_AND_CONFIRM_NOT_MATCH(HttpStatus.BAD_REQUEST, "Mật khẩu và mật khẩu xác nhận không khớp!"),
+    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Tài khoản đã bị xóa!"),
 
     // Role
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại!"),
@@ -87,6 +88,7 @@ public enum ErrorCode {
     TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "Loại không tồn tại!"),
     UPLOAD_FILE_FAILED(HttpStatus.BAD_REQUEST, "Lưu file thất bại!"),
     DELETE_FILE_FAILED(HttpStatus.BAD_REQUEST, "Xoá file thất bại!"),
+    RENAME_FILE_FAILED(HttpStatus.BAD_REQUEST, "Đổi tên file thất bại!"),
 
     // Email
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Gửi email thất bại!"),

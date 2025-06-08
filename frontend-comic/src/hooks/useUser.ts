@@ -8,6 +8,8 @@ import {
   createUserWithAvatar,
   updateUserWithAvatar,
   deleteUser,
+  blockUser,
+  unblockUser,
   getAllLevelTypes,
   getLevelsByTypeId,
 } from "@/services/userService";
@@ -23,6 +25,7 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [showDeleted, setShowDeleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // State cho modal
@@ -105,7 +108,8 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
         currentPage,
         pageSize,
         searchTerm,
-        roleFilter || undefined
+        roleFilter,
+        showDeleted
       );
 
       if (response.status === 200 && response.data) {
@@ -126,7 +130,7 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, roleFilter, pageSize]);
+  }, [currentPage, searchTerm, roleFilter, showDeleted, pageSize]);
 
   // Gọi API khi thay đổi trang hoặc tìm kiếm
   useEffect(() => {
@@ -216,6 +220,46 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
     }
   };
 
+  // Xử lý chặn người dùng
+  const handleBlockUser = async (user: UserResponse) => {
+    try {
+      const response = await blockUser(user.id);
+
+      if (response.status === 200) {
+        toast.success("Chặn người dùng thành công");
+        fetchUsers(); // Tải lại danh sách
+      } else {
+        toast.error(response.message || "Không thể chặn người dùng");
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi chặn người dùng");
+    }
+  };
+
+  // Xử lý bỏ chặn người dùng
+  const handleUnblockUser = async (user: UserResponse) => {
+    try {
+      const response = await unblockUser(user.id);
+
+      if (response.status === 200) {
+        toast.success("Bỏ chặn người dùng thành công");
+        fetchUsers(); // Tải lại danh sách
+      } else {
+        toast.error(response.message || "Không thể bỏ chặn người dùng");
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "error" in error
+          ? (error.error as string)
+          : "Đã xảy ra lỗi";
+      toast.error(errorMessage || "Đã xảy ra lỗi khi bỏ chặn người dùng");
+    }
+  };
+
   // Xử lý tìm kiếm
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,6 +303,7 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
     isLoading,
     searchTerm,
     roleFilter,
+    showDeleted,
     error,
     isModalOpen,
     isDeleteModalOpen,
@@ -269,6 +314,7 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
     setCurrentPage,
     setSearchTerm,
     setRoleFilter,
+    setShowDeleted,
     setIsModalOpen,
     setIsDeleteModalOpen,
 
@@ -280,6 +326,8 @@ export const useUser = (initialPage = 1, pageSize = 5) => {
     handleAddUser,
     handleUpdateUser,
     handleDeleteUser,
+    handleBlockUser,
+    handleUnblockUser,
     fetchUsers,
     fetchLevelsByType,
   };

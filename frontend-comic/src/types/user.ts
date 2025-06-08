@@ -26,6 +26,7 @@ export interface UserResponse {
   vip: boolean;
   active: boolean;
   blocked: boolean;
+  deleted: boolean;
   role: Role;
   balance: number;
   lastTopup: Date;

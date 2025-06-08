@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.LevelRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -22,6 +21,7 @@ import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.service.LevelService;
 import com.thjvjpxx.backend_comic.service.StorageService;
+import com.thjvjpxx.backend_comic.utils.FileUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -113,15 +113,21 @@ public class LevelServiceImpl implements LevelService {
             throw new BaseException(ErrorCode.LEVEL_DUPLICATE);
         }
 
-        deleteLevelGif(level.getUrlGif());
-
         String urlGif = level.getUrlGif();
-        String nameNormalize = StringUtils.generateSlug(request.getName());
+        String newName = request.getName();
+
+        String nameNormalize = StringUtils.generateSlug(newName);
         if (file != null) {
             var response = b2StorageService.uploadFile(file, GlobalConstants.TYPE_LEVEL,
                     nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+            }
+            urlGif = response.getMessage();
+        } else if (!nameNormalize.equals(StringUtils.generateSlug(level.getName()))) {
+            var response = b2StorageService.rename(level.getUrlGif(), nameNormalize);
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
             }
             urlGif = response.getMessage();
         }
@@ -130,7 +136,7 @@ public class LevelServiceImpl implements LevelService {
                 .findById(request.getLevelTypeId())
                 .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
 
-        level.setName(request.getName());
+        level.setName(newName);
         level.setUrlGif(urlGif);
         level.setExpRequired(request.getExpRequired());
         level.setLevelType(levelType);
@@ -148,18 +154,13 @@ public class LevelServiceImpl implements LevelService {
 
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
+        FileUtils.deleteFileFromB2(level.getUrlGif(), b2StorageService);
+
         try {
-            deleteLevelGif(level.getUrlGif());
             levelRepository.delete(level);
             return BaseResponse.success(level);
         } catch (DataIntegrityViolationException e) {
             throw new BaseException(ErrorCode.LEVEL_CANNOT_DELETE_IN_USE);
-        }
-    }
-
-    private void deleteLevelGif(String urlGif) {
-        if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(B2Constants.URL_PREFIX)) {
-            b2StorageService.remove(urlGif);
         }
     }
 

@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.UserRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -20,9 +19,10 @@ import com.thjvjpxx.backend_comic.model.Role;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.RoleRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
-import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.service.LevelService;
+import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.service.UserService;
+import com.thjvjpxx.backend_comic.utils.FileUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -42,22 +42,46 @@ public class UserServiceImpl implements UserService {
     StorageService b2StorageService;
 
     @Override
-    public BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId) {
+    public BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId, Boolean deleted) {
         Pageable pageable = PaginationUtils.createPageable(page, limit);
         int originalPage = page;
         Page<User> users = null;
-        if (search != null && !search.isEmpty() && roleId != null && !roleId.isEmpty()) {
-            Role role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
-            users = userRepository.findByRoleAndUsernameOrEmailContaining(role, search, pageable);
-        } else if (search != null && !search.isEmpty()) {
-            users = userRepository.findByUsernameContainingOrEmailContaining(search, search, pageable);
-        } else if (roleId != null && !roleId.isEmpty()) {
-            Role role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
-            users = userRepository.findByRole(role, pageable);
+
+        // Nếu deleted = null thì mặc định hiển thị user chưa bị xóa
+        deleted = deleted == null ? false : deleted;
+
+        if (deleted == false) {
+            // Hiển thị những user chưa bị xóa (deleted = false)
+            if (search != null && !search.isEmpty() && roleId != null && !roleId.isEmpty()) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
+                users = userRepository.findByDeletedFalseAndRoleAndUsernameOrEmailContaining(role, search, pageable);
+            } else if (search != null && !search.isEmpty()) {
+                users = userRepository.findByDeletedFalseAndUsernameContainingOrEmailContaining(search, search,
+                        pageable);
+            } else if (roleId != null && !roleId.isEmpty()) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
+                users = userRepository.findByDeletedFalseAndRole(role, pageable);
+            } else {
+                users = userRepository.findByDeletedFalse(pageable);
+            }
         } else {
-            users = userRepository.findAll(pageable);
+            // Hiển thị những user đã bị xóa (deleted = true)
+            if (search != null && !search.isEmpty() && roleId != null && !roleId.isEmpty()) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
+                users = userRepository.findByDeletedTrueAndRoleAndUsernameOrEmailContaining(role, search, pageable);
+            } else if (search != null && !search.isEmpty()) {
+                users = userRepository.findByDeletedTrueAndUsernameContainingOrEmailContaining(search, search,
+                        pageable);
+            } else if (roleId != null && !roleId.isEmpty()) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new BaseException(ErrorCode.ROLE_NOT_FOUND));
+                users = userRepository.findByDeletedTrueAndRole(role, pageable);
+            } else {
+                users = userRepository.findByDeletedTrue(pageable);
+            }
         }
 
         return BaseResponse.success(
@@ -127,6 +151,8 @@ public class UserServiceImpl implements UserService {
 
         String imgUrl = user.getImgUrl();
         if (avatar != null) {
+            FileUtils.deleteFileFromB2(imgUrl, b2StorageService);
+
             var response = b2StorageService.uploadFile(avatar, GlobalConstants.TYPE_AVATAR,
                     request.getUsername());
             if (response.getStatus() != HttpStatus.OK.value()) {
@@ -137,6 +163,12 @@ public class UserServiceImpl implements UserService {
 
         if (!user.getUsername().equals(request.getUsername())) {
             validateUsername(request.getUsername());
+            String newUsername = StringUtils.generateSlug(request.getUsername());
+            var response = b2StorageService.rename(user.getImgUrl(), newUsername);
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
+            }
+            imgUrl = response.getMessage();
         }
 
         if (!user.getEmail().equals(request.getEmail())) {
@@ -187,11 +219,16 @@ public class UserServiceImpl implements UserService {
     public BaseResponse<User> deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
-        String imgUrl = user.getImgUrl();
-        if (imgUrl != null && !imgUrl.isEmpty() && imgUrl.startsWith(B2Constants.URL_PREFIX)) {
-            b2StorageService.remove(StringUtils.getIdFromUrl(imgUrl));
+
+        if (user.getDeleted()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_DELETED);
         }
-        userRepository.delete(user);
+
+        // Đánh dấu user là đã xóa (soft delete)
+        user.setDeleted(true);
+        userRepository.save(user);
+
         return BaseResponse.success(user);
     }
+
 }
