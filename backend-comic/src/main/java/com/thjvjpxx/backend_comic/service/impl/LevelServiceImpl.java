@@ -2,8 +2,10 @@ package com.thjvjpxx.backend_comic.service.impl;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,12 +44,12 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public BaseResponse<?> getLevelWithPagination(int page, int limit, String search) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "levelNumber", Sort.Direction.ASC);
         int originalPage = page;
 
         Page<Level> levels;
         if (search != null && !search.isEmpty()) {
-            levels = levelRepository.findByNameContaining(search, pageable);
+            levels = levelRepository.findByNameContainingOrLevelTypeNameContaining(search, search, pageable);
         } else {
             levels = levelRepository.findAll(pageable);
         }
@@ -111,6 +113,8 @@ public class LevelServiceImpl implements LevelService {
             throw new BaseException(ErrorCode.LEVEL_DUPLICATE);
         }
 
+        deleteLevelGif(level.getUrlGif());
+
         String urlGif = level.getUrlGif();
         String nameNormalize = StringUtils.generateSlug(request.getName());
         if (file != null) {
@@ -144,12 +148,19 @@ public class LevelServiceImpl implements LevelService {
 
         Level level = levelRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.LEVEL_NOT_FOUND));
 
-        String urlGif = level.getUrlGif();
+        try {
+            deleteLevelGif(level.getUrlGif());
+            levelRepository.delete(level);
+            return BaseResponse.success(level);
+        } catch (DataIntegrityViolationException e) {
+            throw new BaseException(ErrorCode.LEVEL_CANNOT_DELETE_IN_USE);
+        }
+    }
+
+    private void deleteLevelGif(String urlGif) {
         if (urlGif != null && !urlGif.isEmpty() && urlGif.startsWith(B2Constants.URL_PREFIX)) {
             b2StorageService.remove(urlGif);
         }
-        levelRepository.delete(level);
-        return BaseResponse.success(level);
     }
 
     @Override

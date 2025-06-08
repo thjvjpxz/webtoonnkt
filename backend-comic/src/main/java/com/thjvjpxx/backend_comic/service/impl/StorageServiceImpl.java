@@ -70,21 +70,32 @@ public class StorageServiceImpl implements StorageService {
             String url = getPublicUrl(key);
             return BaseResponse.success(url);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
         }
     }
 
     @Override
-    public BaseResponse<?> remove(String fileKey) {
+    public BaseResponse<?> remove(String url) {
         try {
+            String actualKey = url;
+            if (url.startsWith(B2Constants.URL_PREFIX)) {
+                String urlWithoutPrefix = url.substring(B2Constants.URL_PREFIX.length());
+                String expectedPrefix = bucketName + "/";
+                if (urlWithoutPrefix.startsWith(expectedPrefix)) {
+                    actualKey = urlWithoutPrefix.substring(expectedPrefix.length());
+                } else {
+                    throw new BaseException(ErrorCode.INVALID_ARGUMENT);
+                }
+            }
+
             s3Client.deleteObject(DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileKey)
+                    .key(actualKey)
                     .build());
 
             return BaseResponse.success("Xoá file thành công");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new BaseException(ErrorCode.DELETE_FILE_FAILED);
         }
     }
 

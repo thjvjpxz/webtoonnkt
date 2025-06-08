@@ -66,7 +66,7 @@ export default function LevelTypeModal({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 dark:bg-gray-800 dark:border dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            {levelType ? "Cập nhật loại level" : "Thêm loại level mới"}
+            {levelType ? "Cập nhật loại cấp độ" : "Thêm loại cấp độ mới"}
           </h2>
           <button
             onClick={onClose}
@@ -82,7 +82,7 @@ export default function LevelTypeModal({
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
             >
-              Tên loại level
+              Tên loại cấp độ
             </label>
             <input
               type="text"
@@ -92,7 +92,7 @@ export default function LevelTypeModal({
               value={formData.name}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Nhập tên loại level"
+              placeholder="Nhập tên loại cấp độ"
             />
           </div>
 

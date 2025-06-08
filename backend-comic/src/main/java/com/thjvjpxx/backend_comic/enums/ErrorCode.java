@@ -25,25 +25,28 @@ public enum ErrorCode {
     SLUG_COMIC_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Slug truyện không được trống!"),
 
     // Level Type
-    LEVEL_TYPE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Loại level không được trống!"),
-    LEVEL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "Loại level không tồn tại!"),
-    LEVEL_TYPE_DUPLICATE(HttpStatus.BAD_REQUEST, "Loại level đã tồn tại!"),
+    LEVEL_TYPE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Loại cấp độ không được trống!"),
+    LEVEL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "Loại cấp độ không tồn tại!"),
+    LEVEL_TYPE_DUPLICATE(HttpStatus.BAD_REQUEST, "Loại cấp độ đã tồn tại!"),
+    LEVEL_TYPE_CANNOT_DELETE_IN_USE(HttpStatus.BAD_REQUEST,
+            "Không thể xóa loại cấp độ này vì vẫn có cấp độ đang sử dụng!"),
 
     // Level
-    LEVEL_NUMBER_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Level không được trống!"),
-    LEVEL_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên level không được trống!"),
-    LEVEL_EXP_REQUIRED_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Exp cần để đạt level không được trống!"),
-    LEVEL_EXP_REQUIRED_NOT_MIN(HttpStatus.BAD_REQUEST, "Exp cần để đạt level phải lớn hơn hoặc bằng 0!"),
-    LEVEL_DUPLICATE(HttpStatus.BAD_REQUEST, "Level đã tồn tại!"),
-    LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Level không tồn tại!"),
-    LEVEL_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Level phải lớn hơn hoặc bằng 1!"),
+    LEVEL_NUMBER_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Cấp độ không được trống!"),
+    LEVEL_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên cấp độ không được trống!"),
+    LEVEL_EXP_REQUIRED_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Exp cần để đạt cấp độ không được trống!"),
+    LEVEL_EXP_REQUIRED_NOT_MIN(HttpStatus.BAD_REQUEST, "Exp cần để đạt cấp độ phải lớn hơn hoặc bằng 0!"),
+    LEVEL_DUPLICATE(HttpStatus.BAD_REQUEST, "Cấp độ đã tồn tại!"),
+    LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Cấp độ không tồn tại!"),
+    LEVEL_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Cấp độ phải lớn hơn hoặc bằng 1!"),
+    LEVEL_CANNOT_DELETE_IN_USE(HttpStatus.BAD_REQUEST, "Không thể xóa cấp độ này vì vẫn có người dùng đang sử dụng!"),
 
     // Chapter
-    CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được trống!"),
-    CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chapter không được trống!"),
-    CHAPTER_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Số chapter phải lớn hơn hoặc bằng 0!"),
+    CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chương không được trống!"),
+    CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chương không được trống!"),
+    CHAPTER_NUMBER_NOT_MIN(HttpStatus.BAD_REQUEST, "Số chương phải lớn hơn hoặc bằng 0!"),
     CHAPTER_COMIC_ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Truyện không được trống!"),
-    CHAPTER_REQUEST_NOT_NULL(HttpStatus.BAD_REQUEST, "Chapter request không được trống!"),
+    CHAPTER_REQUEST_NOT_NULL(HttpStatus.BAD_REQUEST, "Chương request không được trống!"),
     CHAPTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Chương không tồn tại!"),
     CHAPTER_NUMBER_EXISTS(HttpStatus.BAD_REQUEST, "Số chương đã tồn tại!"),
 
@@ -83,7 +86,7 @@ public enum ErrorCode {
     INVALID_ARGUMENT(HttpStatus.BAD_REQUEST, "Tham số không hợp lệ!"),
     TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "Loại không tồn tại!"),
     UPLOAD_FILE_FAILED(HttpStatus.BAD_REQUEST, "Lưu file thất bại!"),
-    FILE_EXISTS(HttpStatus.BAD_REQUEST, "File đã tồn tại!"),
+    DELETE_FILE_FAILED(HttpStatus.BAD_REQUEST, "Xoá file thất bại!"),
 
     // Email
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Gửi email thất bại!"),
@@ -116,11 +119,11 @@ public enum ErrorCode {
     PUBLISHER_COMIC_CATEGORIES_MIN_ONE(HttpStatus.BAD_REQUEST, "Phải chọn ít nhất 1 thể loại!"),
     PUBLISHER_COMIC_NOT_OWNER(HttpStatus.FORBIDDEN, "Bạn không có quyền thao tác với truyện này!"),
 
-    PUBLISHER_CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được để trống!"),
-    PUBLISHER_CHAPTER_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "Tiêu đề chapter không được vượt quá 255 ký tự!"),
-    PUBLISHER_CHAPTER_NUMBER_INVALID(HttpStatus.BAD_REQUEST, "Số chapter phải lớn hơn 0!"),
-    PUBLISHER_CHAPTER_PRICE_INVALID(HttpStatus.BAD_REQUEST, "Giá chapter phải lớn hơn hoặc bằng 0!"),
-    PUBLISHER_CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chapter không được trống!"),
+    PUBLISHER_CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chương không được để trống!"),
+    PUBLISHER_CHAPTER_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "Tiêu đề chương không được vượt quá 255 ký tự!"),
+    PUBLISHER_CHAPTER_NUMBER_INVALID(HttpStatus.BAD_REQUEST, "Số chương phải lớn hơn 0!"),
+    PUBLISHER_CHAPTER_PRICE_INVALID(HttpStatus.BAD_REQUEST, "Giá chương phải lớn hơn hoặc bằng 0!"),
+    PUBLISHER_CHAPTER_STATUS_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái chương không được trống!"),
     PUBLISHER_CHAPTER_IMAGES_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Danh sách ảnh không được để trống!"),
     PUBLISHER_CHAPTER_IMAGES_MIN_ONE(HttpStatus.BAD_REQUEST, "Phải có ít nhất 1 ảnh!"),
 
@@ -128,8 +131,8 @@ public enum ErrorCode {
     TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Giao dịch không tồn tại!"),
     TRANSACTION_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "Số tiền không hợp lệ!"),
     TRANSACTION_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "Số dư không đủ!"),
-    CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "Chapter đã được mua!"),
-    CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "Chapter này miễn phí!"),
+    CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "chương đã được mua!"),
+    CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "chương này miễn phí!"),
 
     // Withdrawal
     WITHDRAWAL_AMOUNT_INVALID(HttpStatus.BAD_REQUEST, "Số tiền rút không hợp lệ!"),

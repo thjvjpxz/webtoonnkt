@@ -7,5 +7,5 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 public interface StorageService {
     BaseResponse<?> uploadFile(MultipartFile file, String typeFolder, String fileName);
 
-    BaseResponse<?> remove(String fileId);
+    BaseResponse<?> remove(String url);
 }

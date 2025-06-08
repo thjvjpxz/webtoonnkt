@@ -85,7 +85,7 @@ export default function LevelModal({
         levelNumber: 0,
         color: "#000000",
         expRequired: 0,
-        levelTypeId: levelTypes.length > 0 ? levelTypes[0].id : "",
+        levelTypeId: "",
         urlGif: "",
       });
       setPreviewUrl(null);
@@ -184,7 +184,7 @@ export default function LevelModal({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl p-6 dark:bg-gray-800 dark:border dark:border-gray-700 my-8 mx-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            {level ? "Cập nhật level" : "Thêm level mới"}
+            {level ? "Cập nhật cấp độ" : "Thêm cấp độ mới"}
           </h2>
           <button
             onClick={onClose}
@@ -201,7 +201,7 @@ export default function LevelModal({
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
               >
-                Tên level
+                Tên cấp độ
               </label>
               <input
                 type="text"
@@ -211,7 +211,7 @@ export default function LevelModal({
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="Nhập tên level"
+                placeholder="Nhập tên cấp độ"
               />
             </div>
 
@@ -220,7 +220,7 @@ export default function LevelModal({
                 htmlFor="levelTypeId"
                 className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
               >
-                Loại level
+                Loại cấp độ
               </label>
               <select
                 id="levelTypeId"
@@ -230,7 +230,7 @@ export default function LevelModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
-                <option value="">Chọn loại level</option>
+                <option value="">Chọn loại cấp độ</option>
                 {levelTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
@@ -244,7 +244,7 @@ export default function LevelModal({
                 htmlFor="levelNumber"
                 className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300"
               >
-                Số level
+                Số cấp độ
               </label>
               <input
                 type="number"
@@ -255,7 +255,7 @@ export default function LevelModal({
                 value={formData.levelNumber}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="Nhập số level"
+                placeholder="Nhập số cấp độ"
               />
             </div>
 
@@ -439,6 +439,7 @@ export default function LevelModal({
                           height={160}
                           className="object-cover h-full w-full"
                           loading="lazy"
+                          unoptimized={true}
                         />
                       </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
