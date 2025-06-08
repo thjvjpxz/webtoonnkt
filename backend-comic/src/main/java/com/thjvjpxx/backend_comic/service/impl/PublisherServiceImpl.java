@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
-import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.PublisherChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.PublisherComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -34,8 +33,8 @@ import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.repository.PurchasedChapterRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
+import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.service.PublisherService;
-import com.thjvjpxx.backend_comic.service.StorageFactory;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
@@ -54,7 +53,7 @@ public class PublisherServiceImpl implements PublisherService {
     CategoryRepository categoryRepository;
     PurchasedChapterRepository purchasedChapterRepository;
     UserRepository userRepository;
-    StorageFactory storageFactory;
+    StorageService b2StorageService;
 
     @Override
     @Transactional
@@ -80,7 +79,7 @@ public class PublisherServiceImpl implements PublisherService {
         // Handle cover upload
         String thumbUrl = request.getThumbUrl();
         if (coverFile != null && !coverFile.isEmpty()) {
-            var response = storageFactory.getStorageService().uploadFile(
+            var response = b2StorageService.uploadFile(
                     coverFile,
                     GlobalConstants.TYPE_THUMBNAIL,
                     slug + "_thumb");
@@ -124,7 +123,7 @@ public class PublisherServiceImpl implements PublisherService {
         // Handle cover upload
         String thumbUrl = comic.getThumbUrl();
         if (coverFile != null && !coverFile.isEmpty()) {
-            var response = storageFactory.getStorageService().uploadFile(
+            var response = b2StorageService.uploadFile(
                     coverFile,
                     GlobalConstants.TYPE_THUMBNAIL,
                     comic.getSlug() + "_thumb");
@@ -162,10 +161,8 @@ public class PublisherServiceImpl implements PublisherService {
         Comic comic = findComicById(comicId);
 
         String thumbUrl = comic.getThumbUrl();
-        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(thumbUrl));
-        } else if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
-            storageFactory.getStorageService().remove(thumbUrl);
+        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
+            b2StorageService.remove(thumbUrl);
         }
 
         comicRepository.delete(comic);
@@ -248,10 +245,6 @@ public class PublisherServiceImpl implements PublisherService {
                 .collect(Collectors.toList());
 
         savedChapter.setDetailChapters(detailChapters);
-
-        // Update comic's last chapter
-        comic.setLastChapterId(savedChapter.getId());
-        comicRepository.save(comic);
 
         savedChapter = chapterRepository.save(savedChapter);
         return BaseResponse.success(savedChapter);
@@ -603,7 +596,6 @@ public class PublisherServiceImpl implements PublisherService {
                 .categories(comic.getCategories().stream().collect(Collectors.toList()))
                 .createdAt(comic.getCreatedAt())
                 .updatedAt(comic.getUpdatedAt())
-                .lastChapterId(comic.getLastChapterId())
                 .build();
     }
 }

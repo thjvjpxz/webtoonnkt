@@ -2,11 +2,9 @@ package com.thjvjpxx.backend_comic.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -371,7 +369,7 @@ public class CrawlerServiceImpl implements CrawlerService {
                 }
 
                 if (oTruyenComic.getCategory() != null && !oTruyenComic.getCategory().isEmpty()) {
-                    Set<Category> categories = new HashSet<>();
+                    List<Category> categories = new ArrayList<>();
 
                     for (var oTruyenCategory : oTruyenComic.getCategory()) {
                         String categorySlug = StringUtils.generateSlug(oTruyenCategory.getName());

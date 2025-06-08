@@ -82,7 +82,6 @@ public class DetailComicServiceImpl implements DetailComicService {
                 .followersCount(comic.getFollowersCount())
                 .viewsCount(comic.getViewsCount())
                 .description(comic.getDescription())
-                .lastChapterId(comic.getLastChapterId())
                 .categories(comic.getCategories().stream().collect(Collectors.toList()))
                 .chapters(chapterSummaries)
                 .build();

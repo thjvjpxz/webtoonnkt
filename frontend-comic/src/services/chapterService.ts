@@ -1,4 +1,4 @@
-import { ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
+import { Chapter, ChapterCreateUpdate, ChapterWithComicDetail } from '@/types/chapter'
 import { fetchApi, fetchApiWithFormData } from './api';
 
 export const getChapters = async (
@@ -21,7 +21,7 @@ export const getChapters = async (
 }
 
 export const deleteChapter = async (chapterId: string) => {
-  return await fetchApi<ChapterWithComicDetail>(`/chapters/${chapterId}`, {
+  return await fetchApi<Chapter>(`/chapters/${chapterId}`, {
     method: "DELETE",
   });
 }

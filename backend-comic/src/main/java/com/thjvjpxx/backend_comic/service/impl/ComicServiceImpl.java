@@ -13,15 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
-import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
-import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
-import com.thjvjpxx.backend_comic.mapper.ComicMapper;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
@@ -29,9 +26,8 @@ import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
-import com.thjvjpxx.backend_comic.service.StorageFactory;
+import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
-import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
@@ -43,11 +39,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComicServiceImpl implements ComicService {
     ComicRepository comicRepository;
-    ComicMapper comicMapper;
     CategoryRepository categoryRepository;
-    StorageFactory storageFactory;
+    StorageService b2StorageService;
     ChapterRepository chapterRepository;
-    ChapterMapper chapterMapper;
 
     @Override
     public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
@@ -86,7 +80,7 @@ public class ComicServiceImpl implements ComicService {
         validateComicRequest(comicRequest);
         String thumbUrl = null;
         if (cover != null) {
-            var response = storageFactory.getStorageService().uploadFile(
+            var response = b2StorageService.uploadFile(
                     cover,
                     GlobalConstants.TYPE_THUMBNAIL,
                     comicRequest.getSlug() + "_thumb");
@@ -95,18 +89,17 @@ public class ComicServiceImpl implements ComicService {
             }
             thumbUrl = response.getMessage();
         }
-        String folderId = null;
-        if (storageFactory.getStorageProvider() == "google") {
-            folderId = storageFactory.getStorageService().createFolder(comicRequest.getSlug(),
-                    GoogleDriveConstants.FOLDER_ID_COMIC);
-        } else {
-            folderId = B2Constants.FOLDER_KEY_COMIC;
-        }
-        Comic comic = comicMapper.toComic(comicRequest);
-        comic.setFolderId(folderId);
-        List<String> categories = comicRequest.getCategories();
-        comic.addCategories(convertCategories(categories));
-        comic.setThumbUrl(thumbUrl);
+
+        Comic comic = Comic.builder()
+                .name(comicRequest.getName())
+                .slug(comicRequest.getSlug())
+                .originName(comicRequest.getOriginName())
+                .thumbUrl(thumbUrl)
+                .author(comicRequest.getAuthor())
+                .status(ComicStatus.valueOf(comicRequest.getStatus()))
+                .description(comicRequest.getDescription())
+                .categories(convertCategories(comicRequest.getCategories()))
+                .build();
 
         comicRepository.save(comic);
         return BaseResponse.success(comic);
@@ -186,10 +179,8 @@ public class ComicServiceImpl implements ComicService {
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
 
         String thumbUrl = comic.getThumbUrl();
-        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(thumbUrl));
-        } else if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
-            storageFactory.getStorageService().remove(thumbUrl);
+        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
+            b2StorageService.remove(thumbUrl);
         }
         comicRepository.delete(comic);
         return BaseResponse.success(comic);
@@ -210,7 +201,14 @@ public class ComicServiceImpl implements ComicService {
         }
 
         List<ChapterResponse> chapterResponses = chapters.getContent().stream()
-                .map(chapterMapper::toChapterResponse)
+                .map(chapter -> ChapterResponse.builder()
+                        .id(chapter.getId())
+                        .title(chapter.getTitle())
+                        .chapterNumber(chapter.getChapterNumber())
+                        .status(chapter.getStatus())
+                        .createdAt(chapter.getCreatedAt().toString())
+                        .updatedAt(chapter.getUpdatedAt().toString())
+                        .build())
                 .collect(Collectors.toList());
 
         return BaseResponse.success(
