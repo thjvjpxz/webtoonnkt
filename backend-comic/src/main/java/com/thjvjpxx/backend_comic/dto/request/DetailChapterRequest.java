@@ -9,6 +9,4 @@ import lombok.experimental.FieldDefaults;
 public class DetailChapterRequest {
     String imgUrl;
     int orderNumber;
-    boolean newImage;
-    boolean hasRemove;
 }

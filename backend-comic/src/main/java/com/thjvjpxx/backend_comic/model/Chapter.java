@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thjvjpxx.backend_comic.enums.ChapterStatus;
 
@@ -73,6 +74,7 @@ public class Chapter {
 
     @ManyToOne
     @JoinColumn(name = "comic_id", nullable = false)
+    @JsonIgnore
     Comic comic;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)

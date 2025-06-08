@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +51,7 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "createdAt", Sort.Direction.DESC);
         int originalPage = page;
         Page<Comic> comics = null;
         if (search != null && !search.isEmpty()) {
@@ -126,6 +127,7 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
+        // TODO: Cần thêm logic update comic
         return null;
         // ValidationUtils.checkNullId(id);
 

@@ -2,6 +2,7 @@ package com.thjvjpxx.backend_comic.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,19 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
     // Tính tổng doanh thu của một chapter
     @Query("SELECT COALESCE(SUM(pc.purchasePrice), 0) FROM purchased_chapters pc WHERE pc.chapter = :chapter")
     Double getTotalRevenueByChapter(@Param("chapter") Chapter chapter);
+
+    // Thống kê chapter theo thời gian
+    @Query("SELECT COUNT(pc) FROM purchased_chapters pc WHERE pc.chapter = :chapter AND pc.purchasedAt >= :startDate")
+    Long countPurchasesByChapterAfterDate(@Param("chapter") Chapter chapter, @Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT COALESCE(SUM(pc.purchasePrice), 0) FROM purchased_chapters pc WHERE pc.chapter = :chapter AND pc.purchasedAt >= :startDate")
+    Double getRevenueByChapterAfterDate(@Param("chapter") Chapter chapter, @Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT COUNT(pc) FROM purchased_chapters pc WHERE pc.chapter = :chapter AND pc.purchasedAt >= :startDate AND pc.purchasedAt < :endDate")
+    Long countPurchasesByChapterBetweenDates(@Param("chapter") Chapter chapter, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT COALESCE(SUM(pc.purchasePrice), 0) FROM purchased_chapters pc WHERE pc.chapter = :chapter AND pc.purchasedAt >= :startDate AND pc.purchasedAt < :endDate")
+    Double getRevenueByChapterBetweenDates(@Param("chapter") Chapter chapter, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // Lấy danh sách chapter được mua nhiều nhất của publisher
     @Query("""

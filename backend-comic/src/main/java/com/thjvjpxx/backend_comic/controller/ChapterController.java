@@ -31,7 +31,7 @@ public class ChapterController {
     ChapterService chapterService;
 
     @GetMapping
-    public BaseResponse<?> getAllChapter(
+    public BaseResponse<?> getAllChapters(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int limit,
             @RequestParam(required = false) String search,

@@ -6,9 +6,12 @@ import { ComicResponse } from "@/types/comic";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 
-export const useChapter = (initialPage = 1, pageSize = 5) => {
+export const useChapter = () => {
   const { user, isLoading: authLoading } = useAuth();
   const isPublisher = user?.role?.name === "PUBLISHER";
+
+  const initialPage = 1;
+  const pageSize = 5;
 
   const [chapters, setChapters] = useState<ChapterWithComicDetail[]>([]);
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -64,8 +67,8 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     setIsLoadingComics(true);
     try {
       const response = isPublisher
-        ? await getMyComics(searchTerm, page - 1, limit)
-        : await getComics(searchTerm, page - 1, limit);
+        ? await getMyComics(searchTerm, page, limit)
+        : await getComics(searchTerm, page, limit);
       if (response.status === 200 && response.data) {
         if (page === 1) {
           setComicOptions(response.data);
@@ -219,6 +222,7 @@ export const useChapter = (initialPage = 1, pageSize = 5) => {
     error,
     searchTerm,
     isLoading,
+    isPublisher,
 
     // set
     setCurrentPage,

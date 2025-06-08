@@ -2,6 +2,7 @@ package com.thjvjpxx.backend_comic.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,16 +17,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.dto.request.BulkDeleteRequest;
 import com.thjvjpxx.backend_comic.dto.request.PublisherChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.PublisherComicRequest;
-import com.thjvjpxx.backend_comic.dto.request.WithdrawalRequestDto;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.ChapterStatsResponse;
 import com.thjvjpxx.backend_comic.dto.response.PublisherComicResponse;
-import com.thjvjpxx.backend_comic.dto.response.PublisherStatsResponse;
 import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.User;
-import com.thjvjpxx.backend_comic.model.WithdrawalRequest;
 import com.thjvjpxx.backend_comic.service.PublisherService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
 
@@ -43,20 +43,6 @@ public class PublisherController {
 
     PublisherService publisherService;
     SecurityUtils securityUtils;
-
-    // ==================== DASHBOARD ====================
-
-    @GetMapping("/stats")
-    public BaseResponse<PublisherStatsResponse> getPublisherStats(
-            @AuthenticationPrincipal User publisher) {
-        return publisherService.getPublisherStats(publisher);
-    }
-
-    @GetMapping("/balance")
-    public BaseResponse<Double> getAvailableBalance(
-            @AuthenticationPrincipal User publisher) {
-        return publisherService.getAvailableBalance(publisher);
-    }
 
     // ==================== COMIC MANAGEMENT ====================
 
@@ -112,6 +98,15 @@ public class PublisherController {
         return publisherService.createChapter(publisher, comicId, request);
     }
 
+    @PostMapping(value = "/comics/{comicId}/chapters/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public BaseResponse<Chapter> createChapterWithImages(
+            @AuthenticationPrincipal User publisher,
+            @PathVariable String comicId,
+            @Valid @RequestPart("data") PublisherChapterRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        return publisherService.createChapterWithImages(publisher, comicId, request, images);
+    }
+
     @GetMapping("/comics/{comicId}/chapters")
     public BaseResponse<List<Chapter>> getChaptersByComic(
             @AuthenticationPrincipal User publisher,
@@ -119,6 +114,16 @@ public class PublisherController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int limit) {
         return publisherService.getChaptersByComic(publisher, comicId, page, limit);
+    }
+
+    @GetMapping("/chapters")
+    public BaseResponse<?> getAllChapters(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String comicId) {
+        String currentUserId = securityUtils.getCurrentUserId();
+        return publisherService.getAllChapters(currentUserId, page, limit, search, comicId);
     }
 
     @PutMapping("/chapters/{chapterId}")
@@ -129,6 +134,15 @@ public class PublisherController {
         return publisherService.updateChapter(publisher, chapterId, request);
     }
 
+    @PutMapping(value = "/chapters/{chapterId}/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public BaseResponse<Chapter> updateChapterWithImages(
+            @AuthenticationPrincipal User publisher,
+            @PathVariable String chapterId,
+            @Valid @RequestPart("data") PublisherChapterRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        return publisherService.updateChapterWithImages(publisher, chapterId, request, images);
+    }
+
     @DeleteMapping("/chapters/{chapterId}")
     public BaseResponse<Void> deleteChapter(
             @AuthenticationPrincipal User publisher,
@@ -136,20 +150,25 @@ public class PublisherController {
         return publisherService.deleteChapter(publisher, chapterId);
     }
 
-    // ==================== WITHDRAWAL ====================
-
-    @PostMapping("/withdrawal")
-    public BaseResponse<WithdrawalRequest> createWithdrawalRequest(
+    @DeleteMapping("/chapters/bulk")
+    public BaseResponse<Void> deleteMultipleChapters(
             @AuthenticationPrincipal User publisher,
-            @Valid @RequestBody WithdrawalRequestDto request) {
-        return publisherService.createWithdrawalRequest(publisher, request);
+            @Valid @RequestBody BulkDeleteRequest request) {
+        return publisherService.deleteMultipleChapters(publisher, request.getIds());
     }
 
-    @GetMapping("/withdrawal")
-    public BaseResponse<List<WithdrawalRequest>> getMyWithdrawalRequests(
+    @PostMapping("/chapters/{chapterId}/reorder")
+    public BaseResponse<Void> reorderChapter(
             @AuthenticationPrincipal User publisher,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
-        return publisherService.getMyWithdrawalRequests(publisher, page, limit);
+            @PathVariable String chapterId,
+            @RequestParam Double newChapterNumber) {
+        return publisherService.reorderChapter(publisher, chapterId, newChapterNumber);
+    }
+
+    @GetMapping("/chapters/{chapterId}/stats")
+    public BaseResponse<ChapterStatsResponse> getChapterStats(
+            @AuthenticationPrincipal User publisher,
+            @PathVariable String chapterId) {
+        return publisherService.getChapterStats(publisher, chapterId);
     }
 }

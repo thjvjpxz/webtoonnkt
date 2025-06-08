@@ -9,6 +9,8 @@ import {
   useCallback,
 } from "react";
 import { LoginResponse } from "@/types/auth";
+import { handleLogout, handleRedirectToHome } from "@/utils/authUtils";
+import { refreshTokenService } from "@/services/authService";
 
 interface User {
   id: string;
@@ -40,15 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Hàm redirect về trang chủ
   const redirectToHome = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      // Nếu không phải đang ở trang chủ thì redirect về trang chủ
-      if (window.location.pathname !== '/') {
-        window.location.href = '/';
-      } else {
-        // Nếu đã ở trang chủ thì reload để reset state
-        window.location.reload();
-      }
-    }
+    handleRedirectToHome();
   }, []);
 
   // Kiểm tra token có hết hạn không
@@ -71,17 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Logout function - đặt trước refreshToken để tránh lỗi "used before declaration"
   const logout = useCallback(() => {
-    // Xóa tất cả dữ liệu authentication
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    setUser(null);
-
-    // Redirect về trang chủ
-    redirectToHome();
-
-    // Có thể gọi API logout nếu cần
-    // fetch("/api/auth/logout", { method: "POST" });
+    handleLogout();
   }, [redirectToHome]);
 
   // Refresh token function
@@ -94,23 +78,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch("/api/auth/refresh", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken: refreshTokenValue }),
-      });
+      const response = await refreshTokenService(refreshTokenValue);
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("accessToken", data.accessToken);
-        if (data.refreshToken) {
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem("accessToken", data?.accessToken || "");
+        if (data?.refreshToken) {
           localStorage.setItem("refreshToken", data.refreshToken);
         }
         return true;
       } else {
-        // Refresh token không hợp lệ, đăng xuất và redirect
         logout();
         return false;
       }

@@ -73,7 +73,7 @@ public class SecurityConfig {
 						.requestMatchers("/comments?*").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
-						.requestMatchers("/publisher/**").hasRole("PUBLISHER")
+						.requestMatchers("/publisher/**").hasAnyRole("PUBLISHER", "ADMIN")
 
 						// Các API khác cần xác thực
 						.anyRequest().authenticated())

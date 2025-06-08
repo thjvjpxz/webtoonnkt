@@ -32,35 +32,35 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(indexes = {
-        @Index(name = "idx_purchased_user", columnList = "user_id"),
-        @Index(name = "idx_purchased_chapter", columnList = "chapter_id"),
-        @Index(name = "idx_purchased_transaction", columnList = "transaction_id")
+		@Index(name = "idx_purchased_user", columnList = "user_id"),
+		@Index(name = "idx_purchased_chapter", columnList = "chapter_id"),
+		@Index(name = "idx_purchased_transaction", columnList = "transaction_id")
 }, uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_chapter", columnNames = { "user_id", "chapter_id" })
+		@UniqueConstraint(name = "uk_user_chapter", columnNames = { "user_id", "chapter_id" })
 })
 public class PurchasedChapter {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(columnDefinition = "VARCHAR(36)")
+	String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id", nullable = false)
-    Chapter chapter;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "chapter_id", nullable = false)
+	Chapter chapter;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_id", nullable = false)
-    Transaction transaction;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "transaction_id", nullable = false)
+	Transaction transaction;
 
-    @Column(name = "purchase_price", nullable = false)
-    Double purchasePrice; // Giá mua chapter tại thời điểm mua (tính bằng linh thạch)
+	@Column(name = "purchase_price", nullable = false)
+	Double purchasePrice; // Giá mua chapter tại thời điểm mua (tính bằng linh thạch)
 
-    @Column(name = "purchased_at")
-    @CreationTimestamp
-    LocalDateTime purchasedAt;
+	@Column(name = "purchased_at")
+	@CreationTimestamp
+	LocalDateTime purchasedAt;
 }

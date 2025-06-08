@@ -5,6 +5,27 @@ import { ComicResponse } from "@/types/comic";
 import { toast } from "react-hot-toast";
 import { constructImageUrl } from "@/utils/helpers";
 
+// Hàm sắp xếp file theo tên (page_1.jpg, page_2.jpg, ...)
+const sortFilesByName = (files: File[]): File[] => {
+  return [...files].sort((a, b) => {
+    // Trích xuất số từ tên file (ví dụ: page_1.jpg -> 1)
+    const getNumberFromFileName = (fileName: string): number => {
+      const match = fileName.match(/(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    };
+
+    const numA = getNumberFromFileName(a.name);
+    const numB = getNumberFromFileName(b.name);
+
+    // Sắp xếp theo số, nếu không có số thì sắp xếp theo tên
+    if (numA !== numB) {
+      return numA - numB;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+};
+
 export const useChapterModal = (
   isOpen: boolean,
   chapter: Chapter | null,
@@ -20,14 +41,11 @@ export const useChapterModal = (
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
   const [deletedImageUrls, setDeletedImageUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'link'>('file');
   const [imageLink, setImageLink] = useState<string>('');
-  const [imageLinkList, setImageLinkList] = useState<string[]>([]);
 
   // Tái sử dụng hook
   const {
@@ -105,16 +123,45 @@ export const useChapterModal = (
     selectComic(id); // Gọi hàm từ hook
   };
 
-  // Xử lý tải lên hình ảnh
+  // Xử lý tải lên hình ảnh với sắp xếp theo tên file
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
     const newFiles = Array.from(e.target.files);
-    setImages(prev => [...prev, ...newFiles]);
 
-    // Tạo preview URLs
-    const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
-    setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+    // Sắp xếp file theo tên trước khi thêm vào state
+    const sortedFiles = sortFilesByName(newFiles);
+
+    setImages(prev => {
+      const combinedFiles = [...prev, ...sortedFiles];
+      // Sắp xếp lại toàn bộ danh sách file
+      return sortFilesByName(combinedFiles);
+    });
+
+    // Tạo preview URLs theo thứ tự đã sắp xếp
+    const newPreviewUrls = sortedFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(prev => {
+      const combinedUrls = [...prev, ...newPreviewUrls];
+      // Sắp xếp lại preview URLs theo thứ tự file đã sắp xếp
+      const allFiles = sortFilesByName([...images, ...sortedFiles]);
+      const sortedUrls: string[] = [];
+
+      allFiles.forEach(file => {
+        const existingIndex = images.findIndex(img => img.name === file.name);
+        if (existingIndex !== -1) {
+          // File đã tồn tại, lấy URL từ preview cũ
+          sortedUrls.push(prev[existingIndex]);
+        } else {
+          // File mới, lấy URL từ newPreviewUrls
+          const newIndex = sortedFiles.findIndex(newFile => newFile.name === file.name);
+          if (newIndex !== -1) {
+            sortedUrls.push(newPreviewUrls[newIndex]);
+          }
+        }
+      });
+
+      return sortedUrls;
+    });
   };
 
   // Xóa hình ảnh đã chọn
@@ -155,64 +202,6 @@ export const useChapterModal = (
     }
   };
 
-  // Xử lý kéo thả để đổi vị trí ảnh
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    // Thêm dữ liệu để hỗ trợ Firefox (cần thiết cho drag API)
-    e.dataTransfer.setData('text/plain', index.toString());
-    // Thêm hiệu ứng cho element đang kéo
-    e.currentTarget.classList.add('opacity-50');
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDropTargetIndex(index);
-  };
-
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.currentTarget.classList.add('bg-green-50', 'dark:bg-green-900/20');
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove('bg-green-50', 'dark:bg-green-900/20');
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('bg-green-50', 'dark:bg-green-900/20');
-
-    if (draggedIndex === null) return;
-
-    // Di chuyển ảnh và URL preview
-    const newImages = [...images];
-    const newPreviewUrls = [...previewUrls];
-
-    // Lưu lại item bị kéo
-    const draggedImage = newImages[draggedIndex];
-    const draggedPreview = newPreviewUrls[draggedIndex];
-
-    // Xóa item bị kéo khỏi mảng
-    newImages.splice(draggedIndex, 1);
-    newPreviewUrls.splice(draggedIndex, 1);
-
-    // Chèn lại vào vị trí mới
-    newImages.splice(targetIndex, 0, draggedImage);
-    newPreviewUrls.splice(targetIndex, 0, draggedPreview);
-
-    // Cập nhật state
-    setImages(newImages);
-    setPreviewUrls(newPreviewUrls);
-    setDraggedIndex(null);
-    setDropTargetIndex(null);
-  };
-
-  const handleDragEnd = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove('opacity-50');
-    setDraggedIndex(null);
-    setDropTargetIndex(null);
-  };
-
   // Function kiểm tra URL hợp lệ
   const isValidImageUrl = (url: string): boolean => {
     try {
@@ -231,28 +220,7 @@ export const useChapterModal = (
     }
   };
 
-  // Xử lý thêm link ảnh
-  const handleAddImageLink = () => {
-    if (!imageLink || !isValidImageUrl(imageLink)) return;
 
-    setImageLinkList(prev => [...prev, imageLink]);
-    setPreviewUrls(prev => [...prev, imageLink]);
-    setImageLink('');
-  };
-
-  // Xử lý xóa link ảnh
-  const handleRemoveImageLink = (index: number) => {
-    // Tìm vị trí tương ứng trong previewUrls
-    const linkToRemove = imageLinkList[index];
-    const previewIndex = previewUrls.findIndex(url => url === linkToRemove);
-
-    // Xóa khỏi cả hai danh sách
-    setImageLinkList(prev => prev.filter((_, i) => i !== index));
-
-    if (previewIndex !== -1) {
-      handleRemoveImage(previewIndex);
-    }
-  };
 
   // Thêm hàm kiểm tra các link hợp lệ
   const hasValidImageLinks = (text: string): boolean => {
@@ -288,8 +256,7 @@ export const useChapterModal = (
         return;
       }
 
-      // Thêm các link hợp lệ vào danh sách
-      setImageLinkList(prev => [...prev, ...links]);
+      // Thêm các link hợp lệ vào danh sách preview
       setPreviewUrls(prev => [...prev, ...links]);
       setImageLink(''); // Xóa textarea sau khi thêm
       toast.success(`Đã thêm ${links.length} hình ảnh`);
@@ -408,8 +375,6 @@ export const useChapterModal = (
     images,
     previewUrls,
     isUploading,
-    draggedIndex,
-    dropTargetIndex,
     existingImageUrls,
     deletedImageUrls,
     isSubmitting,
@@ -433,27 +398,17 @@ export const useChapterModal = (
     handleSelectComic,
     handleImageChange,
     handleRemoveImage,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnter,
-    handleDragLeave,
-    handleDrop,
-    handleDragEnd,
     handleSubmit,
     handleComicDropdownScroll,
 
     // Utils
     isEditMode,
 
-    // New states
+    // Upload method states
     uploadMethod,
     setUploadMethod,
     imageLink,
     setImageLink,
-    imageLinkList,
-    handleAddImageLink,
-    handleRemoveImageLink,
-    isValidImageUrl,
     hasValidImageLinks,
     handleAddMultipleImageLinks
   };

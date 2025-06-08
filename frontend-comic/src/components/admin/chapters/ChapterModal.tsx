@@ -46,7 +46,6 @@ export default function ChapterModal({
     comicId,
     previewUrls,
     isUploading,
-    dropTargetIndex,
     status,
     price,
     isSubmitting,
@@ -69,12 +68,6 @@ export default function ChapterModal({
     handleSelectComic,
     handleImageChange,
     handleRemoveImage,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnter,
-    handleDragLeave,
-    handleDrop,
-    handleDragEnd,
     handleSubmit,
     handleComicDropdownScroll,
 
@@ -342,21 +335,13 @@ export default function ChapterModal({
               {previewUrls.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ảnh đã chọn ({previewUrls.length}): <span className="text-xs text-green-500 ml-1">(Kéo thả để sắp xếp)</span>
+                    Ảnh đã chọn ({previewUrls.length}): <span className="text-xs text-blue-500 ml-1">(Tự động sắp xếp theo tên file)</span>
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {previewUrls.map((url, index) => (
                       <div
                         key={index}
-                        className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex ? 'border-green-400 dark:border-green-500 rounded-md' : 'border-transparent'
-                          }`}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragOver={(e) => handleDragOver(e, index)}
-                        onDragEnter={handleDragEnter}
-                        onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, index)}
-                        onDragEnd={handleDragEnd}
+                        className="relative group border-2 border-transparent transition-all duration-200"
                       >
                         <div className="relative w-full pt-[150%] rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                           <Image

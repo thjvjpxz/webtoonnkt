@@ -86,7 +86,6 @@ public class B2StorageServiceImpl implements B2StorageService {
 
     @Override
     public BaseResponse<?> remove(String fileKey) {
-        System.out.println("fileKey: " + fileKey);
         try {
             s3Client.deleteObject(DeleteObjectRequest.builder()
                     .bucket(bucketName)
@@ -103,8 +102,6 @@ public class B2StorageServiceImpl implements B2StorageService {
     public String createFolder(String folderName, String parentFolderKey) {
         String key = parentFolderKey + "/" + folderName + "/";
 
-        // S3 doesn't have true folders, but we can create a zero-byte object with a
-        // trailing slash
         s3Client.putObject(
                 PutObjectRequest.builder()
                         .bucket(bucketName)

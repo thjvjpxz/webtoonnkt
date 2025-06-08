@@ -1,24 +1,21 @@
 'use client'
 
-import { FiPlus, FiEdit, FiTrash2, FiSearch, FiAlertCircle, FiBookOpen, FiEye } from "react-icons/fi";
-import DashboardLayout from "@/components/admin/DashboardLayout";
-import Pagination from "@/components/ui/pagination";
-import { useChapter } from "@/hooks/useChapter";
-import { useAuth } from "@/contexts/AuthContext";
-import Image from "next/image";
-import { formatDate, constructImageUrl } from "@/utils/helpers";
-import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
-import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
 import ChapterModal from "@/components/admin/chapters/ChapterModal";
+import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
+import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import Pagination from "@/components/ui/pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useChapter } from "@/hooks/useChapter";
+import { constructImageUrl, formatDate } from "@/utils/helpers";
+import Image from "next/image";
+import { FiAlertCircle, FiBookOpen, FiEdit, FiEye, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 
 export default function Chapters() {
-  const { user } = useAuth();
-  const isPublisher = user?.role?.name === "PUBLISHER";
 
   const {
     chapters,
@@ -27,6 +24,7 @@ export default function Chapters() {
     isLoading,
     error,
     searchTerm,
+    isPublisher,
     // set
     setCurrentPage,
     setSearchTerm,

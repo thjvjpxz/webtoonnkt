@@ -1,12 +1,14 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
-import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,26 +18,22 @@ import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.PublisherChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.PublisherComicRequest;
-import com.thjvjpxx.backend_comic.dto.request.WithdrawalRequestDto;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.ChapterStatsResponse;
 import com.thjvjpxx.backend_comic.dto.response.PublisherComicResponse;
-import com.thjvjpxx.backend_comic.dto.response.PublisherStatsResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
-import com.thjvjpxx.backend_comic.enums.WithdrawalStatus;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.DetailChapter;
 import com.thjvjpxx.backend_comic.model.User;
-import com.thjvjpxx.backend_comic.model.WithdrawalRequest;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
-import com.thjvjpxx.backend_comic.repository.TransactionRepository;
+import com.thjvjpxx.backend_comic.repository.PurchasedChapterRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
-import com.thjvjpxx.backend_comic.repository.WithdrawalRequestRepository;
 import com.thjvjpxx.backend_comic.service.PublisherService;
 import com.thjvjpxx.backend_comic.service.StorageFactory;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
@@ -54,8 +52,7 @@ public class PublisherServiceImpl implements PublisherService {
     ComicRepository comicRepository;
     ChapterRepository chapterRepository;
     CategoryRepository categoryRepository;
-    TransactionRepository transactionRepository;
-    WithdrawalRequestRepository withdrawalRequestRepository;
+    PurchasedChapterRepository purchasedChapterRepository;
     UserRepository userRepository;
     StorageFactory storageFactory;
 
@@ -73,7 +70,7 @@ public class PublisherServiceImpl implements PublisherService {
         }
 
         // Create slug
-        String slug = generateSlug(request.getName());
+        String slug = StringUtils.generateSlug(request.getName());
 
         // Check if slug exists
         if (comicRepository.findBySlug(slug).isPresent()) {
@@ -115,7 +112,7 @@ public class PublisherServiceImpl implements PublisherService {
         User publisher = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        validateComicOwnership(publisher, comicId);
+        validateComicOwnershipByComicId(publisher, comicId);
         Comic comic = findComicById(comicId);
 
         // Validate categories
@@ -161,7 +158,7 @@ public class PublisherServiceImpl implements PublisherService {
         User publisher = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 
-        validateComicOwnership(publisher, comicId);
+        validateComicOwnershipByComicId(publisher, comicId);
         Comic comic = findComicById(comicId);
 
         String thumbUrl = comic.getThumbUrl();
@@ -211,7 +208,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public BaseResponse<PublisherComicResponse> getMyComic(User publisher, String comicId) {
-        validateComicOwnership(publisher, comicId);
+        validateComicOwnershipByComicId(publisher, comicId);
         Comic comic = findComicById(comicId);
 
         PublisherComicResponse response = convertToPublisherComicResponse(comic);
@@ -221,7 +218,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     @Transactional
     public BaseResponse<Chapter> createChapter(User publisher, String comicId, PublisherChapterRequest request) {
-        validateComicOwnership(publisher, comicId);
+        validateComicOwnershipByComicId(publisher, comicId);
         Comic comic = findComicById(comicId);
 
         // Check if chapter number exists
@@ -263,7 +260,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     @Transactional
     public BaseResponse<Chapter> updateChapter(User publisher, String chapterId, PublisherChapterRequest request) {
-        validateChapterOwnership(publisher, chapterId);
+        validateComicOwnershipByChapterId(publisher, chapterId);
         Chapter chapter = findChapterById(chapterId);
 
         // Check if chapter number exists (excluding current chapter)
@@ -296,7 +293,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     @Transactional
     public BaseResponse<Void> deleteChapter(User publisher, String chapterId) {
-        validateChapterOwnership(publisher, chapterId);
+        validateComicOwnershipByChapterId(publisher, chapterId);
         Chapter chapter = findChapterById(chapterId);
 
         chapterRepository.delete(chapter);
@@ -305,7 +302,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public BaseResponse<List<Chapter>> getChaptersByComic(User publisher, String comicId, int page, int limit) {
-        validateComicOwnership(publisher, comicId);
+        validateComicOwnershipByComicId(publisher, comicId);
         Comic comic = findComicById(comicId);
 
         Pageable pageable = PaginationUtils.createPageable(page, limit);
@@ -319,67 +316,11 @@ public class PublisherServiceImpl implements PublisherService {
                 chapters.getTotalPages());
     }
 
+    /**
+     * Xác thực quyền sở hữu comic bằng comicId
+     */
     @Override
-    public BaseResponse<PublisherStatsResponse> getPublisherStats(User publisher) {
-        PublisherStatsResponse stats = PublisherStatsResponse.builder()
-                .totalComics(comicRepository.countByPublisher(publisher))
-                .totalRevenue(transactionRepository.getTotalRevenueByPublisher(publisher))
-                .availableBalance(calculateAvailableBalance(publisher))
-                .totalWithdrawn(withdrawalRequestRepository.getTotalWithdrawnAmountByPublisher(publisher))
-                .pendingWithdrawal(withdrawalRequestRepository.getTotalPendingAmountByPublisher(publisher))
-                .build();
-
-        return BaseResponse.success(stats);
-    }
-
-    @Override
-    public BaseResponse<Double> getAvailableBalance(User publisher) {
-        Double balance = calculateAvailableBalance(publisher);
-        return BaseResponse.success(balance);
-    }
-
-    @Override
-    @Transactional
-    public BaseResponse<WithdrawalRequest> createWithdrawalRequest(User publisher, WithdrawalRequestDto request) {
-        // Check if publisher has pending withdrawal
-        if (withdrawalRequestRepository.existsByPublisherAndStatus(publisher, WithdrawalStatus.PENDING)) {
-            throw new BaseException(ErrorCode.WITHDRAWAL_PENDING_EXISTS);
-        }
-
-        // Check available balance
-        Double availableBalance = calculateAvailableBalance(publisher);
-        if (availableBalance < request.getAmount()) {
-            throw new BaseException(ErrorCode.WITHDRAWAL_INSUFFICIENT_BALANCE);
-        }
-
-        WithdrawalRequest withdrawalRequest = WithdrawalRequest.builder()
-                .publisher(publisher)
-                .amount(request.getAmount())
-                .bankName(request.getBankName())
-                .bankAccountNumber(request.getBankAccountNumber())
-                .bankAccountName(request.getBankAccountName())
-                .status(WithdrawalStatus.PENDING)
-                .build();
-
-        WithdrawalRequest savedRequest = withdrawalRequestRepository.save(withdrawalRequest);
-        return BaseResponse.success(savedRequest);
-    }
-
-    @Override
-    public BaseResponse<List<WithdrawalRequest>> getMyWithdrawalRequests(User publisher, int page, int limit) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
-        Page<WithdrawalRequest> requests = withdrawalRequestRepository.findByPublisher(publisher, pageable);
-
-        return BaseResponse.success(
-                requests.getContent(),
-                page,
-                (int) requests.getTotalElements(),
-                limit,
-                requests.getTotalPages());
-    }
-
-    @Override
-    public void validateComicOwnership(User publisher, String comicId) {
+    public void validateComicOwnershipByComicId(User publisher, String comicId) {
         Comic comic = findComicById(comicId);
 
         if (!comic.getPublisher().getId().equals(publisher.getId())) {
@@ -387,13 +328,251 @@ public class PublisherServiceImpl implements PublisherService {
         }
     }
 
+    /**
+     * Xác thực quyền sở hữu comic bằng chapterId
+     */
     @Override
-    public void validateChapterOwnership(User publisher, String chapterId) {
+    public void validateComicOwnershipByChapterId(User publisher, String chapterId) {
         Chapter chapter = findChapterById(chapterId);
 
         if (!chapter.getComic().getPublisher().getId().equals(publisher.getId())) {
             throw new BaseException(ErrorCode.PUBLISHER_COMIC_NOT_OWNER);
         }
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse<Chapter> createChapterWithImages(User publisher, String comicId,
+            PublisherChapterRequest request, List<MultipartFile> images) {
+        validateComicOwnershipByComicId(publisher, comicId);
+        Comic comic = findComicById(comicId);
+
+        // Check if chapter number exists
+        if (chapterRepository.existsByComicAndChapterNumber(comic, request.getChapterNumber())) {
+            throw new BaseException(ErrorCode.CHAPTER_NUMBER_EXISTS);
+        }
+
+        // Upload images to storage
+        List<String> imageUrls = uploadChapterImages(images, comic.getSlug(), request.getChapterNumber());
+
+        // Update request with uploaded URLs
+        request.setImageUrls(imageUrls);
+
+        return createChapter(publisher, comicId, request);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse<Chapter> updateChapterWithImages(User publisher, String chapterId,
+            PublisherChapterRequest request, List<MultipartFile> images) {
+        validateComicOwnershipByChapterId(publisher, chapterId);
+        Chapter chapter = findChapterById(chapterId);
+
+        // Upload new images if provided
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = uploadChapterImages(images,
+                    chapter.getComic().getSlug(),
+                    request.getChapterNumber());
+            request.setImageUrls(imageUrls);
+        }
+
+        return updateChapter(publisher, chapterId, request);
+    }
+
+    @Override
+    public BaseResponse<?> getAllChapters(String currentUserId, int page, int limit, String search,
+            String comicId) {
+        User publisher = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "chapterNumber",
+                Sort.Direction.ASC);
+        int originalPage = page;
+        Page<Chapter> chapters = null;
+
+        if (search != null && !search.isEmpty() && comicId != null && !comicId.isEmpty()) {
+            validateComicOwnershipByComicId(publisher, comicId);
+            chapters = chapterRepository.findByTitleContainingAndComicId(search, comicId, pageable);
+        } else if (search != null && !search.isEmpty()) {
+            Page<Comic> publisherComics = comicRepository.findByPublisher(publisher, Pageable.unpaged());
+            List<String> comicIds = publisherComics.getContent().stream()
+                    .map(Comic::getId)
+                    .collect(Collectors.toList());
+
+            if (comicIds.isEmpty()) {
+                chapters = Page.empty(pageable);
+            } else {
+                Page<Chapter> allChapters = chapterRepository.findByTitleContaining(search, pageable);
+                List<Chapter> filteredChapters = allChapters.getContent().stream()
+                        .filter(chapter -> comicIds.contains(chapter.getComic().getId()))
+                        .collect(Collectors.toList());
+                chapters = new org.springframework.data.domain.PageImpl<>(filteredChapters, pageable,
+                        filteredChapters.size());
+            }
+        } else if (comicId != null && !comicId.isEmpty()) {
+            validateComicOwnershipByComicId(publisher, comicId);
+            chapters = chapterRepository.findByComicId(comicId, pageable);
+        } else {
+            Page<Comic> publisherComics = comicRepository.findByPublisher(publisher, Pageable.unpaged());
+            List<String> comicIds = publisherComics.getContent().stream()
+                    .map(Comic::getId)
+                    .collect(Collectors.toList());
+
+            if (comicIds.isEmpty()) {
+                chapters = Page.empty(pageable);
+            } else {
+                Page<Chapter> allChapters = chapterRepository.findAll(pageable);
+                List<Chapter> filteredChapters = allChapters.getContent().stream()
+                        .filter(chapter -> comicIds.contains(chapter.getComic().getId()))
+                        .collect(Collectors.toList());
+                chapters = new org.springframework.data.domain.PageImpl<>(filteredChapters, pageable,
+                        filteredChapters.size());
+            }
+        }
+
+        List<Chapter> chapterList = chapters.getContent();
+
+        if (chapterList.isEmpty()) {
+            return BaseResponse.success(
+                    new ArrayList<>(),
+                    originalPage,
+                    0,
+                    limit,
+                    0);
+        }
+
+        return BaseResponse.success(
+                chapterList,
+                originalPage,
+                (int) chapters.getTotalElements(),
+                limit,
+                chapters.getTotalPages());
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse<Void> deleteMultipleChapters(User publisher, List<String> chapterIds) {
+        validateComicOwnershipByChapterId(publisher, chapterIds.get(0));
+
+        List<Chapter> chapters = chapterRepository.findAllById(chapterIds);
+        chapterRepository.deleteAll(chapters);
+
+        return BaseResponse.success("Xóa các chương thành công");
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse<Void> reorderChapter(User publisher, String chapterId, Double newChapterNumber) {
+        validateComicOwnershipByChapterId(publisher, chapterId);
+        Chapter chapter = findChapterById(chapterId);
+
+        // Check if new chapter number exists
+        if (chapterRepository.existsByComicAndChapterNumber(chapter.getComic(), newChapterNumber)) {
+            throw new BaseException(ErrorCode.CHAPTER_NUMBER_EXISTS);
+        }
+
+        chapter.setChapterNumber(newChapterNumber);
+        chapterRepository.save(chapter);
+
+        return BaseResponse.success("Sắp xếp lại chương thành công");
+    }
+
+    @Override
+    public BaseResponse<ChapterStatsResponse> getChapterStats(User publisher, String chapterId) {
+        validateComicOwnershipByChapterId(publisher, chapterId);
+        Chapter chapter = findChapterById(chapterId);
+
+        // Tính toán thời gian
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        LocalDateTime startOfWeek = now.minusDays(now.getDayOfWeek().getValue() - 1).truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime startOfMonth = now.withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS);
+
+        // Thống kê lượt mua và doanh thu
+        Long totalPurchases = purchasedChapterRepository.countByChapter(chapter);
+        Double totalRevenue = purchasedChapterRepository.getTotalRevenueByChapter(chapter);
+
+        Long purchasesToday = purchasedChapterRepository.countPurchasesByChapterBetweenDates(chapter, startOfDay,
+                endOfDay);
+        Double revenueToday = purchasedChapterRepository.getRevenueByChapterBetweenDates(chapter, startOfDay, endOfDay);
+
+        Long purchasesThisWeek = purchasedChapterRepository.countPurchasesByChapterAfterDate(chapter, startOfWeek);
+        Double revenueThisWeek = purchasedChapterRepository.getRevenueByChapterAfterDate(chapter, startOfWeek);
+
+        Long purchasesThisMonth = purchasedChapterRepository.countPurchasesByChapterAfterDate(chapter, startOfMonth);
+        Double revenueThisMonth = purchasedChapterRepository.getRevenueByChapterAfterDate(chapter, startOfMonth);
+
+        // Tính toán conversion rate và average revenue per user
+        Double conversionRate = 0.0;
+        Double averageRevenuePerUser = 0.0;
+
+        if (totalPurchases > 0) {
+            averageRevenuePerUser = totalRevenue / totalPurchases;
+            // TODO: Cần thêm thống kê views để tính conversion rate chính xác
+            // conversionRate = (totalPurchases.doubleValue() / totalViews) * 100;
+        }
+
+        ChapterStatsResponse stats = ChapterStatsResponse.builder()
+                .chapterId(chapter.getId())
+                .chapterTitle(chapter.getTitle())
+                .chapterNumber(chapter.getChapterNumber())
+                .status(chapter.getStatus().name())
+                .price(chapter.getPrice())
+                .isFree(chapter.getPrice() == null || chapter.getPrice() == 0.0)
+                // Views - TODO: Implement chapter views tracking
+                .totalViews(0L)
+                .viewsToday(0L)
+                .viewsThisWeek(0L)
+                .viewsThisMonth(0L)
+                // Revenue
+                .totalRevenue(totalRevenue != null ? totalRevenue : 0.0)
+                .revenueToday(revenueToday != null ? revenueToday : 0.0)
+                .revenueThisWeek(revenueThisWeek != null ? revenueThisWeek : 0.0)
+                .revenueThisMonth(revenueThisMonth != null ? revenueThisMonth : 0.0)
+                // Purchases
+                .totalPurchases(totalPurchases)
+                .purchasesToday(purchasesToday)
+                .purchasesThisWeek(purchasesThisWeek)
+                .purchasesThisMonth(purchasesThisMonth)
+                // Analytics
+                .conversionRate(conversionRate)
+                .averageRevenuePerUser(averageRevenuePerUser)
+                .build();
+
+        return BaseResponse.success(stats);
+    }
+
+    /**
+     * Upload danh sách ảnh cho chapter
+     */
+    private List<String> uploadChapterImages(List<MultipartFile> images, String comicSlug, Double chapterNumber) {
+        // TODO: Cần thêm logic upload ảnh cho chapter
+        return null;
+        // List<String> imageUrls = new ArrayList<>();
+
+        // if (images != null && !images.isEmpty()) {
+        // for (int i = 0; i < images.size(); i++) {
+        // MultipartFile image = images.get(i);
+        // if (!image.isEmpty()) {
+        // String fileName = String.format("%s_chapter_%s_page_%d",
+        // comicSlug, chapterNumber.toString().replace(".", "_"), i + 1);
+
+        // var response = storageFactory.getStorageService().uploadFile(
+        // image,
+        // GlobalConstants.TYPE_CHAPTER,
+        // fileName);
+
+        // if (response.getStatus() == 200) {
+        // imageUrls.add(response.getMessage());
+        // } else {
+        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        // }
+        // }
+        // }
+        // }
+
+        // return imageUrls;
     }
 
     // Helper methods
@@ -407,27 +586,6 @@ public class PublisherServiceImpl implements PublisherService {
         ValidationUtils.checkNullId(chapterId);
         return chapterRepository.findById(chapterId)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
-    }
-
-    private Double calculateAvailableBalance(User publisher) {
-        Double totalRevenue = transactionRepository.getTotalRevenueByPublisher(publisher);
-        Double totalWithdrawn = withdrawalRequestRepository.getTotalWithdrawnAmountByPublisher(publisher);
-        Double pendingWithdrawal = withdrawalRequestRepository.getTotalPendingAmountByPublisher(publisher);
-
-        return (totalRevenue != null ? totalRevenue : 0.0) -
-                (totalWithdrawn != null ? totalWithdrawn : 0.0) -
-                (pendingWithdrawal != null ? pendingWithdrawal : 0.0);
-    }
-
-    private String generateSlug(String name) {
-        String slug = Normalizer.normalize(name.toLowerCase(), Normalizer.Form.NFD);
-        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        slug = pattern.matcher(slug).replaceAll("");
-        slug = slug.replaceAll("[^a-z0-9\\s-]", "")
-                .replaceAll("\\s+", "-")
-                .replaceAll("-+", "-")
-                .replaceAll("^-|-$", "");
-        return slug;
     }
 
     private PublisherComicResponse convertToPublisherComicResponse(Comic comic) {
