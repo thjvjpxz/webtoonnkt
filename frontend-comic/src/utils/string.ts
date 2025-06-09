@@ -22,3 +22,14 @@ export const getFirstColorFromGradient = (gradient: string) => {
   // Trả về mã màu đầu tiên hoặc màu mặc định
   return hexColorMatch ? hexColorMatch[0] : "#000000";
 }
+
+export const formatRole = (role: string) => {
+  if (role === "ADMIN") {
+    return "Quản trị viên";
+  } else if (role === "READER") {
+    return "Độc giả";
+  } else if (role === "PUBLISHER") {
+    return "Nhà xuất bản";
+  }
+  return role; // Trả về giá trị gốc nếu không khớp
+}

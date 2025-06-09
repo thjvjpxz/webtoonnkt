@@ -28,6 +28,7 @@ import { useUser } from "@/hooks/useUser";
 import UserModal from "@/components/admin/users/UserModal";
 import DeleteUserModal from "@/components/admin/users/DeleteUserModal";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { formatRole } from "@/utils/string";
 
 export default function Users() {
   const {
@@ -197,16 +198,6 @@ export default function Users() {
     }).format(amount);
   };
 
-  const formatRole = (role: string) => {
-    if (role === "ADMIN") {
-      return "Quản trị viên";
-    } else if (role === "READER") {
-      return "Độc giả";
-    } else if (role === "PUBLISHER") {
-      return "Nhà xuất bản";
-    }
-    return role; // Trả về giá trị gốc nếu không khớp
-  }
 
   return (
     <DashboardLayout title="Quản lý người dùng">

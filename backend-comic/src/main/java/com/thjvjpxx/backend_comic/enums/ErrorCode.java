@@ -75,6 +75,7 @@ public enum ErrorCode {
     INVALID_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không chính xác!"),
     PASSWORD_AND_CONFIRM_NOT_MATCH(HttpStatus.BAD_REQUEST, "Mật khẩu và mật khẩu xác nhận không khớp!"),
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Tài khoản đã bị xóa!"),
+    USER_ALREADY_BLOCKED(HttpStatus.BAD_REQUEST, "Tài khoản đã bị khóa!"),
 
     // Role
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại!"),

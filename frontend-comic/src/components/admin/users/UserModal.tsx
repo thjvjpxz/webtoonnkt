@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { formatRole } from "@/utils/string";
 
 interface UserModalProps {
   user: UserResponse | null;
@@ -246,19 +247,6 @@ export default function UserModal({
       setIsSubmitting(false);
     }
   };
-
-  const formatRole = (roleName: string) => {
-    switch (roleName) {
-      case "ADMIN":
-        return "Quản trị viên";
-      case "READER":
-        return "Độc giả";
-      case "PUBLISHER":
-        return "Nhà xuất bản";
-      default:
-        return roleName;
-    }
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
