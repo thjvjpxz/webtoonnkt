@@ -343,7 +343,7 @@ export default function Users() {
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      {showDeleted ? "Ngày xóa" : "Ngày cập nhật"}
+                      {showDeleted ? "Ngày xóa" : "Ngày sửa"}
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Thao tác
