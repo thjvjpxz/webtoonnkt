@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum ErrorCode {
     // Common
     ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Id không được trống!"),
+    HAS_ERROR(HttpStatus.BAD_REQUEST, "Có lỗi xảy ra vui lòng thử lại sau!"),
 
     // Category
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Thể loại không tồn tại!"),
@@ -23,6 +24,7 @@ public enum ErrorCode {
     COMIC_SLUG_EXISTS(HttpStatus.BAD_REQUEST, "Truyện đã tồn tại!"),
     NAME_COMIC_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên truyện không được trống!"),
     SLUG_COMIC_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Slug truyện không được trống!"),
+    COMIC_HAS_CHAPTERS(HttpStatus.BAD_REQUEST, "Truyện này vẫn còn chương, không thể xóa!"),
 
     // Level Type
     LEVEL_TYPE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Loại cấp độ không được trống!"),

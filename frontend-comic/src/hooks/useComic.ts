@@ -209,7 +209,6 @@ export const useComic = () => {
       if (response.status === 200) {
         toast.success("Xóa truyện thành công");
         fetchComics(); // Tải lại danh sách
-        setIsDeleteModalOpen(false);
       } else {
         toast.error(response.message || "Không thể xóa truyện");
       }
@@ -221,6 +220,8 @@ export const useComic = () => {
       toast.error(errorMessage || "Đã xảy ra lỗi khi xóa truyện");
     } finally {
       setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setCurrentComic(null);
     }
   };
 

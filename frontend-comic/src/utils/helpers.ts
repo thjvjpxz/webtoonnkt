@@ -5,9 +5,7 @@ import { vi } from "date-fns/locale";
 export const formatDate = (dateString: string) => {
 
   const date = parseISO(dateString);
-
   const diff = differenceInDays(new Date(), date);
-  console.log(diff);
 
   if (diff < 1) {
     return formatDistanceToNow(date, {

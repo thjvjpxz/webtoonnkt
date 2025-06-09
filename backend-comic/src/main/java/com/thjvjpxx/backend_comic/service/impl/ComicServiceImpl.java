@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -27,6 +27,7 @@ import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
 import com.thjvjpxx.backend_comic.service.StorageService;
+import com.thjvjpxx.backend_comic.utils.FileUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
@@ -65,14 +66,6 @@ public class ComicServiceImpl implements ComicService {
                 (int) comics.getTotalElements(),
                 limit,
                 comics.getTotalPages());
-    }
-
-    @Override
-    public BaseResponse<Comic> getComicById(String id) {
-        ValidationUtils.checkNullId(id);
-
-        Comic comic = comicRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
-        return BaseResponse.success(comic);
     }
 
     @Override
@@ -120,49 +113,138 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
-        // TODO: Cần thêm logic update comic
-        return null;
-        // ValidationUtils.checkNullId(id);
+        ValidationUtils.checkNullId(id);
 
-        // Comic comic = findComicById(id);
+        Comic comic = findComicById(id);
 
-        // if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
-        // && !comicRequest.getSlug().equals(comic.getSlug())) {
-        // validateComicRequest(comicRequest);
-        // if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
-        // storageFactory.getStorageService().rename(comic.getFolderId(),
-        // comicRequest.getSlug());
-        // }
-        // }
+        // Kiểm tra slug có thay đổi không
+        boolean isSlugChanged = isSlugChanged(comic, comicRequest);
 
-        // String thumbUrl = comic.getThumbUrl();
-        // if (cover != null) {
-        // var response = googleDriveService.uploadFile(
-        // cover,
-        // GoogleDriveConstants.TYPE_THUMBNAIL,
-        // comicRequest.getSlug() + "_thumb");
-        // if (response.getStatus() != HttpStatus.OK.value()) {
-        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-        // }
-        // thumbUrl = response.getMessage();
-        // }
+        // Validate slug nếu có thay đổi
+        if (isSlugChanged) {
+            validateComicRequest(comicRequest);
+        }
 
-        // List<Category> categoriesNew =
-        // convertCategories(comicRequest.getCategories());
+        // Xử lý thumbnail
+        String newThumbUrl = handleThumbnailUpdate(comic, comicRequest, cover, isSlugChanged);
 
-        // comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
+        // Cập nhật categories
+        updateComicCategories(comic, comicRequest);
 
-        // comic.addCategories(categoriesNew);
-        // comic.setSlug(comicRequest.getSlug());
-        // comic.setName(comicRequest.getName());
-        // comic.setDescription(comicRequest.getDescription());
-        // comic.setAuthor(comicRequest.getAuthor());
-        // comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
-        // comic.setThumbUrl(thumbUrl);
-        // comic.setOriginName(comicRequest.getOriginName());
+        // Cập nhật thông tin comic
+        updateComicFields(comic, comicRequest, newThumbUrl);
 
-        // comicRepository.save(comic);
-        // return BaseResponse.success(comic);
+        comicRepository.save(comic);
+        return BaseResponse.success(comic);
+    }
+
+    /**
+     * Kiểm tra xem slug có thay đổi không
+     */
+    private boolean isSlugChanged(Comic comic, ComicRequest comicRequest) {
+        return comicRequest.getSlug() != null &&
+                !comicRequest.getSlug().isEmpty() &&
+                !comicRequest.getSlug().equals(comic.getSlug());
+    }
+
+    /**
+     * Xử lý cập nhật thumbnail
+     */
+    private String handleThumbnailUpdate(Comic comic, ComicRequest comicRequest,
+            MultipartFile cover, boolean isSlugChanged) {
+        String currentThumbUrl = comic.getThumbUrl();
+
+        // Không có ảnh mới
+        if (cover == null) {
+            return handleThumbnailWithoutNewImage(currentThumbUrl, comicRequest, isSlugChanged);
+        }
+
+        // Có ảnh mới
+        return handleThumbnailWithNewImage(currentThumbUrl, comicRequest, cover, isSlugChanged);
+    }
+
+    /**
+     * Xử lý thumbnail khi không có ảnh mới
+     */
+    private String handleThumbnailWithoutNewImage(String currentThumbUrl,
+            ComicRequest comicRequest, boolean isSlugChanged) {
+        if (isSlugChanged && currentThumbUrl != null && !currentThumbUrl.isEmpty()) {
+            return renameThumbnail(currentThumbUrl, comicRequest.getSlug());
+        }
+        return currentThumbUrl;
+    }
+
+    /**
+     * Xử lý thumbnail khi có ảnh mới
+     */
+    private String handleThumbnailWithNewImage(String currentThumbUrl, ComicRequest comicRequest,
+            MultipartFile cover, boolean isSlugChanged) {
+        if (isSlugChanged) {
+            // Xóa ảnh cũ nếu có
+            removeOldThumbnail(currentThumbUrl);
+        }
+
+        // Upload ảnh mới
+        return uploadNewThumbnail(cover, comicRequest.getSlug());
+    }
+
+    /**
+     * Rename thumbnail
+     */
+    private String renameThumbnail(String currentThumbUrl, String newSlug) {
+        var response = b2StorageService.rename(currentThumbUrl, newSlug + "_thumb");
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+        return response.getMessage();
+    }
+
+    /**
+     * Xóa thumbnail cũ
+     */
+    private void removeOldThumbnail(String thumbUrl) {
+        if (thumbUrl != null && !thumbUrl.isEmpty()) {
+            var response = b2StorageService.remove(thumbUrl);
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+            }
+        }
+    }
+
+    /**
+     * Upload thumbnail mới
+     */
+    private String uploadNewThumbnail(MultipartFile cover, String slug) {
+        var response = b2StorageService.uploadFile(
+                cover,
+                GlobalConstants.TYPE_THUMBNAIL,
+                slug + "_thumb");
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+        return response.getMessage();
+    }
+
+    /**
+     * Cập nhật categories của comic
+     */
+    private void updateComicCategories(Comic comic, ComicRequest comicRequest) {
+        List<Category> newCategories = convertCategories(comicRequest.getCategories());
+        comic.removeCategories(new ArrayList<>(comic.getCategories()));
+        comic.addCategories(newCategories);
+    }
+
+    /**
+     * Cập nhật các field của comic
+     */
+    private void updateComicFields(Comic comic, ComicRequest comicRequest, String thumbUrl) {
+        comic.setSlug(comicRequest.getSlug());
+        comic.setName(comicRequest.getName());
+        comic.setDescription(comicRequest.getDescription());
+        comic.setAuthor(comicRequest.getAuthor());
+        comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
+        comic.setThumbUrl(thumbUrl);
+        comic.setOriginName(comicRequest.getOriginName());
     }
 
     private Comic findComicById(String id) {
@@ -178,11 +260,16 @@ public class ComicServiceImpl implements ComicService {
 
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
 
-        String thumbUrl = comic.getThumbUrl();
-        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
-            b2StorageService.remove(thumbUrl);
+        FileUtils.deleteFileFromB2(comic.getThumbUrl(), b2StorageService);
+
+        try {
+            comicRepository.delete(comic);
+        } catch (DataIntegrityViolationException e) {
+            throw new BaseException(ErrorCode.COMIC_HAS_CHAPTERS);
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.HAS_ERROR);
         }
-        comicRepository.delete(comic);
+
         return BaseResponse.success(comic);
     }
 
