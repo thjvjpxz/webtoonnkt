@@ -31,5 +31,5 @@ export const formatRole = (role: string) => {
   } else if (role === "PUBLISHER") {
     return "Nhà xuất bản";
   }
-  return role; // Trả về giá trị gốc nếu không khớp
+  return role;
 }

@@ -340,7 +340,10 @@ export default function Users() {
                       Số dư
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      {showDeleted ? "Ngày xóa" : "Ngày tạo"}
+                      Ngày tạo
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
+                      {showDeleted ? "Ngày xóa" : "Ngày cập nhật"}
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Thao tác
@@ -353,6 +356,7 @@ export default function Users() {
                       key={user.id}
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
+                      {/* Avatar */}
                       <TableCell className="py-4">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 relative">
@@ -406,15 +410,23 @@ export default function Users() {
                           </div>
                         </div>
                       </TableCell>
+
+                      {/* Email */}
                       <TableCell className="text-center text-muted-foreground">
                         {user.email}
                       </TableCell>
+
+                      {/* Vai trò */}
                       <TableCell className="text-center">
                         {renderRole(user.role.name)}
                       </TableCell>
+
+                      {/* VIP */}
                       <TableCell className="text-center">
                         {renderVipStatus(user.vip)}
                       </TableCell>
+
+                      {/* Trạng thái */}
                       <TableCell className="text-center">
                         {showDeleted
                           ? renderDeletedStatus(user.deleted)
@@ -423,12 +435,23 @@ export default function Users() {
                             : renderActiveStatus(user.active)
                         }
                       </TableCell>
+
+                      {/* Số dư */}
                       <TableCell className="text-center text-muted-foreground font-medium">
                         {formatCurrency(user.balance)}
                       </TableCell>
+
+                      {/* Ngày tạo */}
                       <TableCell className="text-center text-muted-foreground">
-                        {showDeleted ? formatDate(user.updatedAt) : formatDate(user.createdAt)}
+                        {formatDate(user.createdAt)}
                       </TableCell>
+
+                      {/* Ngày cập nhật */}
+                      <TableCell className="text-center text-muted-foreground">
+                        {formatDate(user.updatedAt)}
+                      </TableCell>
+
+                      {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
                           {/* Chỉ hiển thị actions cho người dùng chưa bị xóa */}

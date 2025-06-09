@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId, Boolean deleted) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
         int originalPage = page;
         Page<User> users = null;
 

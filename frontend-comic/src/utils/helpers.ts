@@ -1,13 +1,22 @@
 import { Chapter } from "@/types/chapter";
+import { differenceInDays, format, formatDistanceToNow, parseISO } from "date-fns";
+import { vi } from "date-fns/locale";
 
-export const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+export const formatDate = (dateString: string) => {
+
+  const date = parseISO(dateString);
+
+  const diff = differenceInDays(new Date(), date);
+  console.log(diff);
+
+  if (diff < 1) {
+    return formatDistanceToNow(date, {
+      addSuffix: true,
+      locale: vi,
+    });
+  }
+
+  return format(date, "dd/MM/yyyy");
 };
 
 export const constructImageUrl = (chapter: Chapter, imgUrl: string) => {

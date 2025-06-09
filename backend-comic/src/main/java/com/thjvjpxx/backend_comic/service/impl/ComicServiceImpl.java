@@ -45,7 +45,7 @@ public class ComicServiceImpl implements ComicService {
 
     @Override
     public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
-        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "createdAt", Sort.Direction.DESC);
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
         int originalPage = page;
         Page<Comic> comics = null;
         if (search != null && !search.isEmpty()) {
