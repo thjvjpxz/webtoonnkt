@@ -33,7 +33,6 @@ export const useChapter = () => {
   const [comicsTotalPages, setComicsTotalPages] = useState(1);
   const [isLoadingComics, setIsLoadingComics] = useState(false);
 
-  // Fetch chapters
   const fetchChapters = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -48,17 +47,19 @@ export const useChapter = () => {
         setChapters(response.data);
       } else {
         setChapters([]);
-        setError(response.message || "Không thể tải danh sách chapter");
+        setError(response.message || "Không thể tải danh sách chương");
       }
     } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      setError(errorMessage || "Đã xảy ra lỗi khi tải danh sách chapter");
+      setError(errorMessage || "Đã xảy ra lỗi khi tải danh sách chương");
     } finally {
       setIsLoading(false);
     }
   }, [currentPage, searchTerm, comicFilter, pageSize, isPublisher]);
 
-  // Fetch comic options
+  /**
+   * Hàm lấy danh sách truyện phân trang
+   */
   const fetchComicOptions = useCallback(async (
     page = 1,
     limit = 5,
@@ -102,66 +103,72 @@ export const useChapter = () => {
   }, [comicSearchTerm, fetchComicOptions, authLoading]);
 
   useEffect(() => {
-    // Chỉ gọi API khi auth đã load xong và không đang loading
     if (!authLoading) {
       fetchChapters();
     }
   }, [fetchChapters, authLoading]);
 
-  // Xử lý xóa chapter
+  /**
+   * Xử lý xóa chapter
+   */
   const handleDeleteChapter = async () => {
     try {
 
       const response = await deleteChapter(selectedChapter!.id);
       if (response.status === 200) {
-        toast.success("Xóa chapter thành công chapter " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
+        toast.success("Xóa chương thành công chương " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
         fetchChapters();
         setIsDeleteModalOpen(false);
       } else {
-        toast.error("Xóa chapter thất bại! " + response.message);
+        toast.error("Xóa chương thất bại! " + response.message);
       }
     } catch (error: unknown) {
       const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      toast.error("Xóa chapter thất bại! " + errorMessage);
+      toast.error("Xóa chương thất bại! " + errorMessage);
     }
   };
 
-  // Xử lý thêm hoặc cập nhật chapter
+  /**
+   * Xử lý thêm hoặc cập nhật chapter
+   * @param chapterRequest - ChapterCreateUpdate
+   * @param files - File[]
+   */
   const handleSubmitChapter = async (
     chapterRequest: ChapterCreateUpdate,
     files: File[]
   ) => {
     try {
-      let response;
+      const isUpdate = !!chapterRequest.id;
 
-      if (chapterRequest.id) {
-        // Đang cập nhật chapter
-        response = await updateChapter(chapterRequest.id, chapterRequest, files);
-        if (response.status === 200) {
-          toast.success("Cập nhật chapter thành công");
-          fetchChapters();
-          setIsAddEditModalOpen(false);
-        } else {
-          toast.error("Cập nhật chapter thất bại! " + response.message);
-        }
+      const response = isUpdate
+        ? await updateChapter(chapterRequest.id!, chapterRequest, files)
+        : await createChapter(chapterRequest, files);
+
+      if (response.status === 200) {
+        const successMessage = isUpdate
+          ? "Cập nhật chương thành công"
+          : "Thêm chương thành công";
+
+        toast.success(successMessage);
+        fetchChapters();
+        setIsAddEditModalOpen(false);
       } else {
-        // Đang thêm mới chapter
-        response = await createChapter(chapterRequest, files);
-        if (response.status === 200) {
-          toast.success("Thêm chapter thành công");
-          fetchChapters();
-          setIsAddEditModalOpen(false);
-        } else {
-          toast.error("Thêm chapter thất bại! " + response.message);
-        }
+        const errorMessage = isUpdate
+          ? "Cập nhật chương thất bại! " + response.message
+          : "Thêm chương thất bại! " + response.message;
+
+        toast.error(errorMessage);
       }
     } catch (error: unknown) {
-      const errorMessage = error && typeof error === "object" && "error" in error ? (error.error as string) : "Đã xảy ra lỗi";
-      toast.error(chapterRequest.id ? "Cập nhật chapter thất bại! " : "Thêm chapter thất bại! " + errorMessage);
+      const actionText = chapterRequest.id ? "Cập nhật" : "Thêm";
+      toast.error(`${actionText} chương thất bại!`);
     }
   };
 
-  // Xử lý trượt cuối dropdown để load more
+  /**
+   * Xử lý trượt cuối dropdown để load more
+   * @param e - Sự kiện trượt
+   */
   const handleComicDropdownScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const bottom = Math.floor(e.currentTarget.scrollHeight - e.currentTarget.scrollTop) === e.currentTarget.clientHeight;
     if (bottom && !isLoadingComics && comicPage < comicsTotalPages) {
@@ -171,45 +178,59 @@ export const useChapter = () => {
     }
   };
 
-  // Xử lý tìm kiếm combobox
+  /**
+   * Xử lý tìm kiếm combobox
+   */
   const filteredComicOptions = comicOptions.filter(comic =>
     comic.name.toLowerCase().includes(comicSearchTerm.toLowerCase())
   );
 
 
 
-  // Xử lý tìm kiếm
+  /**
+   * Xử lý tìm kiếm
+   */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
   };
 
-  // Xử lý chọn truyện
+  /**
+   * Xử lý chọn truyện
+   */
   const handleSelectComic = (comicId: string) => {
     setComicFilter(comicId);
     setIsComicDropdownOpen(false);
     setCurrentPage(1);
   };
 
-  // Xử lý mở modal xem chi tiết
+  /**
+   * Xử lý mở modal xem chi tiết
+   */
   const handleOpenViewModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsViewModalOpen(true);
   };
 
-  // Xử lý mở modal xóa
+  /**
+   * Xử lý mở modal xóa
+   */
   const handleOpenDeleteModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsDeleteModalOpen(true);
   };
 
-  // Xử lý mở modal thêm mới
+  /**
+   * Xử lý mở modal thêm mới
+   */
   const handleOpenAddModal = () => {
     setSelectedChapter(null);
     setIsAddEditModalOpen(true);
   };
 
-  // Xử lý mở modal chỉnh sửa
+  /**
+   * Xử lý mở modal chỉnh sửa
+   */
   const handleOpenEditModal = (chapter: ChapterWithComicDetail) => {
     setSelectedChapter(chapter);
     setIsAddEditModalOpen(true);

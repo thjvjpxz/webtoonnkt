@@ -67,7 +67,7 @@ export default function Chapters() {
   } = useChapter();
 
   return (
-    <DashboardLayout title={isPublisher ? "Chapter của tôi" : "Quản lý chapter"} isPublisher={isPublisher}>
+    <DashboardLayout title={isPublisher ? "Chương của tôi" : "Quản lý chương"} isPublisher={isPublisher}>
       {/* Search and Add Button */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -76,7 +76,7 @@ export default function Chapters() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Tìm kiếm chapter..."
+              placeholder="Tìm kiếm chương..."
               className="pl-10 w-full sm:w-80 border-border focus:border-primary"
             />
             <FiSearch className="h-5 w-5 text-primary absolute left-3 top-2" />
@@ -185,7 +185,7 @@ export default function Chapters() {
           className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <FiPlus className="mr-2" size={18} />
-          {isPublisher ? "Tạo chapter mới" : "Thêm chapter mới"}
+          Thêm chương mới
         </Button>
       </div>
 
@@ -194,7 +194,7 @@ export default function Chapters() {
         <CardHeader className="border-b border-border/50">
           <CardTitle className="text-foreground flex items-center gap-2">
             <FiBookOpen className="text-primary" size={20} />
-            {isPublisher ? "Chapter của tôi" : "Danh sách chapter"}
+            {isPublisher ? "Chương của tôi" : "Danh sách chương"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -215,7 +215,7 @@ export default function Chapters() {
             <div className="p-12 text-center">
               <FiBookOpen className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
               <h3 className="text-lg font-medium text-foreground mb-2">
-                Không có chapter nào
+                Không có chương nào
               </h3>
               <p className="text-muted-foreground mb-6">
                 Chưa có chapter nào được thêm vào hệ thống.
@@ -225,7 +225,7 @@ export default function Chapters() {
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <FiPlus className="mr-2" size={18} />
-                Thêm chapter mới
+                Thêm chương mới
               </Button>
             </div>
           ) : (
@@ -237,7 +237,7 @@ export default function Chapters() {
                       Truyện
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      Chapter
+                      Chương
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Trạng thái
@@ -430,7 +430,6 @@ export default function Chapters() {
         onClose={() => setIsAddEditModalOpen(false)}
         onSubmit={handleSubmitChapter}
         chapter={selectedChapter}
-        comicOptions={comicOptions}
       />
     </DashboardLayout>
   )

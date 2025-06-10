@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useChapter } from "@/hooks/useChapter";
 import { Chapter, ChapterCreateUpdate, ChapterStatus, DetailChapterCreateUpdate } from "@/types/chapter";
-import { ComicResponse } from "@/types/comic";
 import { toast } from "react-hot-toast";
 import { constructImageUrl } from "@/utils/helpers";
 
@@ -29,7 +28,6 @@ const sortFilesByName = (files: File[]): File[] => {
 export const useChapterModal = (
   isOpen: boolean,
   chapter: Chapter | null,
-  comicOptions: ComicResponse[],
   onSubmit: (chapterData: ChapterCreateUpdate, images: File[]) => void
 ) => {
   const isEditMode = !!chapter;
@@ -47,73 +45,91 @@ export const useChapterModal = (
   const [uploadMethod, setUploadMethod] = useState<'file' | 'link'>('file');
   const [imageLink, setImageLink] = useState<string>('');
 
-  // Tái sử dụng hook
   const {
+    comicOptions,
     comicSearchTerm,
     setComicSearchTerm,
     isComicDropdownOpen,
     setIsComicDropdownOpen,
     isLoadingComics,
     handleComicDropdownScroll,
-    handleSelectComic: selectComic
+    handleSelectComic: selectComic,
+    filteredComicOptions
   } = useChapter();
 
-  // Lọc truyện theo từ khóa tìm kiếm
-  const filteredComicOptions = comicOptions.filter(comic =>
-    comic.name.toLowerCase().includes(comicSearchTerm.toLowerCase())
-  );
+  /**
+   * Xử lý chuyển đổi chế độ upload
+   * @param method - Chế độ upload
+   */
+  const handleUploadMethodChange = (method: 'file' | 'link') => {
+    if (method === uploadMethod) return;
 
-  // Reset form khi modal đóng
-  useEffect(() => {
-    if (isOpen) {
-      if (chapter) {
-        setTitle(chapter.title);
-        setChapterNumber(chapter.chapterNumber.toString());
-        setStatus(chapter.status !== undefined ? chapter.status : ChapterStatus.FREE);
-        setPrice(chapter.price);
-
-        // Set comic ID
-        const comic = comicOptions.find(comic => comic.name === chapter.comicName);
-        if (comic) setComicId(comic.id.toString());
-
-        // Load chapter images if in edit mode and chapter has images
-        if (chapter.detailChapters && chapter.detailChapters.length > 0) {
-          const sortedDetails = [...chapter.detailChapters].sort((a, b) => a.orderNumber - b.orderNumber);
-          const urls = sortedDetails.map(detail => {
-            // Đảm bảo URL là hợp lệ trước khi thêm vào danh sách
-            try {
-              const url = constructImageUrl(chapter, detail.imgUrl);
-              new URL(url); // Kiểm tra URL hợp lệ
-              return url;
-            } catch (error) {
-              console.error("URL không hợp lệ từ database:", detail.imgUrl);
-              console.error(error);
-              return null;
-            }
-          }).filter(url => url !== null) as string[];
-
-          setPreviewUrls(urls);
-          setExistingImageUrls(urls);
-        }
-        setDeletedImageUrls([]);
-      } else {
-        // Reset form for new chapter
-        setTitle("");
-        setChapterNumber("");
-        setComicId("");
-        setStatus(ChapterStatus.FREE);
-        setPrice(undefined);
-        setImages([]);
-        setPreviewUrls([]);
-        setExistingImageUrls([]);
-        setDeletedImageUrls([]);
-      }
+    if (method === 'file') {
+      // Chuyển sang file mode: clear tất cả URL links, chỉ giữ file URLs và existing images
+      setPreviewUrls(prev => prev.filter(url => url.startsWith('blob:') || existingImageUrls.includes(url)));
+      setImageLink('');
     } else {
-      // Reset image states when modal closes
+      // Chuyển sang link mode: clear tất cả files và file URLs, chỉ giữ existing images
+      setImages([]);
+      setPreviewUrls(prev => {
+        // Revoke blob URLs để tránh memory leak
+        prev.forEach(url => {
+          if (url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+          }
+        });
+        // Chỉ giữ existing images
+        return prev.filter(url => existingImageUrls.includes(url));
+      });
+    }
+
+    setUploadMethod(method);
+  };
+
+  useEffect(() => {
+    if (isOpen && chapter) {
+      setTitle(chapter.title);
+      setChapterNumber(chapter.chapterNumber.toString());
+      setStatus(chapter.status !== undefined ? chapter.status : ChapterStatus.FREE);
+      setPrice(chapter.price);
+
+      // Set comic ID
+      const comic = comicOptions.find(comic => comic.name === chapter.comicName);
+      if (comic) setComicId(comic.id.toString());
+
+      // Load chapter images if in edit mode and chapter has images
+      if (chapter.detailChapters && chapter.detailChapters.length > 0) {
+        const sortedDetails = [...chapter.detailChapters].sort((a, b) => a.orderNumber - b.orderNumber);
+        const urls = sortedDetails.map(detail => {
+          // Đảm bảo URL là hợp lệ trước khi thêm vào danh sách
+          try {
+            const url = constructImageUrl(chapter, detail.imgUrl);
+            new URL(url); // Kiểm tra URL hợp lệ
+            return url;
+          } catch (error) {
+            console.error("URL không hợp lệ từ database:", detail.imgUrl);
+            console.error(error);
+            return null;
+          }
+        }).filter(url => url !== null) as string[];
+
+        setPreviewUrls(urls);
+        setExistingImageUrls(urls);
+      }
+      setDeletedImageUrls([]);
+    } else {
+      // Reset form for new chapter
+      setTitle("");
+      setChapterNumber("");
+      setComicId("");
+      setStatus(ChapterStatus.FREE);
+      setPrice(undefined);
       setImages([]);
       setPreviewUrls([]);
       setExistingImageUrls([]);
       setDeletedImageUrls([]);
+      setUploadMethod('file'); // Reset về upload file
+      setImageLink(''); // Clear image link
     }
   }, [isOpen, chapter, comicOptions]);
 
@@ -132,36 +148,30 @@ export const useChapterModal = (
     // Sắp xếp file theo tên trước khi thêm vào state
     const sortedFiles = sortFilesByName(newFiles);
 
+    // Thêm file mới vào danh sách file hiện tại
     setImages(prev => {
       const combinedFiles = [...prev, ...sortedFiles];
       // Sắp xếp lại toàn bộ danh sách file
       return sortFilesByName(combinedFiles);
     });
 
-    // Tạo preview URLs theo thứ tự đã sắp xếp
+    // Tạo preview URLs cho file mới
     const newPreviewUrls = sortedFiles.map(file => URL.createObjectURL(file));
+
+    // Thêm URL preview mới vào danh sách hiện tại (chỉ cho file mode)
     setPreviewUrls(prev => {
-      const combinedUrls = [...prev, ...newPreviewUrls];
-      // Sắp xếp lại preview URLs theo thứ tự file đã sắp xếp
-      const allFiles = sortFilesByName([...images, ...sortedFiles]);
-      const sortedUrls: string[] = [];
-
-      allFiles.forEach(file => {
-        const existingIndex = images.findIndex(img => img.name === file.name);
-        if (existingIndex !== -1) {
-          // File đã tồn tại, lấy URL từ preview cũ
-          sortedUrls.push(prev[existingIndex]);
-        } else {
-          // File mới, lấy URL từ newPreviewUrls
-          const newIndex = sortedFiles.findIndex(newFile => newFile.name === file.name);
-          if (newIndex !== -1) {
-            sortedUrls.push(newPreviewUrls[newIndex]);
-          }
-        }
-      });
-
-      return sortedUrls;
+      // Chỉ giữ lại URLs từ files hoặc existing images, loại bỏ external URLs
+      const fileUrls = prev.filter(url => url.startsWith('blob:') || existingImageUrls.includes(url));
+      return [...fileUrls, ...newPreviewUrls];
     });
+
+    // Clear image link nếu đang ở file mode
+    setImageLink('');
+
+    // Reset input file sau khi xử lý
+    if (e.target) {
+      e.target.value = '';
+    }
   };
 
   // Xóa hình ảnh đã chọn
@@ -205,64 +215,36 @@ export const useChapterModal = (
   // Function kiểm tra URL hợp lệ
   const isValidImageUrl = (url: string): boolean => {
     try {
-      // Thử tạo đối tượng URL để kiểm tra tính hợp lệ
       new URL(url);
-
-      // Kiểm tra định dạng ảnh nếu URL hợp lệ
-      return url.trim() !== '' &&
-        (url.startsWith('http://') || url.startsWith('https://')) &&
-        /\.(jpg|jpeg|png|webp|gif|bmp)(\?.*)?$/i.test(url);
+      return true;
     } catch (error) {
-      // URL không hợp lệ
-      console.error("URL không hợp lệ:", url);
-      console.error(error);
       return false;
     }
   };
 
 
 
-  // Thêm hàm kiểm tra các link hợp lệ
-  const hasValidImageLinks = (text: string): boolean => {
-    if (!text.trim()) return false;
+  // Xử lý tự động khi thay đổi nội dung textarea link
+  const handleImageLinkChange = (value: string) => {
+    setImageLink(value);
 
-    const links = text.split('\n').filter(link => link.trim() !== '');
-    return links.some(link => isValidImageUrl(link.trim()));
-  };
-
-  // Xử lý thêm nhiều link ảnh
-  const handleAddMultipleImageLinks = () => {
-    if (!imageLink.trim()) return;
-
-    try {
-      const links = imageLink
+    // Tự động xử lý links khi có nội dung
+    if (value.trim()) {
+      const inputLinks = value
         .split('\n')
         .map(link => link.trim())
-        .filter(link => {
-          try {
-            // Kiểm tra URL có hợp lệ
-            if (link === '') return false;
-            new URL(link);
-            return isValidImageUrl(link);
-          } catch (error) {
-            console.error("URL không hợp lệ trong danh sách:", link);
-            console.error(error);
-            return false;
-          }
-        });
+        .filter(link => link !== '');
 
-      if (links.length === 0) {
-        toast.error("Không có URL hợp lệ nào được thêm");
-        return;
+      const validLinks = inputLinks.filter(link => isValidImageUrl(link));
+
+      // Chỉ cập nhật preview nếu có link hợp lệ, giữ nguyên thứ tự của links
+      if (validLinks.length > 0) {
+        setPreviewUrls(validLinks);
+        setImages([]); // Clear files khi chuyển sang URL mode
       }
-
-      // Thêm các link hợp lệ vào danh sách preview
-      setPreviewUrls(prev => [...prev, ...links]);
-      setImageLink(''); // Xóa textarea sau khi thêm
-      toast.success(`Đã thêm ${links.length} hình ảnh`);
-    } catch (error) {
-      console.error("Lỗi khi xử lý URL hình ảnh:", error);
-      toast.error("Có lỗi xảy ra khi xử lý URL hình ảnh");
+    } else {
+      // Clear preview khi textarea trống (chỉ clear link URLs, giữ existing images)
+      setPreviewUrls(prev => prev.filter(url => existingImageUrls.includes(url)));
     }
   };
 
@@ -272,12 +254,12 @@ export const useChapterModal = (
 
     // Validate data
     if (!title.trim()) {
-      toast.error("Vui lòng nhập tiêu đề chapter");
+      toast.error("Vui lòng nhập tiêu đề chương");
       return;
     }
 
     if (!chapterNumber || parseFloat(chapterNumber) < 0) {
-      toast.error("Vui lòng nhập số chapter hợp lệ");
+      toast.error("Vui lòng nhập số chương hợp lệ");
       return;
     }
 
@@ -293,12 +275,12 @@ export const useChapterModal = (
 
     // Validate price nếu chapter là trả phí
     if (status === ChapterStatus.FEE && (!price || price <= 0)) {
-      toast.error("Vui lòng nhập giá hợp lệ cho chapter trả phí");
+      toast.error("Vui lòng nhập giá hợp lệ cho chương trả phí");
       return;
     }
 
-    // Nếu đang chỉnh sửa, không cần validate có ảnh hay không
-    if (!isEditMode && images.length === 0) {
+    // Validate có ảnh nếu không phải chế độ edit và chưa có preview nào
+    if (!isEditMode && previewUrls.length === 0) {
       toast.error("Vui lòng thêm ít nhất một ảnh");
       return;
     }
@@ -354,12 +336,9 @@ export const useChapterModal = (
 
     try {
       await onSubmit(chapterData, images);
-      // Sau khi xử lý xong thì reset form hoặc đóng modal
       setIsUploading(false);
       setIsSubmitting(false);
     } catch (error) {
-      // Xử lý lỗi
-      console.error("Error submitting chapter:", error);
       setIsUploading(false);
       setIsSubmitting(false);
     }
@@ -406,10 +385,8 @@ export const useChapterModal = (
 
     // Upload method states
     uploadMethod,
-    setUploadMethod,
+    setUploadMethod: handleUploadMethodChange,
     imageLink,
-    setImageLink,
-    hasValidImageLinks,
-    handleAddMultipleImageLinks
+    setImageLink: handleImageLinkChange
   };
-}; 
+};
