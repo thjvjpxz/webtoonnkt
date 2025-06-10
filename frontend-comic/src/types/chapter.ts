@@ -1,3 +1,5 @@
+import { LevelResponse } from "./level";
+
 export interface Chapter {
   id: string;
   chapterNumber: number;
@@ -12,6 +14,8 @@ export interface Chapter {
   createdAt: string;
   updatedAt: string;
   chapterSummaries?: ChapterSummary[];
+  publisherName?: string;
+  publisherLevel?: LevelResponse;
 }
 
 export interface ChapterSummary {

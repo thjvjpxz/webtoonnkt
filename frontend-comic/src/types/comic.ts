@@ -10,6 +10,11 @@ export interface ComicCreateUpdate {
   originName: string;
   categories: string[];
   thumbUrl?: string;
+
+  isSlugChanged: boolean;
+  isThumbUrlChanged: boolean;
+  isCategoriesChanged: boolean;
+  shouldRemoveThumbUrl: boolean;
 }
 
 // Định nghĩa kiểu dữ liệu cho truyện

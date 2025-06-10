@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { FiCalendar, FiDollarSign, FiEdit3, FiHome, FiKey, FiMail, FiShield, FiStar, FiTrendingUp, FiUser } from "react-icons/fi";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function ProfilePage() {
   const { isAuthenticated } = useAuthState();
@@ -158,7 +159,7 @@ export default function ProfilePage() {
                         <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-primary/20">
                           {userProfile.imgUrl ? (
                             <Image
-                              src={userProfile.imgUrl}
+                              src={chooseImageUrl(userProfile.imgUrl)}
                               alt={userProfile.username}
                               width={128}
                               height={128}
@@ -353,7 +354,7 @@ export default function ProfilePage() {
                           <div className="w-16 h-16 rounded overflow-hidden border border-gray-200 dark:border-gray-700">
                             {userProfile.level.levelNumber !== 1 ? (
                               <Image
-                                src={userProfile.level.urlGif}
+                                src={chooseImageUrl(userProfile.level.urlGif)}
                                 alt={userProfile.level.name}
                                 width={64}
                                 height={64}

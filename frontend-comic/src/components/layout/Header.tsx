@@ -27,6 +27,7 @@ import RegisterModal from "../auth/RegisterModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useRouter } from "next/navigation";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -63,7 +64,7 @@ export default function Header() {
         >
           {user?.imgUrl ? (
             <Image
-              src={user.imgUrl}
+              src={chooseImageUrl(user.imgUrl)}
               alt={user.username}
               fill
               sizes="36px"
@@ -88,7 +89,7 @@ export default function Header() {
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
           {user?.imgUrl ? (
             <Image
-              src={user.imgUrl}
+              src={chooseImageUrl(user.imgUrl)}
               alt={user.username}
               width={48}
               height={48}

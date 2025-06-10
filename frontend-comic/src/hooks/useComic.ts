@@ -27,14 +27,29 @@ const convertPublisherComicToComic = (publisherComic: PublisherComicResponse): C
 });
 
 // Helper function để chuyển đổi ComicCreateUpdate thành PublisherComicRequest
-const convertComicCreateToPublisherRequest = (comicData: ComicCreateUpdate): PublisherComicRequest => ({
-  name: comicData.name,
-  originName: comicData.originName,
-  author: comicData.author,
-  description: comicData.description,
-  thumbUrl: comicData.thumbUrl,
-  categoryIds: comicData.categories,
-});
+const convertComicCreateToPublisherRequest = (comicData: ComicCreateUpdate, isUpdate: boolean = false): PublisherComicRequest => {
+  const baseRequest = {
+    name: comicData.name,
+    originName: comicData.originName,
+    author: comicData.author,
+    description: comicData.description,
+    thumbUrl: comicData.thumbUrl,
+    categoryIds: comicData.categories,
+  };
+
+  // Chỉ thêm các biến check khi đang cập nhật
+  if (isUpdate) {
+    return {
+      ...baseRequest,
+      isSlugChanged: comicData.isSlugChanged,
+      isThumbUrlChanged: comicData.isThumbUrlChanged,
+      isCategoriesChanged: comicData.isCategoriesChanged,
+      shouldRemoveThumbUrl: comicData.shouldRemoveThumbUrl,
+    };
+  }
+
+  return baseRequest;
+};
 
 export const useComic = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -142,7 +157,7 @@ export const useComic = () => {
   const handleAddComic = async (comicData: ComicCreateUpdate, file?: File) => {
     try {
       const response = isPublisher
-        ? await publisherService.createComicWithCover(convertComicCreateToPublisherRequest(comicData), file)
+        ? await publisherService.createComicWithCover(convertComicCreateToPublisherRequest(comicData, false), file)
         : await createComicWithCover(comicData, file);
 
       if (response.status === 200) {
@@ -172,7 +187,7 @@ export const useComic = () => {
       const response = isPublisher
         ? await publisherService.updateComicWithCover(
           currentComic.id,
-          convertComicCreateToPublisherRequest(comicData),
+          convertComicCreateToPublisherRequest(comicData, true),
           file
         )
         : await updateComicWithCover(

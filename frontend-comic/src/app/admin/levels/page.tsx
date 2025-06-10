@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Levels() {
   const {
@@ -247,13 +248,12 @@ export default function Levels() {
                             <div className="flex justify-center">
                               {level.urlGif && level.levelNumber !== 1 ? (
                                 <Image
-                                  src={level.urlGif}
+                                  src={chooseImageUrl(level.urlGif)}
                                   alt={level.name}
                                   width={40}
                                   height={40}
                                   loading="lazy"
                                   className="object-cover rounded !h-10"
-                                  unoptimized={true}
                                 />
                               ) : level.levelNumber === 1 ? (
                                 <div

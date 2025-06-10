@@ -13,6 +13,7 @@ import {
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuthState } from "@/hooks/useAuthState";
 import Link from "next/link";
+import { chooseImageUrl } from "@/utils/string";
 
 export type TopbarProps = {
   title: string;
@@ -29,23 +30,13 @@ export default function Topbar({ title }: TopbarProps) {
           variant="ghost"
           className="relative h-10 w-10 rounded-full hover:bg-accent/50 transition-all duration-200 select-none"
         >
-          {user?.imgUrl ? (
-            <Image
-              src={user.imgUrl}
-              alt={user.username}
-              fill
-              sizes="36px"
-              className="rounded-full border-2 border-primary/20 h-[36px] w-[36px] object-cover"
-            />
-          ) : (
-            <Image
-              src="https://placehold.co/100x100/05df72/fff?text=Admin"
-              alt="Admin"
-              fill
-              sizes="36px"
-              className="rounded-full border-2 border-primary/20 h-[36px] w-[36px] object-cover"
-            />
-          )}
+          <Image
+            src={chooseImageUrl(user?.imgUrl || "")}
+            alt={user?.username || ""}
+            fill
+            sizes="36px"
+            className="rounded-full border-2 border-primary/20 h-[36px] w-[36px] object-cover"
+          />
           {user?.vip && (
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-bold text-white">★</span>
@@ -60,23 +51,14 @@ export default function Topbar({ title }: TopbarProps) {
       >
         {/* User Info Header */}
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
-          {user?.imgUrl ? (
-            <Image
-              src={user.imgUrl}
-              alt={user.username}
-              width={48}
-              height={48}
-              className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
-            />
-          ) : (
-            <Image
-              src="https://placehold.co/100x100/05df72/fff?text=Admin"
-              alt="Admin"
-              width={48}
-              height={48}
-              className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
-            />
-          )}
+          <Image
+            src={chooseImageUrl(user?.imgUrl || "")}
+            alt={user?.username || ""}
+            width={48}
+            height={48}
+            className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
+          />
+
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground truncate">
               {user?.username || 'Admin'}

@@ -2,8 +2,8 @@ package com.thjvjpxx.backend_comic.dto.response;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thjvjpxx.backend_comic.enums.ChapterStatus;
+import com.thjvjpxx.backend_comic.model.Level;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Builder
 @AllArgsConstructor
@@ -32,6 +31,8 @@ public class ChapterResponse {
     List<ChapterResponseSummary> chapterSummaries;
     String createdAt;
     String updatedAt;
+    String publisherName;
+    Level publisherLevel;
 
     @Data
     @Builder

@@ -8,6 +8,12 @@ export interface PublisherComicRequest {
   description?: string;
   thumbUrl?: string;
   categoryIds: string[];
+
+  // Biến check để theo dõi thay đổi
+  isSlugChanged?: boolean;
+  isThumbUrlChanged?: boolean;
+  isCategoriesChanged?: boolean;
+  shouldRemoveThumbUrl?: boolean;
 }
 
 // Interface cho response comic của publisher với thông tin thống kê

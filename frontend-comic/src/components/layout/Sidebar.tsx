@@ -2,6 +2,7 @@
 
 import { CategoryResponse } from '@/types/category';
 import { PopulerToday } from '@/types/home';
+import { chooseImageUrl } from '@/utils/string';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -77,31 +78,19 @@ export default function Sidebar({ populerWeek, populerMonth, populerAll, categor
                   <span className='w-6 h-6 self-center text-[13px] font-medium rounded border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 flex items-center justify-center'>
                     {index + 1}
                   </span>
-                  {comic.thumbUrl ?
-                    <Image
-                      src={comic.thumbUrl}
-                      alt={comic.name}
-                      width={60}
-                      height={100}
-                      className='rounded h-[70px] object-cover group-hover:opacity-80 transition-opacity'
-                      loading="lazy"
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/placeholder.svg';
-                      }}
-                    /> :
-                    <Image
-                      src="/images/placeholder.svg"
-                      alt={comic.name}
-                      width={60}
-                      height={100}
-                      className='rounded h-[70px] object-cover group-hover:opacity-80 transition-opacity'
-                      loading="lazy"
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    />
-                  }
+                  <Image
+                    src={chooseImageUrl(comic.thumbUrl)}
+                    alt={comic.name}
+                    width={60}
+                    height={100}
+                    className='rounded h-[70px] object-cover group-hover:opacity-80 transition-opacity'
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/placeholder.svg';
+                    }}
+                  />
                   <div className='flex flex-col gap-1'>
                     <span className='text-sm text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors'>{comic.name.length > 20 ? comic.name.slice(0, 20) + '...' : comic.name}</span>
                     <span className='text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1'>

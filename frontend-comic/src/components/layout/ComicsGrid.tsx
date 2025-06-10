@@ -1,4 +1,5 @@
 import { PopulerToday } from "@/types/home";
+import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -29,32 +30,19 @@ export default function CategoryComicsGrid({ comics, categoryName }: CategoryCom
                 } group`}
             >
               <Link href={`/comic/${comic.slug}`}>
-                {comic.thumbUrl ? (
-                  <Image
-                    src={comic.thumbUrl}
-                    alt={comic.name}
-                    width={120}
-                    height={150}
-                    className="rounded flex-shrink-0 h-[150px] object-cover group-hover:opacity-80 transition-opacity cursor-pointer"
-                    loading={index < 4 ? "eager" : "lazy"}
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/placeholder.svg';
-                    }}
-                  />
-                ) : (
-                  <Image
-                    src="/images/placeholder.svg"
-                    alt={comic.name}
-                    width={120}
-                    height={150}
-                    className="rounded flex-shrink-0 h-[150px] object-cover group-hover:opacity-80 transition-opacity cursor-pointer"
-                    loading={index < 4 ? "eager" : "lazy"}
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                  />
-                )}
+                <Image
+                  src={chooseImageUrl(comic.thumbUrl)}
+                  alt={comic.name}
+                  width={120}
+                  height={150}
+                  className="rounded flex-shrink-0 h-[150px] object-cover group-hover:opacity-80 transition-opacity cursor-pointer"
+                  loading={index < 4 ? "eager" : "lazy"}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/placeholder.svg';
+                  }}
+                />
               </Link>
 
               <div className="flex-1 min-w-0">

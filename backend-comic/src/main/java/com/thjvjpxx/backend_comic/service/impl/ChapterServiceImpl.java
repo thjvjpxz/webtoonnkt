@@ -13,9 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.dto.response.ChapterResponse.DetailChapterResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Chapter;
+import com.thjvjpxx.backend_comic.model.Level;
+import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ChapterService;
@@ -38,8 +41,8 @@ public class ChapterServiceImpl implements ChapterService {
 
     @Override
     public BaseResponse<?> getAllChapters(int page, int limit, String search, String comicId) {
-        Pageable pageForQuery = PaginationUtils.createPageableWithSort(page, limit, "chapterNumber",
-                Sort.Direction.ASC);
+        Pageable pageForQuery = PaginationUtils.createPageableWithSort(page, limit, "updatedAt",
+                Sort.Direction.DESC);
         int originalPage = page;
 
         Page<Chapter> chapters = null;
@@ -65,21 +68,41 @@ public class ChapterServiceImpl implements ChapterService {
                     0);
         }
 
-        // Chuyển đổi entity thành DTO để tránh circular reference
-        List<ChapterResponse> chapterResponses = chapterList.stream()
-                .map(chapter -> ChapterResponse.builder()
-                        .id(chapter.getId())
-                        .title(chapter.getTitle())
-                        .chapterNumber(chapter.getChapterNumber())
-                        .comicName(chapter.getComic().getName())
-                        .status(chapter.getStatus())
-                        .price(chapter.getPrice())
-                        .domainCdn(chapter.getDomainCdn())
-                        .chapterPath(chapter.getChapterPath())
-                        .createdAt(chapter.getCreatedAt().toString())
-                        .updatedAt(chapter.getUpdatedAt().toString())
-                        .build())
-                .collect(Collectors.toList());
+        List<ChapterResponse> chapterResponses = new ArrayList<>();
+        for (Chapter chapter : chapterList) {
+            List<DetailChapterResponse> detailChapterResponses = chapter.getDetailChapters().stream()
+                    .map(detailChapter -> DetailChapterResponse.builder()
+                            .id(detailChapter.getId())
+                            .imgUrl(detailChapter.getImgUrl())
+                            .orderNumber(detailChapter.getOrderNumber())
+                            .build())
+                    .collect(Collectors.toList());
+
+            String publisherName = chapter.getComic().getPublisher() != null
+                    ? chapter.getComic().getPublisher().getUsername()
+                    : null;
+            Level publisherLevel = chapter.getComic().getPublisher() != null
+                    ? chapter.getComic().getPublisher().getLevel()
+                    : null;
+
+            ChapterResponse chapterResponse = ChapterResponse.builder()
+                    .id(chapter.getId())
+                    .title(chapter.getTitle())
+                    .chapterNumber(chapter.getChapterNumber())
+                    .comicName(chapter.getComic().getName())
+                    .status(chapter.getStatus())
+                    .price(chapter.getPrice())
+                    .domainCdn(chapter.getDomainCdn())
+                    .chapterPath(chapter.getChapterPath())
+                    .detailChapters(detailChapterResponses)
+                    .createdAt(chapter.getCreatedAt().toString())
+                    .updatedAt(chapter.getUpdatedAt().toString())
+                    .publisherName(publisherName)
+                    .publisherLevel(publisherLevel)
+                    .build();
+
+            chapterResponses.add(chapterResponse);
+        }
 
         return BaseResponse.success(
                 chapterResponses,

@@ -29,6 +29,8 @@ import UserModal from "@/components/admin/users/UserModal";
 import DeleteUserModal from "@/components/admin/users/DeleteUserModal";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { formatRole } from "@/utils/string";
+import UserName from "@/components/ui/UserName";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Users() {
   const {
@@ -362,12 +364,11 @@ export default function Users() {
                           <div className="flex-shrink-0 h-10 w-10 relative">
                             {user.imgUrl ? (
                               <Image
-                                src={user.imgUrl}
+                                src={chooseImageUrl(user.imgUrl)}
                                 alt={user.username}
                                 fill
                                 sizes="40px"
                                 className="rounded-full object-cover shadow-soft border border-border/30"
-                                unoptimized={true}
                               />
                             ) : (
                               <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground shadow-soft">
@@ -377,32 +378,12 @@ export default function Users() {
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-foreground">
-                              <span
-                                style={{
-                                  color:
-                                    user.level?.levelNumber === 1
-                                      ? user.level?.urlGif
-                                      : "transparent",
-                                  backgroundImage:
-                                    user.level?.levelNumber !== 1
-                                      ? `url(${user.level?.urlGif})`
-                                      : "none",
-                                  backgroundSize:
-                                    user.level?.levelNumber !== 1
-                                      ? "auto"
-                                      : "none",
-                                  backgroundPosition:
-                                    user.level?.levelNumber !== 1
-                                      ? "center"
-                                      : "none",
-                                  WebkitBackgroundClip:
-                                    user.level?.levelNumber !== 1
-                                      ? "text"
-                                      : "none",
-                                }}
-                              >
-                                {user.username}
-                              </span>
+                              <UserName
+                                username={user.username}
+                                level={user.level}
+                                showLevel={false}
+                                className="text-sm font-medium text-foreground"
+                              />
                             </div>
                             <div className="text-xs text-muted-foreground">
                               Level: {user.level?.name || "N/A"}

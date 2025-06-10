@@ -4,11 +4,10 @@ import Link from "next/link";
 import { CommentResponse } from "@/types/comment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/helpers";
 import { FiMessageCircle, FiTrash2, FiChevronDown, FiChevronRight, FiBookOpen, FiUser } from "react-icons/fi";
-import { getFirstColorFromGradient } from "@/utils/string";
-import { useAuth } from "@/contexts/AuthContext";
+import UserName from "@/components/ui/UserName";
+import { chooseImageUrl } from "@/utils/string";
 
 interface CommentItemProps {
   comment: CommentResponse;
@@ -67,7 +66,7 @@ export default function CommentItem({
       <div className="flex items-start gap-3 mb-3">
         <div className="relative w-10 h-10 rounded-full transition-all duration-200 select-none">
           <Image
-            src={comment.user.imgUrl || "/images/placeholder.svg"}
+            src={chooseImageUrl(comment.user.imgUrl)}
             alt={comment.user.username}
             fill
             sizes="36px"
@@ -82,65 +81,10 @@ export default function CommentItem({
 
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <span
-                style={{
-                  color:
-                    comment.user.level?.levelNumber === 1
-                      ? comment.user.level?.urlGif
-                      : "transparent",
-                  backgroundImage:
-                    comment.user.level?.levelNumber !== 1
-                      ? `url(${comment.user.level?.urlGif})`
-                      : "none",
-                  backgroundSize:
-                    comment.user.level?.levelNumber !== 1
-                      ? "auto"
-                      : "none",
-                  backgroundPosition:
-                    comment.user.level?.levelNumber !== 1
-                      ? "center"
-                      : "none",
-                  WebkitBackgroundClip:
-                    comment.user.level?.levelNumber !== 1
-                      ? "text"
-                      : "none",
-                }}
-              >
-                {comment.user.username}
-              </span>
-              {
-                comment.user.level?.color.startsWith('linear-gradient') ? (
-                  <Badge
-                    className="text-xs bg-white dark:bg-gray-800 border rounded"
-                    style={{
-                      background: comment.user.level?.color,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      borderColor: getFirstColorFromGradient(comment.user.level?.color),
-                    }}
-                  >
-                    {comment.user.level?.name}
-                  </Badge>
-                ) : (
-                  <Badge
-                    className="text-xs bg-white dark:bg-gray-800 border rounded"
-                    style={{
-                      color: comment.user.level?.color,
-                      borderColor: comment.user.level?.color,
-                    }}
-                  >
-                    {comment.user.level?.name}
-                  </Badge>
-                )
-              }
-
-              {/* {comment.user.vip && (
-                <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs">
-                  VIP
-                </Badge>
-              )} */}
-            </div>
+            <UserName
+              username={comment.user.username}
+              level={comment.user.level}
+            />
             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {formatDate(comment.createdAt)}
             </span>
@@ -241,7 +185,7 @@ export default function CommentItem({
               <div className="flex items-start gap-3">
                 <div className="relative w-10 h-10 rounded-full transition-all duration-200 select-none">
                   <Image
-                    src={reply.user.imgUrl || "/images/placeholder.svg"}
+                    src={chooseImageUrl(reply.user.imgUrl)}
                     alt={reply.user.username}
                     fill
                     sizes="36px"
@@ -256,64 +200,10 @@ export default function CommentItem({
 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-                    <div className="flex items-center gap-2">
-                      <span
-                        style={{
-                          color:
-                            reply.user.level?.levelNumber === 1
-                              ? reply.user.level?.urlGif
-                              : "transparent",
-                          backgroundImage:
-                            reply.user.level?.levelNumber !== 1
-                              ? `url(${reply.user.level?.urlGif})`
-                              : "none",
-                          backgroundSize:
-                            reply.user.level?.levelNumber !== 1
-                              ? "auto"
-                              : "none",
-                          backgroundPosition:
-                            reply.user.level?.levelNumber !== 1
-                              ? "center"
-                              : "none",
-                          WebkitBackgroundClip:
-                            reply.user.level?.levelNumber !== 1
-                              ? "text"
-                              : "none",
-                        }}
-                      >
-                        {reply.user.username}
-                      </span>
-                      {
-                        reply.user.level?.color.startsWith('linear-gradient') ? (
-                          <Badge
-                            className="text-xs bg-white dark:bg-gray-800 border rounded"
-                            style={{
-                              background: reply.user.level?.color,
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              borderColor: getFirstColorFromGradient(reply.user.level?.color),
-                            }}
-                          >
-                            {reply.user.level?.name}
-                          </Badge>
-                        ) : (
-                          <Badge
-                            className="text-xs bg-white dark:bg-gray-800 border rounded"
-                            style={{
-                              color: reply.user.level?.color,
-                              borderColor: reply.user.level?.color,
-                            }}
-                          >
-                            {reply.user.level?.name}
-                          </Badge>
-                        )
-                      }
-                      {/* {reply.user.vip && (
-                        <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 text-xs">
-                          VIP
-                        </Badge>
-                      )} */}
-                    </div>
+                    <UserName
+                      username={reply.user.username}
+                      level={reply.user.level}
+                    />
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatDate(reply.createdAt)}

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-import { formatRole } from "@/utils/string";
+import { chooseImageUrl, formatRole } from "@/utils/string";
 
 interface UserModalProps {
   user: UserResponse | null;
@@ -282,7 +282,7 @@ export default function UserModal({
                   {previewImage ? (
                     <div className="relative w-32 h-32 mb-3 rounded-full overflow-hidden">
                       <Image
-                        src={previewImage}
+                        src={chooseImageUrl(previewImage)}
                         alt="Avatar Preview"
                         fill
                         sizes="128px"

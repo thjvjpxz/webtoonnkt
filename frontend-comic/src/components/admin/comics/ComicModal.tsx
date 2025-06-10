@@ -1,12 +1,14 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -17,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Select,
   SelectContent,
@@ -25,13 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Textarea } from "@/components/ui/textarea";
 import { CategoryResponse } from "@/types/category";
 import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
-import { generateSlug } from "@/utils/string";
-import NextImage from "next/image";
+import { chooseImageUrl, generateSlug } from "@/utils/string";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -62,6 +62,10 @@ export default function ComicModal({
       categories: [],
       thumbUrl: "",
       originName: "",
+      isSlugChanged: false,
+      isThumbUrlChanged: false,
+      isCategoriesChanged: false,
+      shouldRemoveThumbUrl: false,
     },
   });
 
@@ -76,6 +80,17 @@ export default function ComicModal({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Lưu trữ giá trị ban đầu để so sánh thay đổi
+  const [initialValues, setInitialValues] = useState<{
+    slug: string;
+    thumbUrl: string;
+    categories: string[];
+  }>({
+    slug: "",
+    thumbUrl: "",
+    categories: [],
+  });
+
   // Nếu đang sửa, điền dữ liệu vào form
   useEffect(() => {
     if (comic) {
@@ -88,16 +103,27 @@ export default function ComicModal({
         status: comic.status || "ONGOING",
         originName: comic.originName || "",
         categories: comic.categories?.map((cat) => cat.id) || [],
+        isSlugChanged: false,
+        isThumbUrlChanged: false,
+        isCategoriesChanged: false,
+        shouldRemoveThumbUrl: false,
       };
 
       form.reset(formData);
-      setPreviewImage(comic.thumbUrl || "");
+      setPreviewImage(chooseImageUrl(comic.thumbUrl) || "");
 
       // Nếu có thumbUrl, đặt phương thức tải lên là URL
       if (comic.thumbUrl) {
-        setImageUrl(comic.thumbUrl);
+        setImageUrl(chooseImageUrl(comic.thumbUrl));
         setUploadMethod("url");
       }
+
+      // Lưu giá trị ban đầu
+      setInitialValues({
+        slug: comic.slug || "",
+        thumbUrl: comic.thumbUrl || "",
+        categories: comic.categories?.map((cat) => cat.id) || [],
+      });
     } else {
       // Reset form khi tạo mới
       form.reset({
@@ -109,11 +135,22 @@ export default function ComicModal({
         categories: [],
         thumbUrl: "",
         originName: "",
+        isSlugChanged: false,
+        isThumbUrlChanged: false,
+        isCategoriesChanged: false,
+        shouldRemoveThumbUrl: false,
       });
       setPreviewImage(null);
       setImageUrl("");
       setSelectedFile(null);
       setUploadMethod("file");
+
+      // Lưu giá trị ban đầu
+      setInitialValues({
+        slug: "",
+        thumbUrl: "",
+        categories: [],
+      });
     }
   }, [comic, form]);
 
@@ -121,7 +158,8 @@ export default function ComicModal({
   const watchName = form.watch("name");
   useEffect(() => {
     if (watchName) {
-      form.setValue("slug", generateSlug(watchName));
+      const newSlug = generateSlug(watchName);
+      form.setValue("slug", newSlug);
     }
   }, [watchName, form]);
 
@@ -191,6 +229,31 @@ export default function ComicModal({
       dataToSubmit.thumbUrl = imageUrl;
     }
 
+    // Chỉ thiết lập các biến check khi đang cập nhật (có comic hiện tại)
+    if (comic) {
+      // Thiết lập các biến check để theo dõi thay đổi
+      const currentThumbUrl = dataToSubmit.thumbUrl || "";
+      const currentCategories = dataToSubmit.categories || [];
+
+      dataToSubmit.isSlugChanged = dataToSubmit.slug !== initialValues.slug;
+      dataToSubmit.isThumbUrlChanged = currentThumbUrl !== initialValues.thumbUrl;
+      dataToSubmit.isCategoriesChanged = JSON.stringify(currentCategories.sort()) !== JSON.stringify(initialValues.categories.sort());
+
+      // Kiểm tra nếu ảnh bìa bị xóa (có ảnh ban đầu nhưng bây giờ không có)
+      dataToSubmit.shouldRemoveThumbUrl = initialValues.thumbUrl !== "" && currentThumbUrl === "";
+
+      // Nếu có file được chọn, đánh dấu thumbUrl đã thay đổi
+      if (uploadMethod === "file" && selectedFile) {
+        dataToSubmit.isThumbUrlChanged = true;
+      }
+    } else {
+      // Khi tạo mới, đặt tất cả biến check về false
+      dataToSubmit.isSlugChanged = false;
+      dataToSubmit.isThumbUrlChanged = false;
+      dataToSubmit.isCategoriesChanged = false;
+      dataToSubmit.shouldRemoveThumbUrl = false;
+    }
+
     setIsSubmitting(true);
     setIsUploading(true);
     try {
@@ -220,7 +283,6 @@ export default function ComicModal({
 
     // Sử dụng window.Image thay vì Image
     const img = new window.Image();
-    img.crossOrigin = "anonymous";
     img.onload = () => {
       setPreviewImage(imageUrl);
       form.setValue("thumbUrl", imageUrl);
@@ -277,7 +339,7 @@ export default function ComicModal({
     // Hiển thị preview
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPreviewImage(e.target?.result as string);
+      setPreviewImage(chooseImageUrl(e.target?.result as string));
     };
     reader.readAsDataURL(file);
   };
@@ -319,8 +381,8 @@ export default function ComicModal({
                   <div className="flex flex-col items-center justify-center">
                     {previewImage ? (
                       <div className="relative w-full h-64 mb-4">
-                        <NextImage
-                          src={previewImage}
+                        <Image
+                          src={chooseImageUrl(previewImage)}
                           alt="Ảnh bìa truyện"
                           fill
                           className="object-cover rounded"
@@ -333,6 +395,7 @@ export default function ComicModal({
                             setPreviewImage(null);
                             setSelectedFile(null);
                             form.setValue("thumbUrl", "");
+                            setImageUrl("");
                           }}
                           className="absolute top-2 right-2"
                         >

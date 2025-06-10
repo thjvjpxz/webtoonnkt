@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ChapterModalProps {
   isOpen: boolean;
@@ -146,7 +147,7 @@ export default function ChapterModal({
                               {comic.thumbUrl ? (
                                 <div className="relative h-10 w-8">
                                   <Image
-                                    src={comic.thumbUrl}
+                                    src={chooseImageUrl(comic.thumbUrl)}
                                     alt={comic.name}
                                     fill
                                     sizes="32px"
@@ -345,7 +346,7 @@ export default function ChapterModal({
                       >
                         <div className="relative w-full pt-[150%] rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                           <Image
-                            src={url}
+                            src={chooseImageUrl(url)}
                             alt={`Preview ${index}`}
                             fill
                             sizes="100%"

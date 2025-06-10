@@ -1,3 +1,5 @@
+import { LevelResponse } from "./level";
+
 export interface CommentResponse {
   id: string;
   content: string;
@@ -15,24 +17,16 @@ export interface CommentResponse {
 export interface UserInfo {
   id: string;
   username: string;
-  imgUrl?: string;
+  imgUrl: string;
   vip?: boolean;
-  level?: LevelInfo;
-}
-
-export interface LevelInfo {
-  id: string;
-  levelNumber: number;
-  name: string;
-  color: string;
-  urlGif: string;
+  level?: LevelResponse;
 }
 
 export interface ComicInfo {
   id: string;
   name: string;
   slug: string;
-  thumbUrl?: string;
+  thumbUrl: string;
 }
 
 export interface ChapterInfo {

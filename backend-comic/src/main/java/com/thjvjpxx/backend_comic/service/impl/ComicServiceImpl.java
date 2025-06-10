@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -111,25 +112,35 @@ public class ComicServiceImpl implements ComicService {
         });
     }
 
+    /**
+     * Validate comic request cho update (loại trừ comic hiện tại)
+     */
+    private void validateComicUpdateRequest(String currentComicId, ComicRequest comicRequest) {
+        comicRepository.findBySlug(comicRequest.getSlug())
+                .filter(comic -> !comic.getId().equals(currentComicId))
+                .ifPresent(comic -> {
+                    throw new BaseException(ErrorCode.COMIC_SLUG_EXISTS);
+                });
+    }
+
     @Override
     public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
         ValidationUtils.checkNullId(id);
 
         Comic comic = findComicById(id);
 
-        // Kiểm tra slug có thay đổi không
-        boolean isSlugChanged = isSlugChanged(comic, comicRequest);
-
         // Validate slug nếu có thay đổi
-        if (isSlugChanged) {
-            validateComicRequest(comicRequest);
+        if (comicRequest.getIsSlugChanged()) {
+            validateComicUpdateRequest(id, comicRequest);
         }
 
-        // Xử lý thumbnail
-        String newThumbUrl = handleThumbnailUpdate(comic, comicRequest, cover, isSlugChanged);
+        // Xử lý thumbnail với logic được tối ưu
+        String newThumbUrl = handleThumbnailUpdateOptimized(comic, comicRequest, cover);
 
-        // Cập nhật categories
-        updateComicCategories(comic, comicRequest);
+        // Cập nhật categories chỉ khi cần thiết
+        if (comicRequest.getIsCategoriesChanged()) {
+            updateComicCategories(comic, comicRequest);
+        }
 
         // Cập nhật thông tin comic
         updateComicFields(comic, comicRequest, newThumbUrl);
@@ -139,48 +150,45 @@ public class ComicServiceImpl implements ComicService {
     }
 
     /**
-     * Kiểm tra xem slug có thay đổi không
+     * Xử lý cập nhật thumbnail được tối ưu với flag
      */
-    private boolean isSlugChanged(Comic comic, ComicRequest comicRequest) {
-        return comicRequest.getSlug() != null &&
-                !comicRequest.getSlug().isEmpty() &&
-                !comicRequest.getSlug().equals(comic.getSlug());
-    }
-
-    /**
-     * Xử lý cập nhật thumbnail
-     */
-    private String handleThumbnailUpdate(Comic comic, ComicRequest comicRequest,
-            MultipartFile cover, boolean isSlugChanged) {
+    private String handleThumbnailUpdateOptimized(Comic comic, ComicRequest comicRequest, MultipartFile cover) {
         String currentThumbUrl = comic.getThumbUrl();
 
-        // Không có ảnh mới
-        if (cover == null) {
-            return handleThumbnailWithoutNewImage(currentThumbUrl, comicRequest, isSlugChanged);
+        // Trường hợp 1: Có file upload mới
+        if (cover != null && !cover.isEmpty()) {
+            return handleNewImageUpload(currentThumbUrl, comicRequest, cover);
         }
 
-        // Có ảnh mới
-        return handleThumbnailWithNewImage(currentThumbUrl, comicRequest, cover, isSlugChanged);
-    }
+        // Trường hợp 2: Muốn xóa thumbnail hiện tại
+        if (comicRequest.getShouldRemoveThumbnail()) {
+            removeOldThumbnail(currentThumbUrl);
+            return null;
+        }
 
-    /**
-     * Xử lý thumbnail khi không có ảnh mới
-     */
-    private String handleThumbnailWithoutNewImage(String currentThumbUrl,
-            ComicRequest comicRequest, boolean isSlugChanged) {
-        if (isSlugChanged && currentThumbUrl != null && !currentThumbUrl.isEmpty()) {
+        // Trường hợp 3: URL trong request thay đổi
+        if (comicRequest.getIsThumbUrlChanged()) {
+            // Xóa image cũ nếu có
+            removeOldThumbnail(currentThumbUrl);
+            return comicRequest.getThumbUrl();
+        }
+
+        // Trường hợp 4: Chỉ slug thay đổi, cần rename file
+        if (comicRequest.getIsSlugChanged() &&
+                currentThumbUrl != null && !currentThumbUrl.isEmpty()) {
             return renameThumbnail(currentThumbUrl, comicRequest.getSlug());
         }
+
+        // Trường hợp 5: Không có thay đổi gì
         return currentThumbUrl;
     }
 
     /**
-     * Xử lý thumbnail khi có ảnh mới
+     * Xử lý upload file mới
      */
-    private String handleThumbnailWithNewImage(String currentThumbUrl, ComicRequest comicRequest,
-            MultipartFile cover, boolean isSlugChanged) {
-        if (isSlugChanged) {
-            // Xóa ảnh cũ nếu có
+    private String handleNewImageUpload(String currentThumbUrl, ComicRequest comicRequest, MultipartFile cover) {
+        // Xóa ảnh cũ nếu có và slug thay đổi
+        if (comicRequest.getIsSlugChanged()) {
             removeOldThumbnail(currentThumbUrl);
         }
 
@@ -203,7 +211,7 @@ public class ComicServiceImpl implements ComicService {
      * Xóa thumbnail cũ
      */
     private void removeOldThumbnail(String thumbUrl) {
-        if (thumbUrl != null && !thumbUrl.isEmpty()) {
+        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
             var response = b2StorageService.remove(thumbUrl);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -226,10 +234,16 @@ public class ComicServiceImpl implements ComicService {
     }
 
     /**
-     * Cập nhật categories của comic
+     * Cập nhật categories của comic với tối ưu hóa
      */
     private void updateComicCategories(Comic comic, ComicRequest comicRequest) {
-        List<Category> newCategories = convertCategories(comicRequest.getCategories());
+        // Validate categories trước khi thực hiện thay đổi
+        List<Category> newCategories = categoryRepository.findAllById(comicRequest.getCategories());
+        if (newCategories.size() != comicRequest.getCategories().size()) {
+            throw new BaseException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+
+        // Thực hiện update categories
         comic.removeCategories(new ArrayList<>(comic.getCategories()));
         comic.addCategories(newCategories);
     }

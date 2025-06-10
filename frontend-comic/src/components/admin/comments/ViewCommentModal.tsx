@@ -18,6 +18,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { formatDate } from "@/utils/helpers";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ViewCommentModalProps {
   isOpen: boolean;
@@ -133,7 +134,7 @@ export default function ViewCommentModal({
                 <div className="flex items-center gap-4">
                   <div className="relative w-12 h-12 rounded-full overflow-hidden">
                     <Image
-                      src={comment.user.imgUrl || "/images/placeholder.svg"}
+                      src={chooseImageUrl(comment.user.imgUrl)}
                       alt={comment.user.username}
                       fill
                       className="object-cover"
@@ -168,7 +169,7 @@ export default function ViewCommentModal({
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-20 rounded overflow-hidden">
                     <Image
-                      src={comment.comic.thumbUrl || "/images/placeholder.svg"}
+                      src={chooseImageUrl(comment.comic.thumbUrl)}
                       alt={comment.comic.name}
                       fill
                       className="object-cover"
@@ -212,7 +213,7 @@ export default function ViewCommentModal({
                   <div className="flex items-center gap-3">
                     <div className="relative w-8 h-8 rounded-full overflow-hidden">
                       <Image
-                        src={comment.parent.user.imgUrl || "/images/placeholder.svg"}
+                        src={chooseImageUrl(comment.parent.user.imgUrl)}
                         alt={comment.parent.user.username}
                         fill
                         className="object-cover"
@@ -247,7 +248,7 @@ export default function ViewCommentModal({
                       <div className="flex items-center gap-3 mb-2">
                         <div className="relative w-6 h-6 rounded-full overflow-hidden">
                           <Image
-                            src={reply.user.imgUrl || "/images/placeholder.svg"}
+                            src={chooseImageUrl(reply.user.imgUrl)}
                             alt={reply.user.username}
                             fill
                             className="object-cover"

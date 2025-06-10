@@ -10,8 +10,10 @@ import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Pagination from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import UserName from "@/components/ui/UserName";
 import { useChapter } from "@/hooks/useChapter";
 import { constructImageUrl, formatDate } from "@/utils/helpers";
+import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
 import { FiAlertCircle, FiBookOpen, FiEdit, FiEye, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 
@@ -140,7 +142,7 @@ export default function Chapters() {
                           {comic.thumbUrl ? (
                             <div className="relative h-10 w-8">
                               <Image
-                                src={comic.thumbUrl}
+                                src={chooseImageUrl(comic.thumbUrl)}
                                 alt={comic.name}
                                 fill
                                 sizes="32px"
@@ -244,6 +246,9 @@ export default function Chapters() {
                       Giá
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
+                      Nhà xuất bản
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -260,11 +265,12 @@ export default function Chapters() {
                       key={chapter.id}
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
+                      {/* Thumbnail */}
                       <TableCell className="py-4 flex items-center w-[100px]">
                         <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
                           {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
                             <Image
-                              src={constructImageUrl(chapter, chapter.detailChapters[0].imgUrl)}
+                              src={chooseImageUrl(constructImageUrl(chapter, chapter.detailChapters[0].imgUrl))}
                               alt={`Ảnh bìa ${chapter.comicName}`}
                               fill
                               sizes="100px"
@@ -289,9 +295,13 @@ export default function Chapters() {
                           </div>
                         </div>
                       </TableCell>
+
+                      {/* Chapter Number */}
                       <TableCell className="text-center text-foreground font-medium">
                         {chapter.chapterNumber}
                       </TableCell>
+
+                      {/* Trạng thái */}
                       <TableCell className="text-center">
                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
@@ -300,18 +310,49 @@ export default function Chapters() {
                           {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
                         </span>
                       </TableCell>
+
+                      {/* Giá */}
                       <TableCell className="text-center text-foreground">
-                        {chapter.status === 'FEE' && chapter.price
-                          ? `${chapter.price.toLocaleString('vi-VN')} VNĐ`
-                          : '-'
-                        }
+                        {chapter.status === 'FEE' && chapter.price ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <Image
+                              src="/images/linh-thach.webp"
+                              alt="Linh thạch"
+                              width={16}
+                              height={16}
+                              className="flex-shrink-0"
+                            />
+                            <span>{chapter.price.toLocaleString('vi-VN')}</span>
+                          </div>
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
+
+                      {/* Nhà xuất bản */}
+                      <TableCell className="text-center text-foreground">
+                        <div className="flex items-center justify-center">
+                          {chapter.publisherName !== null ? (
+                            <UserName
+                              username={chapter.publisherName || ''}
+                              level={chapter.publisherLevel}
+                              showLevel={false}
+                            />
+                          ) : "Không có"}
+                        </div>
+                      </TableCell>
+
+                      {/* Ngày tạo */}
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.createdAt)}
                       </TableCell>
+
+                      {/* Ngày cập nhật */}
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.updatedAt)}
                       </TableCell>
+
+                      {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
                           <Button

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ViewChapterModalProps {
   isOpen: boolean;
@@ -92,7 +93,7 @@ export default function ViewChapterModal({
                     <div key={image.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
-                          src={constructImageUrl(chapter, image.imgUrl)}
+                          src={chooseImageUrl(constructImageUrl(chapter, image.imgUrl))}
                           alt={`Trang ${image.orderNumber}`}
                           width={1500}
                           height={2400}

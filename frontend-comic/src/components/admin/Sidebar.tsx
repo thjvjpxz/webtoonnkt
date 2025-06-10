@@ -51,15 +51,15 @@ export default function Sidebar({
       show: isPublisher
     },
     {
-      path: "/admin/levels",
-      icon: <FiAward size={20} />,
-      label: "Quản lý cấp độ",
-    },
-    {
       path: "/admin/chapters",
       icon: <FiFileText size={20} />,
       label: "Quản lý chương",
       show: isPublisher
+    },
+    {
+      path: "/admin/levels",
+      icon: <FiAward size={20} />,
+      label: "Quản lý cấp độ",
     },
     {
       path: "/admin/users",

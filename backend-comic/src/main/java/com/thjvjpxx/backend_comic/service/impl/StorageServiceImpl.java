@@ -1,6 +1,8 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -101,7 +103,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     private String getPublicUrl(String key) {
-        return B2Constants.URL_PREFIX + bucketName + "/" + key;
+        String version = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        return B2Constants.URL_PREFIX + bucketName + "/" + key + "?v=" + version;
     }
 
     @Override
@@ -113,7 +116,14 @@ public class StorageServiceImpl implements StorageService {
                 String urlWithoutPrefix = url.substring(B2Constants.URL_PREFIX.length());
                 String expectedPrefix = bucketName + "/";
                 if (urlWithoutPrefix.startsWith(expectedPrefix)) {
-                    oldKey = urlWithoutPrefix.substring(expectedPrefix.length());
+                    String keyWithQueryParams = urlWithoutPrefix.substring(expectedPrefix.length());
+                    // Loại bỏ query parameters (phần sau dấu ?)
+                    int queryParamIndex = keyWithQueryParams.indexOf('?');
+                    if (queryParamIndex != -1) {
+                        oldKey = keyWithQueryParams.substring(0, queryParamIndex);
+                    } else {
+                        oldKey = keyWithQueryParams;
+                    }
                 } else {
                     throw new BaseException(ErrorCode.INVALID_ARGUMENT);
                 }
@@ -151,6 +161,7 @@ public class StorageServiceImpl implements StorageService {
             String newUrl = getPublicUrl(newKey);
             return BaseResponse.success(newUrl);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
         }
     }

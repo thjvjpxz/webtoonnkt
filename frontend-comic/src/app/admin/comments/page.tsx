@@ -27,6 +27,7 @@ import {
 } from "react-icons/fi";
 import { formatDate } from "@/utils/helpers";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Comments() {
   const {
@@ -247,7 +248,7 @@ export default function Comments() {
                         <div className="flex items-center justify-center gap-3">
                           <div className="relative w-8 h-8 rounded-full overflow-hidden">
                             <Image
-                              src={comment.user.imgUrl || "/images/placeholder.svg"}
+                              src={chooseImageUrl(comment.user.imgUrl)}
                               alt={comment.user.username}
                               fill
                               className="object-cover"
@@ -285,7 +286,7 @@ export default function Comments() {
                         <div className="flex items-center justify-center gap-2">
                           <div className="relative w-8 h-10 rounded overflow-hidden">
                             <Image
-                              src={comment.comic.thumbUrl || "/images/placeholder.svg"}
+                              src={chooseImageUrl(comment.comic.thumbUrl)}
                               alt={comment.comic.name}
                               fill
                               className="object-cover"

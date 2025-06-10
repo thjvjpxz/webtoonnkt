@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useComic } from "@/hooks/useComic";
 import { CategoryResponse } from "@/types/category";
 import { formatDate } from "@/utils/helpers";
+import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
 import {
   FiAlertCircle,
@@ -66,19 +67,19 @@ export default function Comics() {
     switch (status) {
       case "COMPLETED":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500 text-white shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-500 text-white shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105">
             Đã hoàn thành
           </span>
         );
       case "ONGOING":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500 text-white shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-500 text-white shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105">
             Đang cập nhật
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500 text-white shadow-md hover:shadow-lg hover:bg-gray-600 transition-all duration-300 hover:scale-105">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-500 text-white shadow-md hover:shadow-lg hover:bg-gray-600 transition-all duration-300 hover:scale-105">
             Không xác định
           </span>
         );
@@ -101,7 +102,7 @@ export default function Comics() {
   const renderAuthor = (author: string | null) => {
     if (!author) {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-500 text-white shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-300 hover:scale-105">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-orange-500 text-white shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-300 hover:scale-105">
           Đang cập nhật
         </span>
       );
@@ -269,7 +270,7 @@ export default function Comics() {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-12 w-12 relative">
                             <Image
-                              src={comic.thumbUrl || "/images/placeholder.svg"}
+                              src={chooseImageUrl(comic.thumbUrl)}
                               alt={comic.name}
                               fill
                               sizes="48px"

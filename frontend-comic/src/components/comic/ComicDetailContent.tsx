@@ -33,6 +33,7 @@ import {
   FiUser,
   FiX
 } from "react-icons/fi";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ComicDetailContentProps {
   comicDetailResponse: ComicDetailResponse;
@@ -73,8 +74,18 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
   const renderChapterStatus = (status: ChapterStatus, price?: number) => {
     return status === ChapterStatus.FEE ? (
       <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-auto" >
-        {price ? `${price.toLocaleString('vi-VN')}đ` : 'Trả phí'
-        }
+        {price ? (
+          <div className="flex items-center gap-1">
+            <Image
+              src="/images/linh-thach.webp"
+              alt="Linh thạch"
+              width={12}
+              height={12}
+              className="flex-shrink-0"
+            />
+            <span>{price.toLocaleString('vi-VN')}</span>
+          </div>
+        ) : 'Trả phí'}
       </Badge>
     ) : (
       <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 ml-auto" >
@@ -115,7 +126,7 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
             <div className="lg:w-1/3 xl:w-1/4 p-4 sm:p-6 flex justify-center lg:justify-start">
               <div className="relative w-40 h-56 sm:w-48 sm:h-64 md:w-56 md:h-80 lg:w-64 lg:h-96 rounded overflow-hidden shadow-lg group">
                 <Image
-                  src={comicDetailResponse.thumbUrl || "/images/placeholder.svg"}
+                  src={chooseImageUrl(comicDetailResponse.thumbUrl)}
                   alt={comicDetailResponse.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"

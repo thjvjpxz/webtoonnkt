@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ComicResponse } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
+import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 
@@ -49,7 +50,7 @@ export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
             <div className="w-full md:w-1/3 flex justify-center">
               <div className="relative w-48 h-72">
                 <Image
-                  src={comic.thumbUrl || "/images/placeholder.svg"}
+                  src={chooseImageUrl(comic.thumbUrl)}
                   alt={comic.name}
                   fill
                   className="object-cover rounded shadow-md"

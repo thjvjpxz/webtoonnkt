@@ -10,6 +10,7 @@ import { FiX, FiUpload } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { chooseImageUrl } from "@/utils/string";
 
 interface LevelModalProps {
   isOpen: boolean;
@@ -433,13 +434,12 @@ export default function LevelModal({
                     <div className="flex flex-col items-center">
                       <div className="relative h-40 w-40 mb-3 overflow-hidden rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
                         <Image
-                          src={previewUrl}
+                          src={chooseImageUrl(previewUrl)}
                           alt="Preview"
                           width={160}
                           height={160}
                           className="object-cover h-full w-full"
                           loading="lazy"
-                          unoptimized={true}
                         />
                       </div>
                       <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
