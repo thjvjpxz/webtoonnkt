@@ -1,7 +1,5 @@
 package com.thjvjpxx.backend_comic.controller;
 
-import java.util.List;
-
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
-import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.service.ComicService;
 
 import jakarta.validation.Valid;
@@ -33,7 +29,7 @@ public class ComicController {
     ComicService comicService;
 
     @GetMapping
-    public BaseResponse<List<Comic>> getAllComics(
+    public BaseResponse<?> getAllComics(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
             @RequestParam(required = false) String search,
@@ -43,7 +39,7 @@ public class ComicController {
     }
 
     @GetMapping("/{id}/chapters")
-    public BaseResponse<List<ChapterResponse>> getAllChapters(
+    public BaseResponse<?> getAllChapters(
             @PathVariable String id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int limit,
@@ -53,21 +49,21 @@ public class ComicController {
     }
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public BaseResponse<Comic> createComic(
+    public BaseResponse<?> createComic(
             @Valid @RequestPart("data") ComicRequest comicRequest,
             @RequestPart(value = "cover", required = false) MultipartFile cover) {
         return comicService.createComic(comicRequest, cover);
     }
 
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public BaseResponse<Comic> updateComic(@PathVariable String id,
+    public BaseResponse<?> updateComic(@PathVariable String id,
             @Valid @RequestPart("data") ComicRequest comicRequest,
             @RequestPart(value = "cover", required = false) MultipartFile cover) {
         return comicService.updateComic(id, comicRequest, cover);
     }
 
     @DeleteMapping("/{id}")
-    public BaseResponse<Comic> deleteComic(@PathVariable String id) {
+    public BaseResponse<?> deleteComic(@PathVariable String id) {
         return comicService.deleteComic(id);
     }
 }

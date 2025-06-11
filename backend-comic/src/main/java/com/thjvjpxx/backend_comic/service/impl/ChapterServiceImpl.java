@@ -4,21 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse.DetailChapterResponse;
+import com.thjvjpxx.backend_comic.enums.ChapterStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Chapter;
+import com.thjvjpxx.backend_comic.model.Comic;
+import com.thjvjpxx.backend_comic.model.DetailChapter;
 import com.thjvjpxx.backend_comic.model.Level;
-import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ChapterService;
@@ -33,12 +38,24 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChapterServiceImpl implements ChapterService {
-    ChapterRepository chapterRepository;
-    ComicRepository comicRepository;
-    StorageService b2StorageService;
+    final ChapterRepository chapterRepository;
+    final ComicRepository comicRepository;
+    final StorageService b2StorageService;
 
+    @Value("${b2.bucketName}")
+    String bucketName;
+
+    /**
+     * Lấy danh sách chương
+     * 
+     * @param page    trang hiện tại
+     * @param limit   số lượng phần tử trên mỗi trang
+     * @param search  từ khóa tìm kiếm
+     * @param comicId id của comic
+     * @return BaseResponse<?>
+     */
     @Override
     public BaseResponse<?> getAllChapters(int page, int limit, String search, String comicId) {
         Pageable pageForQuery = PaginationUtils.createPageableWithSort(page, limit, "updatedAt",
@@ -112,6 +129,11 @@ public class ChapterServiceImpl implements ChapterService {
                 chapters.getTotalPages());
     }
 
+    /**
+     * Validate chapter request
+     * 
+     * @param chapterRequest
+     */
     private void validateChapterRequest(ChapterRequest chapterRequest) {
         if (chapterRequest == null) {
             throw new BaseException(ErrorCode.CHAPTER_REQUEST_NOT_NULL);
@@ -123,285 +145,314 @@ public class ChapterServiceImpl implements ChapterService {
 
     }
 
-    private void validateChapterNumber(ChapterRequest chapterRequest, String oldChapterId) {
-        chapterRepository.findByChapterNumberAndComicId(
-                chapterRequest.getChapterNumber(),
+    /**
+     * Validate chapter number
+     * 
+     * @param chapterRequest
+     */
+    private void validateChapterNumber(ChapterRequest chapterRequest) {
+        chapterRepository.findByComicIdAndChapterNumber(
                 chapterRequest.getComicId(),
-                oldChapterId).ifPresent(
+                chapterRequest.getChapterNumber()).ifPresent(
                         chapter -> {
                             throw new BaseException(ErrorCode.CHAPTER_NUMBER_EXISTS);
                         });
     }
 
+    /**
+     * Validate chapter number cho update
+     * 
+     * @param chapterRequest
+     * @param currentChapterId
+     */
+    private void validateChapterNumberForUpdate(ChapterRequest chapterRequest, String currentChapterId) {
+        chapterRepository.findByChapterNumberAndComicId(
+                chapterRequest.getChapterNumber(),
+                chapterRequest.getComicId(),
+                currentChapterId).ifPresent(
+                        chapter -> {
+                            throw new BaseException(ErrorCode.CHAPTER_NUMBER_EXISTS);
+                        });
+    }
+
+    /**
+     * Tạo chương mới
+     * 
+     * @param chapterRequest
+     * @param files
+     * @return BaseResponse<?>
+     */
     @Override
+    @Transactional
     public BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files) {
-        // TODO: Implement create chapter
-        return null;
-        // validateChapterRequest(chapterRequest);
-        // validateChapterNumber(chapterRequest, null);
+        validateChapterRequest(chapterRequest);
+        validateChapterNumber(chapterRequest);
 
-        // Chapter chapter = chapterMapper.toChapter(chapterRequest);
-        // Comic comic = comicRepository.findById(chapterRequest.getComicId())
-        // .orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
+        Chapter chapter = Chapter.builder()
+                .title(chapterRequest.getTitle())
+                .chapterNumber(chapterRequest.getChapterNumber())
+                .status(chapterRequest.getStatus())
+                .price(chapterRequest.getStatus() == ChapterStatus.FREE ? 0.0 : chapterRequest.getPrice())
+                .build();
 
-        // List<DetailChapter> detailChapters = new ArrayList<>();
+        String path = null;
+        String domainCdn = null;
 
-        // String folderName = String.format("chapter-%s",
-        // chapterRequest.getChapterNumber());
+        List<DetailChapter> detailChapters = null;
 
-        // String folderId = googleDriveService.getFileId(folderName,
-        // comic.getFolderId());
-        // if (folderId == null) {
-        // folderId = googleDriveService.createFolder(folderName, comic.getFolderId());
-        // }
+        Comic comic = comicRepository.findById(chapterRequest.getComicId())
+                .orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
 
-        // String imgUrl = null;
-        // int orderNumber = 1;
+        if (chapterRequest.getIsFileUploaded()) {
+            // Lưu vào path: /comics/slugComic/slugChapter/
+            path = String.format(
+                    "%s/chapter-%s",
+                    comic.getSlug(),
+                    chapterRequest.getChapterNumber());
+            detailChapters = handleIsFileUploaded(files, path, chapter);
 
-        // for (var file : files) {
-        // String fileName = String.valueOf(orderNumber);
-        // var response = googleDriveService.uploadFileToFolder(file, fileName,
-        // folderId);
+            domainCdn = B2Constants.URL_PREFIX + bucketName + "/" + B2Constants.FOLDER_KEY_COMIC;
+        } else {
+            detailChapters = handleIsNotFileUploaded(chapterRequest, chapter);
+        }
 
-        // if (response.getStatus() != HttpStatus.OK.value()) {
-        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-        // }
+        chapter.setComic(comic);
+        chapter.setDetailChapters(detailChapters);
+        chapter.setChapterPath(path);
+        chapter.setDomainCdn(domainCdn);
 
-        // imgUrl = response.getMessage();
-        // detailChapters.add(DetailChapter.builder()
-        // .imgUrl(imgUrl)
-        // .orderNumber(orderNumber)
-        // .chapter(chapter)
-        // .build());
-        // orderNumber++;
-        // }
+        chapterRepository.save(chapter);
 
-        // chapter.setComic(comic);
-        // chapter.setDetailChapters(detailChapters);
-
-        // chapterRepository.save(chapter);
-
-        // double chapterNumberMax =
-        // chapterRepository.findMaxChapterNumberByComicId(chapterRequest.getComicId());
-        // if (chapter.getChapterNumber() >= chapterNumberMax) {
-        // comic.setLastChapterId(chapter.getId());
-        // comicRepository.save(comic);
-        // }
-
-        // return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
+        return BaseResponse.success("Thêm chương " + chapter.getChapterNumber() + " thành công");
     }
 
+    /**
+     * Xử lý khi là dạng file
+     * 
+     * @param files
+     * @param key
+     * @param chapter
+     * @return List<DetailChapter>
+     */
+    private List<DetailChapter> handleIsFileUploaded(List<MultipartFile> files, String slugChapter, Chapter chapter) {
+        List<DetailChapter> detailChapters = new ArrayList<>();
+
+        String fileName = null;
+        String pathName = null;
+        int orderNumber = 1;
+
+        for (var file : files) {
+            fileName = file.getOriginalFilename();
+            pathName = slugChapter + "/" + fileName;
+
+            var response = b2StorageService.uploadFile(file, B2Constants.FOLDER_KEY_COMIC, pathName);
+
+            if (response.getStatus() != HttpStatus.OK.value()) {
+                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+            }
+
+            var splitUrl = response.getMessage().split("/");
+            fileName = splitUrl[splitUrl.length - 1];
+
+            detailChapters.add(DetailChapter.builder()
+                    .imgUrl(fileName)
+                    .orderNumber(orderNumber)
+                    .chapter(chapter)
+                    .build());
+            orderNumber++;
+        }
+
+        return detailChapters;
+    }
+
+    /**
+     * Xử lý khi là dạng url
+     * 
+     * @param chapterRequest
+     * @param chapter
+     * @return List<DetailChapter>
+     */
+    private List<DetailChapter> handleIsNotFileUploaded(ChapterRequest chapterRequest, Chapter chapter) {
+        List<DetailChapter> detailChapters = new ArrayList<>();
+
+        for (var item : chapterRequest.getDetailChapters()) {
+            DetailChapter detailChapter = DetailChapter.builder()
+                    .chapter(chapter)
+                    .imgUrl(item.getImgUrl())
+                    .orderNumber(item.getOrderNumber())
+                    .build();
+            detailChapters.add(detailChapter);
+        }
+
+        return detailChapters;
+    }
+
+    /**
+     * Extract filename từ CDN URL
+     * Ví dụ:
+     * https://cdn.kimthi1708.id.vn/file/webtoon-thjvjpxx/comics/thidz/chapter-1.0/3.jpg?v=20250611112659
+     * -> 3.jpg?v=20250611112659
+     * 
+     * @param fullUrl URL đầy đủ từ CDN
+     * @return filename hoặc URL gốc nếu không phải CDN URL
+     */
+    private String extractFilenameFromCdnUrl(String fullUrl) {
+        if (fullUrl == null || fullUrl.trim().isEmpty()) {
+            return fullUrl;
+        }
+
+        // Kiểm tra nếu là blob URL thì bỏ qua (sẽ được xử lý từ file upload)
+        if (fullUrl.startsWith("blob:")) {
+            return null;
+        }
+
+        // Kiểm tra nếu là CDN URL
+        if (fullUrl.contains("cdn.kimthi1708.id.vn") || fullUrl.contains(B2Constants.URL_PREFIX)) {
+            // Tìm vị trí cuối cùng của dấu "/"
+            int lastSlashIndex = fullUrl.lastIndexOf('/');
+            if (lastSlashIndex != -1 && lastSlashIndex < fullUrl.length() - 1) {
+                return fullUrl.substring(lastSlashIndex + 1);
+            }
+        }
+
+        // Trả về URL gốc nếu không phải CDN URL
+        return fullUrl;
+    }
+
+    /**
+     * Cập nhật chương
+     * 
+     * @param id             id của chương
+     * @param chapterRequest thông tin cập nhật
+     * @param files          danh sách file upload (có thể null)
+     * @return BaseResponse<?>
+     */
     @Override
+    @Transactional
     public BaseResponse<?> updateChapter(String id, ChapterRequest chapterRequest, List<MultipartFile> files) {
-        // TODO: Implement update chapter
-        return null;
-        // ValidationUtils.checkNullId(id);
-        // Chapter chapter = chapterRepository.findById(id)
-        // .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
+        // Validate input
+        ValidationUtils.checkNullId(id);
+        validateChapterRequest(chapterRequest);
 
-        // // Cập nhật thông tin cơ bản
-        // chapter.setTitle(chapterRequest.getTitle());
-        // chapter.setChapterNumber(chapterRequest.getChapterNumber());
-        // chapter.setStatus(chapterRequest.getStatus());
-        // chapter.setPrice(chapterRequest.getPrice());
-        // chapterRepository.save(chapter);
+        // Tìm chapter hiện tại
+        Chapter existingChapter = chapterRepository.findById(id)
+                .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
 
-        // // Nếu không có thông tin chi tiết chương, không cần xử lý ảnh
-        // if (chapterRequest.getDetailChapters() == null ||
-        // chapterRequest.getDetailChapters().isEmpty()) {
-        // return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
-        // }
+        // Validate comic tồn tại
+        Comic comic = comicRepository.findById(chapterRequest.getComicId())
+                .orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
 
-        // // 1. Lấy danh sách chi tiết hiện tại
-        // List<DetailChapter> existingDetails =
-        // detailChapterRepository.findByChapterId(id);
+        // Validate chapter number không trùng lặp (trừ chính nó)
+        if (!existingChapter.getChapterNumber().equals(chapterRequest.getChapterNumber())) {
+            validateChapterNumberForUpdate(chapterRequest, id);
+        }
 
-        // // 2. Tạo danh sách chi tiết mới
-        // List<DetailChapter> newDetails = new ArrayList<>();
+        // Cập nhật thông tin cơ bản
+        existingChapter.setTitle(chapterRequest.getTitle());
+        existingChapter.setStatus(chapterRequest.getStatus());
+        existingChapter.setPrice(chapterRequest.getStatus() == ChapterStatus.FREE ? 0.0 : chapterRequest.getPrice());
 
-        // // 3. Map để lưu chi tiết cũ theo URL
-        // Map<String, DetailChapter> existingDetailsMap = existingDetails.stream()
-        // .collect(Collectors.toMap(DetailChapter::getImgUrl, Function.identity(), (a,
-        // b) -> a));
+        String path = existingChapter.getChapterPath();
+        String domainCdn = existingChapter.getDomainCdn();
+        List<DetailChapter> newDetailChapters = new ArrayList<>();
 
-        // // 4. Tạo danh sách các chi tiết sẽ bị xóa
-        // List<DetailChapter> detailsToRemove = new ArrayList<>(existingDetails);
+        // Kiểm tra nếu chapterNumber thay đổi và chapter có file trên storage
+        boolean chapterNumberChanged = !existingChapter.getChapterNumber().equals(chapterRequest.getChapterNumber());
+        if (chapterNumberChanged && path != null) {
+            // Tạo path mới với chapterNumber mới
+            String newPath = String.format(
+                    "%s/chapter-%s",
+                    comic.getSlug(),
+                    chapterRequest.getChapterNumber());
 
-        // // 5. Biến để theo dõi index của file mới
-        // int fileIndex = 0;
+            // Đổi tên folder trên storage từ path cũ sang path mới
+            String oldFolderUrl = B2Constants.FOLDER_KEY_COMIC + "/" + path + "/";
+            String newFolderName = "chapter-" + chapterRequest.getChapterNumber();
 
-        // // Lấy folderId của comic
-        // Comic comic = chapter.getComic();
-        // String folderName = String.format("chapter-%s", chapter.getChapterNumber());
+            try {
+                // Sử dụng rename method của StorageService để đổi tên folder
+                var renameResponse = b2StorageService.rename(oldFolderUrl, newFolderName);
 
-        // // 6. Xử lý từng chi tiết từ request
-        // for (DetailChapterRequest detailRequest : chapterRequest.getDetailChapters())
-        // {
-        // // Kiểm tra nếu chi tiết cần xóa thì bỏ qua
-        // if (detailRequest.isHasRemove()) {
-        // // Tìm và xóa file ảnh trên Google Drive nếu cần
-        // if (detailRequest.getImgUrl() != null && !detailRequest.getImgUrl().isEmpty()
-        // && !detailRequest.getImgUrl().startsWith("blob:")) {
-        // if
-        // (detailRequest.getImgUrl().startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE))
-        // {
-        // // Xóa file trên Google Drive
-        // String idOld = StringUtils.getIdFromUrl(detailRequest.getImgUrl());
-        // googleDriveService.remove(idOld);
-        // }
+                if (renameResponse.getStatus() == 200) {
+                    path = newPath;
+                } else {
+                    throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
+                }
 
-        // // Tìm và lấy bản ghi cần xóa
-        // DetailChapter detailToRemove = existingDetails.stream()
-        // .filter(detailChapter -> detailChapter.getImgUrl() != null &&
-        // detailChapter.getImgUrl().equals(detailRequest.getImgUrl()))
-        // .findFirst()
-        // .orElse(null);
+            } catch (Exception e) {
+                throw new BaseException(ErrorCode.RENAME_FILE_FAILED);
+            }
+        }
 
-        // // Nếu tìm thấy thì xóa bằng ID
-        // if (detailToRemove != null) {
-        // detailChapterRepository.deleteById(detailToRemove.getId());
-        // // Đảm bảo loại bỏ khỏi danh sách
-        // existingDetails.remove(detailToRemove);
-        // detailsToRemove.remove(detailToRemove);
-        // }
-        // }
-        // continue; // Bỏ qua không thêm vào danh sách chi tiết mới
-        // }
+        // Cập nhật chapterNumber sau khi xử lý path
+        existingChapter.setChapterNumber(chapterRequest.getChapterNumber());
 
-        // DetailChapter detail;
+        // Xử lý detail chapters từ URL (ảnh cũ đã có)
+        if (chapterRequest.getDetailChapters() != null && !chapterRequest.getDetailChapters().isEmpty()) {
+            for (var item : chapterRequest.getDetailChapters()) {
+                String extractedFilename = extractFilenameFromCdnUrl(item.getImgUrl());
 
-        // if (detailRequest.isNewImage()) {
-        // detail = new DetailChapter();
-        // // Tạo mới chi tiết
-        // detail.setChapter(chapter);
-        // // 6.1. Đây là ảnh mới, cần tạo mới và upload file
-        // if (files != null && fileIndex < files.size()) {
-        // // Kiểm tra và lấy folder ID của chapter
-        // String folderId = googleDriveService.getFileId(folderName,
-        // comic.getFolderId());
-        // if (folderId == null) {
-        // folderId = googleDriveService.createFolder(folderName, comic.getFolderId());
-        // }
+                // Chỉ thêm nếu không phải blob URL
+                if (extractedFilename != null) {
+                    DetailChapter detailChapter = DetailChapter.builder()
+                            .chapter(existingChapter)
+                            .imgUrl(extractedFilename)
+                            .orderNumber(item.getOrderNumber())
+                            .build();
+                    newDetailChapters.add(detailChapter);
+                }
+            }
+        }
 
-        // // Tìm detailChapter cũ bằng orderNumber và xử lý an toàn
-        // existingDetails.stream()
-        // .filter(detailChapter -> detailChapter.getOrderNumber() ==
-        // detailRequest.getOrderNumber())
-        // .findFirst()
-        // .ifPresent(detailChapter -> {
-        // String urlOld = detailChapter.getImgUrl();
-        // if (urlOld != null && !urlOld.isEmpty()) {
-        // String idOld = StringUtils.getIdFromUrl(urlOld);
-        // googleDriveService.remove(idOld);
-        // }
-        // });
+        // Nếu có file upload mới, thêm vào cuối danh sách
+        if (chapterRequest.getIsFileUploaded() != null && chapterRequest.getIsFileUploaded()
+                && files != null && !files.isEmpty()) {
 
-        // // Xoá file cũ trong folder
-        // // Upload file mới vào Google Drive và lấy URL
-        // String fileName = String.valueOf(detailRequest.getOrderNumber());
-        // var response = googleDriveService.uploadFileToFolder(files.get(fileIndex),
-        // fileName, folderId);
+            // Tạo hoặc cập nhật path cho chapter nếu chưa có
+            if (path == null) {
+                path = String.format(
+                        "%s/chapter-%s",
+                        comic.getSlug(),
+                        chapterRequest.getChapterNumber());
+                domainCdn = B2Constants.URL_PREFIX + bucketName + "/" + B2Constants.FOLDER_KEY_COMIC;
+            }
 
-        // if (response.getStatus() != HttpStatus.OK.value()) {
-        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-        // }
+            // Tìm orderNumber lớn nhất hiện tại để thêm ảnh mới vào cuối
+            int maxOrderNumber = newDetailChapters.stream()
+                    .mapToInt(DetailChapter::getOrderNumber)
+                    .max()
+                    .orElse(0);
 
-        // detail.setImgUrl(response.getMessage());
-        // fileIndex++;
-        // } else {
-        // detail.setImgUrl(detailRequest.getImgUrl());
-        // }
-        // } else {
-        // // 6.2. Đây là ảnh cũ
-        // String imgUrl = detailRequest.getImgUrl();
+            // Upload và thêm file mới vào cuối danh sách
+            List<DetailChapter> uploadedDetailChapters = handleIsFileUploaded(files, path, existingChapter);
 
-        // // Kiểm tra xem có phải là URL blob không
-        // if (imgUrl != null && imgUrl.startsWith("blob:")) {
-        // // Nếu là URL blob nhưng không có file tương ứng, bỏ qua
-        // if (fileIndex < files.size()) {
-        // // Tạo mới chi tiết
-        // detail = new DetailChapter();
-        // detail.setChapter(chapter);
+            // Cập nhật orderNumber cho các ảnh mới
+            for (DetailChapter uploadedDetail : uploadedDetailChapters) {
+                uploadedDetail.setOrderNumber(++maxOrderNumber);
+                newDetailChapters.add(uploadedDetail);
+            }
+        }
 
-        // // Kiểm tra và lấy folder ID của chapter
-        // String folderId = googleDriveService.getFileId(folderName,
-        // comic.getFolderId());
-        // if (folderId == null) {
-        // folderId = googleDriveService.createFolder(folderName, comic.getFolderId());
-        // }
+        // Xóa tất cả detail chapters cũ và thêm mới (sử dụng collection hiện có)
+        existingChapter.getDetailChapters().clear();
+        existingChapter.getDetailChapters().addAll(newDetailChapters);
 
-        // // Upload file mới vào Google Drive và lấy URL
-        // String fileName = String.valueOf(detailRequest.getOrderNumber());
-        // var response = googleDriveService.uploadFileToFolder(files.get(fileIndex),
-        // fileName, folderId);
+        // Cập nhật thông tin chapter
+        existingChapter.setChapterPath(path);
+        existingChapter.setDomainCdn(domainCdn);
 
-        // if (response.getStatus() != HttpStatus.OK.value()) {
-        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-        // }
+        // Lưu chapter đã cập nhật
+        chapterRepository.save(existingChapter);
 
-        // detail.setImgUrl(response.getMessage());
-        // fileIndex++;
-        // } else {
-        // continue; // Bỏ qua nếu không có file tương ứng
-        // }
-        // } else {
-        // // Đây là URL Google Drive hợp lệ, kiểm tra xem có tồn tại không
-        // detail = existingDetailsMap.get(imgUrl);
-        // if (detail != null) {
-        // // Nếu tìm thấy, loại bỏ khỏi danh sách cần xóa
-        // detailsToRemove.remove(detail);
-        // } else {
-        // // Nếu không tìm thấy, tạo mới
-        // detail = new DetailChapter();
-        // detail.setChapter(chapter);
-        // detail.setImgUrl(imgUrl);
-        // }
-        // }
-        // }
-        // // 6.4. Thêm vào danh sách chi tiết mới
-        // detail.setOrderNumber(detailRequest.getOrderNumber());
-        // newDetails.add(detail);
-        // }
-
-        // // 7. Xóa các chi tiết không còn sử dụng
-        // if (!detailsToRemove.isEmpty()) {
-        // detailChapterRepository.deleteAll(detailsToRemove);
-        // }
-
-        // // 8. Lưu tất cả chi tiết mới
-        // detailChapterRepository.saveAll(newDetails);
-
-        // // 9. Xử lý lại thứ tự tên file trên Google Drive
-        // if (!newDetails.isEmpty()) {
-        // String folderId = googleDriveService.getFileId(folderName,
-        // comic.getFolderId());
-
-        // if (folderId != null) {
-        // // Sắp xếp lại danh sách theo orderNumber
-        // List<DetailChapter> sortedDetails = newDetails.stream()
-        // .sorted((a, b) -> Integer.compare(a.getOrderNumber(), b.getOrderNumber()))
-        // .collect(Collectors.toList());
-
-        // // Duyệt qua và đổi tên file nếu cần
-        // for (int i = 0; i < sortedDetails.size(); i++) {
-        // DetailChapter detail = sortedDetails.get(i);
-        // // Tạo tên file theo định dạng "image_[orderNumber]" để tránh trùng lặp
-        // String newFileName = "image_" + detail.getOrderNumber();
-
-        // // Lấy ID file từ URL
-        // String fileId = StringUtils.getIdFromUrl(detail.getImgUrl());
-        // if (fileId != null) {
-        // // Đổi tên file trên Google Drive
-        // googleDriveService.rename(fileId, newFileName);
-        // }
-        // }
-        // }
-        // }
-
-        // return BaseResponse.success(chapterMapper.toChapterResponse(chapter));
-
+        return BaseResponse.success("Cập nhật chương " + existingChapter.getChapterNumber() + " thành công");
     }
 
+    /**
+     * Xóa chương
+     * 
+     * @param id id của chương
+     * @return BaseResponse<?>
+     */
     @Override
     @Transactional
     public BaseResponse<?> deleteChapter(String id) {
@@ -409,7 +460,8 @@ public class ChapterServiceImpl implements ChapterService {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
 
-        // TODO: Remove chapter from b2
+        String key = B2Constants.FOLDER_KEY_COMIC + "/" + chapter.getChapterPath() + "/";
+        b2StorageService.remove(key);
 
         chapterRepository.delete(chapter);
 

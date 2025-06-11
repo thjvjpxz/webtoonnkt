@@ -10,4 +10,6 @@ public interface StorageService {
     BaseResponse<?> remove(String url);
 
     BaseResponse<?> rename(String url, String newName);
+
+    BaseResponse<?> getAllFiles(String folder);
 }

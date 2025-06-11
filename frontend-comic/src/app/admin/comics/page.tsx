@@ -15,6 +15,7 @@ import { useComic } from "@/hooks/useComic";
 import { CategoryResponse } from "@/types/category";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
+import { renderComicStatus, renderComicCategory, renderComicAuthor, renderBadge } from "@/utils/comic-render";
 import Image from "next/image";
 import {
   FiAlertCircle,
@@ -62,57 +63,7 @@ export default function Comics() {
     handleDeleteComic,
   } = useComic();
 
-  // Hiển thị trạng thái với hiệu ứng đẹp
-  const renderStatus = (status: string) => {
-    switch (status) {
-      case "COMPLETED":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-500 text-white shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105">
-            Đã hoàn thành
-          </span>
-        );
-      case "ONGOING":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-500 text-white shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105">
-            Đang cập nhật
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-500 text-white shadow-md hover:shadow-lg hover:bg-gray-600 transition-all duration-300 hover:scale-105">
-            Không xác định
-          </span>
-        );
-    }
-  };
-
-  // Hiển thị thể loại với hiệu ứng đẹp
-  const renderCategory = (category: CategoryResponse) => {
-    return (
-      <span
-        key={category.id}
-        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500 text-white shadow-md hover:shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-105"
-      >
-        {category.name}
-      </span>
-    );
-  };
-
-  // Hiển thị badge cho tác giả đang cập nhật
-  const renderAuthor = (author: string | null) => {
-    if (!author) {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-orange-500 text-white shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-300 hover:scale-105">
-          Đang cập nhật
-        </span>
-      );
-    }
-    return (
-      <span className="text-muted-foreground font-medium">
-        {author}
-      </span>
-    );
-  };
+  // Các hàm render đã được tách ra utils/comic-render.tsx
 
   return (
     <DashboardLayout title={isPublisher ? "Truyện của tôi" : "Quản lý truyện"} isPublisher={isPublisher}>
@@ -244,6 +195,9 @@ export default function Comics() {
                       Tác giả
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
+                      Nhà xuất bản
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
                       Thể loại
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -266,6 +220,7 @@ export default function Comics() {
                       key={comic.id}
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
+                      {/* Thumbnail */}
                       <TableCell className="py-4">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-12 w-12 relative">
@@ -287,12 +242,21 @@ export default function Comics() {
                           </div>
                         </div>
                       </TableCell>
+
+                      {/* Tác giả */}
                       <TableCell className="text-center text-muted-foreground font-medium">
-                        {renderAuthor(comic.author)}
+                        {renderComicAuthor(comic.author)}
                       </TableCell>
+
+                      {/* Nhà xuất bản */}
+                      <TableCell className="text-center text-muted-foreground font-medium">
+                        {renderBadge(comic.publisherUserName)}
+                      </TableCell>
+
+                      {/* Thể loại */}
                       <TableCell className="text-center">
                         <div className="flex flex-wrap gap-1 justify-center">
-                          {comic.categories.slice(0, 2).map(renderCategory)}
+                          {comic.categories.slice(0, 2).map(renderComicCategory)}
                           {comic.categories.length > 2 && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-500 text-white shadow-md hover:shadow-lg hover:bg-gray-600 transition-all duration-300 hover:scale-105">
                               +{comic.categories.length - 2}
@@ -300,18 +264,26 @@ export default function Comics() {
                           )}
                         </div>
                       </TableCell>
+
+                      {/* Lượt xem */}
                       <TableCell className="text-center text-muted-foreground font-medium">
                         <span className="inline-flex items-center gap-1">
                           <FiEye size={14} className="text-primary" />
                           {comic.viewsCount.toLocaleString() || 0}
                         </span>
                       </TableCell>
+
+                      {/* Trạng thái */}
                       <TableCell className="text-center">
-                        {renderStatus(comic.status)}
+                        {renderComicStatus(comic.status)}
                       </TableCell>
+
+                      {/* Cập nhật */}
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(comic.updatedAt)}
                       </TableCell>
+
+                      {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
                           <Button
@@ -388,6 +360,7 @@ export default function Comics() {
 
       {isViewModalOpen && currentComic && (
         <ViewComic
+          isOpen={isViewModalOpen}
           comic={currentComic}
           onClose={() => setIsViewModalOpen(false)}
         />

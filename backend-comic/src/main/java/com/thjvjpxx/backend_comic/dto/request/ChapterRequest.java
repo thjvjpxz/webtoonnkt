@@ -30,4 +30,7 @@ public class ChapterRequest {
     Double price;
 
     List<DetailChapterRequest> detailChapters;
+
+    Boolean isFileUploaded;
+    
 }

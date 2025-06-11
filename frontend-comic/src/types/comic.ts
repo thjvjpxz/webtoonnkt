@@ -29,7 +29,7 @@ export interface ComicResponse {
   followersCount: number;
   viewsCount: number;
   description: string;
-  lastChapterId: string;
+  publisherUserName: string;
   categories: CategoryResponse[];
   createdAt: string;
   updatedAt: string;

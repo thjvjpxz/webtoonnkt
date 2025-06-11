@@ -1,22 +1,21 @@
-import { FiUpload, FiX, FiSearch, FiPlus } from "react-icons/fi";
-import Image from "next/image";
 import { useChapterModal } from "@/hooks/useChapterModal";
 import { Chapter, ChapterCreateUpdate, ChapterStatus } from "@/types/chapter";
 import { ComicResponse } from "@/types/comic";
+import Image from "next/image";
 import { useRef } from "react";
+import { FiLoader, FiPlus, FiSearch, FiUpload, FiX } from "react-icons/fi";
 
 // Shadcn/ui components
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -24,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { chooseImageUrl } from "@/utils/string";
 
 interface ChapterModalProps {
@@ -316,6 +316,16 @@ export default function ChapterModal({
 
               {uploadMethod === 'file' ? (
                 <>
+                  {/* Input file ẩn luôn tồn tại để nút "Thêm ảnh" có thể hoạt động */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+
                   {previewUrls.length === 0 && (
                     <div
                       className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4 hover:border-primary transition-colors"
@@ -337,15 +347,6 @@ export default function ChapterModal({
                         >
                           Chọn ảnh
                         </Button>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleImageChange}
-                          className="hidden"
-                          disabled={previewUrls.length >= 20}
-                        />
                       </div>
                     </div>
                   )}
@@ -355,13 +356,10 @@ export default function ChapterModal({
                   <Textarea
                     value={imageLink}
                     onChange={(e) => setImageLink(e.target.value)}
-                    placeholder="Nhập link ảnh, mỗi link một dòng (https://...)&#10;Ảnh sẽ tự động hiển thị khi bạn dán link hợp lệ"
+                    placeholder="Nhập link ảnh, mỗi link một dòng (https://...). Ảnh sẽ tự động hiển thị khi bạn dán link hợp lệ"
                     className="min-h-[100px]"
                     rows={4}
                   />
-                  <p className="text-xs text-gray-500 mt-2">
-                    Hỗ trợ nhập nhiều link ảnh, mỗi link trên một dòng. Ảnh sẽ được sắp xếp theo thứ tự link.
-                  </p>
                 </div>
               )}
 
@@ -447,6 +445,7 @@ export default function ChapterModal({
               variant="default"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
+              {isUploading && <FiLoader className="animate-spin ml-2" />}
               {isEditMode ? "Cập nhật" : "Thêm mới"}
             </Button>
           </DialogFooter>
@@ -454,4 +453,4 @@ export default function ChapterModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
+import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.dto.request.LevelRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
@@ -74,11 +74,12 @@ public class LevelServiceImpl implements LevelService {
             throw new BaseException(ErrorCode.LEVEL_DUPLICATE);
         }
 
-        String nameNormalize = StringUtils.generateSlug(request.getName());
+        String nameNormalize = StringUtils.generateSlug(request.getName()) + "."
+                + StringUtils.getExtension(file.getOriginalFilename());
 
         String urlGif = null;
         if (file != null) {
-            var response = b2StorageService.uploadFile(file, GlobalConstants.TYPE_LEVEL,
+            var response = b2StorageService.uploadFile(file, B2Constants.FOLDER_KEY_LEVEL,
                     nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -118,13 +119,15 @@ public class LevelServiceImpl implements LevelService {
 
         String nameNormalize = StringUtils.generateSlug(newName);
         if (file != null) {
-            var response = b2StorageService.uploadFile(file, GlobalConstants.TYPE_LEVEL,
+            nameNormalize += "." + StringUtils.getExtension(file.getOriginalFilename());
+            var response = b2StorageService.uploadFile(file, B2Constants.FOLDER_KEY_LEVEL,
                     nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
             urlGif = response.getMessage();
         } else if (!nameNormalize.equals(StringUtils.generateSlug(level.getName()))) {
+            nameNormalize += "." + StringUtils.getExtension(level.getUrlGif());
             var response = b2StorageService.rename(level.getUrlGif(), nameNormalize);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.RENAME_FILE_FAILED);

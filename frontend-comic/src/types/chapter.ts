@@ -36,6 +36,7 @@ export interface ChapterCreateUpdate {
   status: ChapterStatus;
   price?: number;
   detailChapters: DetailChapterCreateUpdate[];
+  isFileUploaded: boolean;
 }
 
 export interface ChapterImage {
@@ -65,8 +66,6 @@ export enum ChapterStatus {
 export interface DetailChapterCreateUpdate {
   imgUrl: string;
   orderNumber: number;
-  newImage: boolean;
-  hasRemove: boolean;
 }
 
 export interface DetailChapter {

@@ -1,146 +1,179 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ComicResponse } from "@/types/comic";
+import { renderBadge, renderComicAuthor, renderComicCategory, renderComicStatus } from "@/utils/comic-render";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
-import { FiX } from "react-icons/fi";
+import {
+  FiBook,
+  FiCalendar,
+  FiClock,
+  FiEye,
+  FiFileText,
+  FiHash,
+  FiHeart,
+  FiTag,
+  FiUser,
+} from "react-icons/fi";
 
 interface ViewComicModalProps {
+  isOpen: boolean;
   comic: ComicResponse;
   onClose: () => void;
 }
-export default function VewComicModal({ comic, onClose }: ViewComicModalProps) {
-  const renderStatus = (status: string) => {
-    switch (status) {
-      case "completed":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-            Đã hoàn thành
-          </span>
-        );
-      case "ongoing":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-            Đang tiến hành
-          </span>
-        );
-      default:
-        return null;
-    }
-  }
+
+export default function ViewComicModal({ isOpen, comic, onClose }: ViewComicModalProps) {
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto custom-scrollbar">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl dark:bg-gray-800 dark:border dark:border-gray-700">
-        <div className="flex justify-between items-center p-6 border-b border-green-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Chi tiết truyện
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 cursor-pointer"
-          >
-            <FiX size={20} />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogHeader className="p-6 pb-4">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <FiBook className="h-5 w-5 text-primary" />
+              Chi tiết truyện
+            </DialogTitle>
+          </div>
+        </DialogHeader>
 
-        <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Ảnh bìa truyện */}
-            <div className="w-full md:w-1/3 flex justify-center">
-              <div className="relative w-48 h-72">
-                <Image
-                  src={chooseImageUrl(comic.thumbUrl)}
-                  alt={comic.name}
-                  fill
-                  className="object-cover rounded shadow-md"
-                />
-              </div>
-            </div>
+        <ScrollArea className="max-h-[70vh] px-6 pb-6">
+          <div className="space-y-6">
+            {/* Thông tin cơ bản và ảnh bìa */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FiHash className="h-4 w-4 text-primary" />
+                  Thông tin cơ bản
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Ảnh bìa truyện */}
+                  <div className="w-full md:w-1/4">
+                    <div className="relative w-48 h-72 rounded-lg overflow-hidden">
+                      <Image
+                        src={chooseImageUrl(comic.thumbUrl)}
+                        alt={comic.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
 
-            {/* Thông tin truyện */}
-            <div className="w-full md:w-2/3">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                {comic.name}
-              </h2>
+                  {/* Thông tin truyện */}
+                  <div className="w-full md:w-3/4 space-y-4">
+                    <div>
+                      <h2 className="text-2xl font-bold text-foreground mb-2">
+                        {comic.name}
+                      </h2>
+                      {comic.originName && (
+                        <p className="text-muted-foreground">
+                          <span className="font-medium">Tên gốc:</span> {comic.originName}
+                        </p>
+                      )}
+                    </div>
 
-              {comic.originName && (
-                <p className="text-gray-600 dark:text-gray-400 mb-3">
-                  <span className="font-medium">Tên gốc:</span> {comic.originName}
-                </p>
-              )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2">
+                        <FiUser className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm text-muted-foreground">Nhà xuất bản:</span>
+                          {renderBadge(comic.publisherUserName)}
+                        </div>
+                      </div>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Tác giả:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">{comic.author}</span>
-              </div>
+                      <div className="flex items-center gap-2">
+                        <FiUser className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm text-muted-foreground">Tác giả:</span>
+                          {renderComicAuthor(comic.author)}
+                        </div>
+                      </div>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Trạng thái:</span>{" "}
-                {renderStatus(comic.status)}
-              </div>
+                      <div className="flex items-center gap-2">
+                        <FiHash className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm text-muted-foreground">Trạng thái:</span>
+                          {renderComicStatus(comic.status)}
+                        </div>
+                      </div>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Lượt xem:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">{comic.viewsCount.toLocaleString()}</span>
-              </div>
+                      <div className="flex items-center gap-2">
+                        <FiEye className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2">
+                          <span className="text-sm text-muted-foreground">Lượt xem:</span>
+                          <p className="text-sm font-medium">{comic.viewsCount.toLocaleString()}</p>
+                        </div>
+                      </div>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Lượt theo dõi:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">{comic.followersCount.toLocaleString()}</span>
-              </div>
+                      <div className="flex items-center gap-2">
+                        <FiHeart className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2">
+                          <span className="text-sm text-muted-foreground">Lượt theo dõi:</span>
+                          <p className="text-sm font-medium">{comic.followersCount.toLocaleString()}</p>
+                        </div>
+                      </div>
 
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-1 mt-1">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">Thể loại:</span>{" "}
-                  {comic.categories.map((category) => (
-                    <span
-                      key={category.id}
-                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                    >
-                      {category.name}
-                    </span>
-                  ))}
+                      <div className="flex items-center gap-2">
+                        <FiCalendar className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2">
+                          <span className="text-sm text-muted-foreground">Ngày tạo:</span>
+                          <p className="text-sm font-medium">{formatDate(comic.createdAt)}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <FiClock className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex gap-2">
+                          <span className="text-sm text-muted-foreground">Cập nhật:</span>
+                          <p className="text-sm font-medium">{formatDate(comic.updatedAt)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Ngày tạo:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">
-                  {formatDate(comic.createdAt)}
-                </span>
-              </div>
+            {/* Thể loại */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FiTag className="h-4 w-4 text-primary" />
+                  Thể loại
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {comic.categories.map(renderComicCategory)}
+                </div>
+              </CardContent>
+            </Card>
 
-              <div className="mb-3">
-                <span className="font-medium text-gray-700 dark:text-gray-300">Cập nhật:</span>{" "}
-                <span className="text-gray-600 dark:text-gray-400">
-                  {formatDate(comic.updatedAt)}
-                </span>
-              </div>
-            </div>
+            {/* Mô tả truyện */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FiFileText className="h-4 w-4 text-primary" />
+                  Mô tả
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <div
+                    className="prose prose-sm max-w-none dark:prose-invert text-foreground text-justify leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: comic.description }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Mô tả truyện */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              Mô tả
-            </h3>
-            <div
-              className="prose prose-green max-w-none dark:prose-invert dark:text-gray-300 text-justify"
-              dangerouslySetInnerHTML={{ __html: comic.description }}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end p-6 border-t border-green-100 dark:border-gray-700">
-          <Button
-            onClick={onClose}
-            variant="secondary"
-          >
-            Đóng
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
+        </ScrollArea>
+      </DialogContent>
+    </Dialog >
+  );
 }

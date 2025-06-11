@@ -113,6 +113,8 @@ export const useChapterModal = (
           }
         }).filter(url => url !== null) as string[];
 
+        setImageLink(urls.join('\n'));
+
         setPreviewUrls(urls);
         setExistingImageUrls(urls);
       }
@@ -295,43 +297,28 @@ export const useChapterModal = (
       comicId,
       status,
       price,
-      detailChapters: []
+      detailChapters: [],
+      isFileUploaded: uploadMethod === 'file' && images.length > 0
     };
+
+    // Tạo danh sách chi tiết cho tất cả các ảnh (cả create và update)
+    const imageDetails: DetailChapterCreateUpdate[] = [];
+
+    // Trường hợp upload file
+    previewUrls.forEach((url, index) => {
+      imageDetails.push({
+        imgUrl: url,
+        orderNumber: index + 1
+      });
+    });
+
+
+    // Gán danh sách chi tiết vào chapterData
+    chapterData.detailChapters = imageDetails;
 
     // Thêm id nếu đang ở chế độ chỉnh sửa
     if (isEditMode && chapter?.id) {
       chapterData.id = chapter.id;
-
-      // Tạo danh sách chi tiết mới để gửi lên server
-      const imageDetails: DetailChapterCreateUpdate[] = [];
-
-      // Thêm ảnh còn hiển thị (không bị xóa)
-      previewUrls.forEach((url, index) => {
-        const isNewImage = url.startsWith('blob:') || !existingImageUrls.includes(url);
-
-        imageDetails.push({
-          imgUrl: url,
-          orderNumber: index + 1, // orderNumber bắt đầu từ 1
-          newImage: isNewImage,
-          hasRemove: false // Không xóa
-        });
-      });
-
-      // Thêm ảnh đã bị xóa với isDelete = true
-      deletedImageUrls.forEach(url => {
-        // Chỉ thêm các URL không bắt đầu bằng 'blob:' (là ảnh đã tồn tại trên server)
-        if (!url.startsWith('blob:')) {
-          imageDetails.push({
-            imgUrl: url,
-            orderNumber: 0, // Số thứ tự không quan trọng vì ảnh sẽ bị xóa
-            newImage: false, // Không phải ảnh mới
-            hasRemove: true // Đánh dấu xóa
-          });
-        }
-      });
-
-      // Gán danh sách chi tiết vào chapterData để gửi lên server
-      chapterData.detailChapters = imageDetails;
     }
 
     try {
@@ -389,4 +376,4 @@ export const useChapterModal = (
     imageLink,
     setImageLink: handleImageLinkChange
   };
-};
+}; 

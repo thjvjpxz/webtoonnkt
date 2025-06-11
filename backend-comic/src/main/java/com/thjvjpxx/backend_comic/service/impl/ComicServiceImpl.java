@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.constant.B2Constants;
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.dto.response.ComicResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
@@ -30,6 +30,7 @@ import com.thjvjpxx.backend_comic.service.ComicService;
 import com.thjvjpxx.backend_comic.service.StorageService;
 import com.thjvjpxx.backend_comic.utils.FileUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
+import com.thjvjpxx.backend_comic.utils.StringUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
@@ -46,7 +47,7 @@ public class ComicServiceImpl implements ComicService {
     ChapterRepository chapterRepository;
 
     @Override
-    public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
+    public BaseResponse<?> getAllComics(int page, int limit, String search, String status, String category) {
         Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
         int originalPage = page;
         Page<Comic> comics = null;
@@ -61,8 +62,27 @@ public class ComicServiceImpl implements ComicService {
             comics = comicRepository.findAll(pageable);
         }
 
+        List<ComicResponse> comicResponses = comics.getContent().stream()
+                .map(comic -> ComicResponse.builder()
+                        .id(comic.getId())
+                        .name(comic.getName())
+                        .slug(comic.getSlug())
+                        .originName(comic.getOriginName())
+                        .thumbUrl(comic.getThumbUrl())
+                        .author(comic.getAuthor())
+                        .status(comic.getStatus())
+                        .followersCount(comic.getFollowersCount())
+                        .viewsCount(comic.getViewsCount())
+                        .description(comic.getDescription())
+                        .publisherUserName(comic.getPublisher() != null ? comic.getPublisher().getUsername() : null)
+                        .categories(comic.getCategories())
+                        .createdAt(comic.getCreatedAt().toString())
+                        .updatedAt(comic.getUpdatedAt().toString())
+                        .build())
+                .collect(Collectors.toList());
+
         return BaseResponse.success(
-                comics.getContent(),
+                comicResponses,
                 originalPage,
                 (int) comics.getTotalElements(),
                 limit,
@@ -76,8 +96,8 @@ public class ComicServiceImpl implements ComicService {
         if (cover != null) {
             var response = b2StorageService.uploadFile(
                     cover,
-                    GlobalConstants.TYPE_THUMBNAIL,
-                    comicRequest.getSlug() + "_thumb");
+                    B2Constants.FOLDER_KEY_THUMBNAIL,
+                    comicRequest.getSlug() + "_thumb." + StringUtils.getExtension(cover.getOriginalFilename()));
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
@@ -225,8 +245,8 @@ public class ComicServiceImpl implements ComicService {
     private String uploadNewThumbnail(MultipartFile cover, String slug) {
         var response = b2StorageService.uploadFile(
                 cover,
-                GlobalConstants.TYPE_THUMBNAIL,
-                slug + "_thumb");
+                B2Constants.FOLDER_KEY_THUMBNAIL,
+                slug + "_thumb." + StringUtils.getExtension(cover.getOriginalFilename()));
         if (response.getStatus() != HttpStatus.OK.value()) {
             throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
         }

@@ -303,7 +303,7 @@ export default function Chapters() {
 
                       {/* Trạng thái */}
                       <TableCell className="text-center">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${chapter.status === 'FREE'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                           }`}>

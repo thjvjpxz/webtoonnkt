@@ -42,6 +42,7 @@ public class SecurityConfig {
 						// .requestMatchers("/**").permitAll()
 						// Các API công khai
 						.requestMatchers(
+								"/test/**",
 								"/public/**",
 								"/auth/login",
 								"/auth/register",

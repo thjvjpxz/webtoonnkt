@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
+import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.dto.request.UserRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
@@ -116,8 +116,8 @@ public class UserServiceImpl implements UserService {
 
         String imgUrl = null;
         if (avatar != null) {
-            var response = b2StorageService.uploadFile(avatar, GlobalConstants.TYPE_AVATAR,
-                    request.getUsername());
+            var response = b2StorageService.uploadFile(avatar, B2Constants.FOLDER_KEY_AVATAR,
+                    request.getUsername() + "." + StringUtils.getExtension(avatar.getOriginalFilename()));
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
             }
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
         if (avatar != null) {
             FileUtils.deleteFileFromB2(imgUrl, b2StorageService);
 
-            var response = b2StorageService.uploadFile(avatar, GlobalConstants.TYPE_AVATAR,
+            var response = b2StorageService.uploadFile(avatar, B2Constants.FOLDER_KEY_AVATAR,
                     request.getUsername());
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -164,7 +164,8 @@ public class UserServiceImpl implements UserService {
 
         if (!user.getUsername().equals(request.getUsername())) {
             validateUsername(request.getUsername());
-            String newUsername = StringUtils.generateSlug(request.getUsername());
+            String newUsername = StringUtils.generateSlug(request.getUsername()) + "."
+                    + StringUtils.getExtension(avatar.getOriginalFilename());
             var response = b2StorageService.rename(user.getImgUrl(), newUsername);
             if (response.getStatus() != HttpStatus.OK.value()) {
                 throw new BaseException(ErrorCode.RENAME_FILE_FAILED);

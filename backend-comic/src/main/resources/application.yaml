@@ -60,12 +60,6 @@ crawler:
     size: 5
     delay-ms: 0
 
-storage:
-  provider: b2 # nhập 'b2' hoặc 'google'
-
-google-drive:
-  folder-id: 1H89l7BIVVNR3byETuuqZp2OXJpbSsT2R
-
 jwt:
   expiration: 3600000 # 1 giờ
   refresh-expiration: 604800000 # 7 ngày

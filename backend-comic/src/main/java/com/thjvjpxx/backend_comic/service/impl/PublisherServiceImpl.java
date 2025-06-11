@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.constant.B2Constants;
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.request.PublisherChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.PublisherComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -81,7 +80,7 @@ public class PublisherServiceImpl implements PublisherService {
         if (coverFile != null && !coverFile.isEmpty()) {
             var response = b2StorageService.uploadFile(
                     coverFile,
-                    GlobalConstants.TYPE_THUMBNAIL,
+                    B2Constants.FOLDER_KEY_THUMBNAIL,
                     slug + "_thumb");
             if (response.getStatus() != 200) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
@@ -125,7 +124,7 @@ public class PublisherServiceImpl implements PublisherService {
         if (coverFile != null && !coverFile.isEmpty()) {
             var response = b2StorageService.uploadFile(
                     coverFile,
-                    GlobalConstants.TYPE_THUMBNAIL,
+                    B2Constants.FOLDER_KEY_THUMBNAIL,
                     comic.getSlug() + "_thumb");
             if (response.getStatus() != 200) {
                 throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
