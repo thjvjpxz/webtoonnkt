@@ -7,7 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -22,6 +25,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class VipPackage {
 
     @Id
@@ -49,6 +55,9 @@ public class VipPackage {
 
     @Column(name = "duration_days", nullable = false)
     Integer durationDays; // Thời hạn VIP (số ngày)
+
+    @Column(name = "is_active", nullable = false)
+    Boolean isActive; // Trạng thái bán: true = còn bán, false = ngừng bán
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -91,5 +100,14 @@ public class VipPackage {
                 discountEndDate != null &&
                 now.isAfter(discountStartDate) &&
                 now.isBefore(discountEndDate);
+    }
+
+    /**
+     * Kiểm tra xem gói VIP có khả dụng để mua không
+     * 
+     * @return true nếu gói VIP còn được bán
+     */
+    public boolean isAvailableForPurchase() {
+        return isActive != null && isActive;
     }
 }

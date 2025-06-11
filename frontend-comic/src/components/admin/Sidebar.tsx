@@ -13,6 +13,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiAward,
+  FiPackage,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 
@@ -55,6 +56,11 @@ export default function Sidebar({
       icon: <FiFileText size={20} />,
       label: "Quản lý chương",
       show: isPublisher
+    },
+    {
+      path: "/admin/vip-packages",
+      icon: <FiPackage size={20} />,
+      label: "Quản lý gói VIP",
     },
     {
       path: "/admin/levels",

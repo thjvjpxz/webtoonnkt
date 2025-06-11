@@ -139,13 +139,16 @@ public enum ErrorCode {
     CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "chương đã được mua!"),
     CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "chương này miễn phí!"),
 
-    // Withdrawal
-    WITHDRAWAL_AMOUNT_INVALID(HttpStatus.BAD_REQUEST, "Số tiền rút không hợp lệ!"),
-    WITHDRAWAL_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "Số dư không đủ để rút!"),
-    WITHDRAWAL_PENDING_EXISTS(HttpStatus.BAD_REQUEST, "Bạn đã có yêu cầu rút tiền đang chờ xử lý!"),
-    WITHDRAWAL_BANK_INFO_REQUIRED(HttpStatus.BAD_REQUEST, "Thông tin ngân hàng là bắt buộc!"),
-    WITHDRAWAL_NOT_FOUND(HttpStatus.NOT_FOUND, "Yêu cầu rút tiền không tồn tại!"),
-    WITHDRAWAL_NOT_PENDING(HttpStatus.BAD_REQUEST, "Yêu cầu rút tiền không ở trạng thái chờ xử lý!"),
+    // Vip Package
+    VIP_PACKAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Gói VIP không tồn tại!"),
+    VIP_PACKAGE_INVALID(HttpStatus.BAD_REQUEST, "Thông tin gói VIP không hợp lệ!"),
+    VIP_PACKAGE_NAME_EXISTS(HttpStatus.BAD_REQUEST, "Tên gói VIP đã tồn tại!"),
+    VIP_PACKAGE_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên gói VIP không được trống!"),
+    ORIGINAL_PRICE_NOT_NULL(HttpStatus.BAD_REQUEST, "Giá gốc không được trống!"),
+    ORIGINAL_PRICE_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Giá gốc phải lớn hơn 0!"),
+    DURATION_DAYS_NOT_NULL(HttpStatus.BAD_REQUEST, "Thời hạn không được trống!"),
+    DURATION_DAYS_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Thời hạn phải lớn hơn 0!"),
+    IS_ACTIVE_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái không được trống!"),
 
     // Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi máy chủ!");
