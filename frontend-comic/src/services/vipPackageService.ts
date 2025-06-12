@@ -13,8 +13,8 @@ export const getAllVipPackages = async (
     endpoint += `&search=${encodeURIComponent(search)}`;
   }
 
-  if (status) {
-    endpoint += `&status=${status}`;
+  if (status !== undefined) {
+    endpoint += `&isActive=${status}`;
   }
 
   return await fetchApi<VipPackage[]>(endpoint);
@@ -54,10 +54,8 @@ export const permanentDeleteVipPackage = async (id: string) => {
   });
 }
 
-export const toggleActiveStatus = async (id: string) => {
-  const endpoint = `/vip-packages/${id}/toggle-status`;
+export const getPublicVipPackages = async () => {
+  const endpoint = `/public/vip-packages`;
 
-  return await fetchApi<VipPackage>(endpoint, {
-    method: "PATCH",
-  });
+  return await fetchApi<VipPackage[]>(endpoint);
 }

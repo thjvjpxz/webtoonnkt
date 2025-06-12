@@ -39,11 +39,6 @@ public interface VipPackageService {
     BaseResponse<String> permanentDeleteVipPackage(String id);
 
     /**
-     * Kích hoạt/vô hiệu hóa gói VIP
-     */
-    BaseResponse<VipPackage> toggleActiveStatus(String id);
-
-    /**
      * Lấy danh sách gói VIP để hiển thị cho khách hàng (chỉ active)
      */
     BaseResponse<List<VipPackage>> getPublicVipPackages();

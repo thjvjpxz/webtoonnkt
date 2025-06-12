@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.service.HomeService;
+import com.thjvjpxx.backend_comic.service.VipPackageService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
 
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 public class HomeController {
     HomeService homeService;
     SecurityUtils securityUtils;
+    VipPackageService vipPackageService;
 
     @GetMapping
     public BaseResponse<?> getHomeComic() {
@@ -74,5 +76,10 @@ public class HomeController {
     public BaseResponse<?> changePassword(@RequestBody ChangePassRequest request) {
         String currentUserId = securityUtils.getCurrentUserId();
         return homeService.changePassword(currentUserId, request);
+    }
+
+    @GetMapping("/public/vip-packages")
+    public BaseResponse<?> getPublicVipPackages() {
+        return vipPackageService.getPublicVipPackages();
     }
 }

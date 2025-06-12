@@ -45,7 +45,7 @@ public class VipPackage {
     Integer originalPrice; // Giá gốc bằng gem
 
     @Column(name = "discounted")
-    Integer discountedPrice; // Giá giảm, null = không giảm giá
+    Integer discountedPrice; // Phần trăm giảm giá, null = không giảm giá
 
     @Column(name = "discount_start_date")
     LocalDateTime discountStartDate; // Bắt đầu giảm giá
@@ -72,7 +72,7 @@ public class VipPackage {
      * 
      * @return giá hiện tại (có thể là giá giảm hoặc giá gốc)
      */
-    public Integer getCurrentPrice() {
+    public Double getCurrentPrice() {
         LocalDateTime now = LocalDateTime.now();
 
         // Kiểm tra xem có đang trong thời gian giảm giá không
@@ -81,10 +81,10 @@ public class VipPackage {
                 discountEndDate != null &&
                 now.isAfter(discountStartDate) &&
                 now.isBefore(discountEndDate)) {
-            return discountedPrice;
+            return Double.valueOf(originalPrice - (originalPrice * discountedPrice / 100.0));
         }
 
-        return originalPrice;
+        return Double.valueOf(originalPrice);
     }
 
     /**

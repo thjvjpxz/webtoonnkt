@@ -36,17 +36,20 @@ public class VipPackageServiceImpl implements VipPackageService {
 
         Page<VipPackage> vipPackagePage = null;
 
-        if (search == null || search.isEmpty() && isActive == null) {
-            // Nếu không có tìm kiếm và lọc theo trạng thái
+        // Kiểm tra xem có tìm kiếm hay không
+        boolean hasSearch = search != null && !search.isEmpty();
+
+        if (!hasSearch && isActive == null) {
+            // Không có tìm kiếm và không lọc theo trạng thái
             vipPackagePage = vipPackageRepository.findAll(pageable);
-        } else if (search != null && !search.isEmpty() && isActive != null) {
-            // Nếu có tìm kiếm và lọc theo trạng thái
+        } else if (hasSearch && isActive != null) {
+            // Có tìm kiếm và lọc theo trạng thái
             vipPackagePage = vipPackageRepository.findBySearchTermAndStatus(search, isActive, pageable);
         } else if (isActive != null) {
-            // Nếu chỉ có lọc theo trạng thái
+            // Chỉ lọc theo trạng thái (không tìm kiếm)
             vipPackagePage = vipPackageRepository.findByIsActive(isActive, pageable);
         } else {
-            // Nếu chỉ có tìm kiếm
+            // Chỉ tìm kiếm (không lọc theo trạng thái)
             vipPackagePage = vipPackageRepository.findBySearchTerm(search, pageable);
         }
 
@@ -165,25 +168,6 @@ public class VipPackageServiceImpl implements VipPackageService {
         vipPackageRepository.delete(vipPackage);
 
         return BaseResponse.success("Đã xóa gói VIP vĩnh viễn");
-    }
-
-    @Override
-    @Transactional
-    public BaseResponse<VipPackage> toggleActiveStatus(String id) {
-        VipPackage vipPackage = vipPackageRepository.findById(id)
-                .orElse(null);
-
-        if (vipPackage == null) {
-            throw new BaseException(ErrorCode.VIP_PACKAGE_NOT_FOUND);
-        }
-
-        // Đảo trạng thái active
-        vipPackage.setIsActive(!vipPackage.getIsActive());
-        vipPackageRepository.save(vipPackage);
-
-        String status = vipPackage.getIsActive() ? "kích hoạt" : "vô hiệu hóa";
-
-        return BaseResponse.success("Đã " + status + " gói VIP thành công");
     }
 
     @Override

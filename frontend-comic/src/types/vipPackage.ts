@@ -11,6 +11,8 @@ export interface VipPackage {
   isActive: boolean; // còn bán hay không
   createdAt: string;
   updatedAt: string;
+  currentPrice: number;
+  onDiscount: boolean;
 }
 
 export interface VipPackageCreateUpdate {

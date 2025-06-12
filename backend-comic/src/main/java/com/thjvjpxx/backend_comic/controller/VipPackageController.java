@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -89,25 +88,5 @@ public class VipPackageController {
     @DeleteMapping("/{id}/permanent")
     public BaseResponse<String> permanentDeleteVipPackage(@PathVariable String id) {
         return vipPackageService.permanentDeleteVipPackage(id);
-    }
-
-    /**
-     * Kích hoạt/vô hiệu hóa gói VIP
-     * PATCH /vip-packages/{id}/toggle-status
-     */
-    @PatchMapping("/{id}/toggle-status")
-    public BaseResponse<VipPackage> toggleActiveStatus(@PathVariable String id) {
-        return vipPackageService.toggleActiveStatus(id);
-    }
-
-    // ===== API PUBLIC CHO KHÁCH HÀNG =====
-
-    /**
-     * Lấy danh sách gói VIP để hiển thị cho khách hàng (chỉ active)
-     * GET /vip-packages/public
-     */
-    @GetMapping("/public")
-    public BaseResponse<List<VipPackage>> getPublicVipPackages() {
-        return vipPackageService.getPublicVipPackages();
     }
 }

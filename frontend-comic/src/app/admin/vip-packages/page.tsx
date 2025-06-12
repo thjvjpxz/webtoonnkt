@@ -66,33 +66,9 @@ export default function VipPackages() {
     return price.toLocaleString('vi-VN');
   };
 
-  // Hàm tính giá sau giảm
-  const calculateDiscountedPrice = (originalPrice: number, discountPercent: number) => {
-    return originalPrice * (1 - discountPercent / 100);
-  };
-
-  // Hàm kiểm tra xem có đang trong thời gian giảm giá không
-  const isInDiscountPeriod = (vipPackage: VipPackage) => {
-    if (!vipPackage.discountStartDate ||
-      !vipPackage.discountEndDate ||
-      !vipPackage.discountedPrice ||
-      vipPackage.discountedPrice <= 0) {
-      return false;
-    }
-
-    const now = new Date();
-    const startDate = new Date(vipPackage.discountStartDate);
-    const endDate = new Date(vipPackage.discountEndDate);
-
-    return now >= startDate && now <= endDate;
-  };
-
-  // Hàm hiển thị giá
+  // Hàm hiển thị giá (sử dụng trực tiếp currentPrice và onDiscount)
   const renderPrice = (vipPackage: VipPackage) => {
-    const hasDiscount = isInDiscountPeriod(vipPackage);
-
-    if (hasDiscount) {
-      const discountedPrice = calculateDiscountedPrice(vipPackage.originalPrice, vipPackage.discountedPrice);
+    if (vipPackage.onDiscount) {
       return (
         <div className="space-y-1">
           <div className="flex items-center justify-center gap-1 text-sm line-through text-muted-foreground">
@@ -113,7 +89,7 @@ export default function VipPackages() {
               height={16}
               className="flex-shrink-0"
             />
-            <span>{formatPrice(discountedPrice)}</span>
+            <span>{formatPrice(vipPackage.currentPrice)}</span>
           </div>
           <Badge variant="secondary" className="text-xs">
             -{vipPackage.discountedPrice}%
@@ -131,7 +107,7 @@ export default function VipPackages() {
           height={16}
           className="flex-shrink-0"
         />
-        <span>{formatPrice(vipPackage.originalPrice)}</span>
+        <span>{formatPrice(vipPackage.currentPrice)}</span>
       </div>
     );
   };

@@ -6,7 +6,6 @@ import {
   updateVipPackage,
   deleteVipPackage,
   permanentDeleteVipPackage,
-  toggleActiveStatus,
 } from "@/services/vipPackageService";
 import { VipPackage, VipPackageCreateUpdate } from "@/types/vipPackage";
 
@@ -65,6 +64,7 @@ export const useVipPackage = (initialPage = 1, pageSize = 5) => {
         setIsModalOpen(false);
       } else {
         toast.error(response.message || "Không thể thêm gói VIP");
+        setIsModalOpen(false);
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -89,6 +89,7 @@ export const useVipPackage = (initialPage = 1, pageSize = 5) => {
         setIsModalOpen(false);
       } else {
         toast.error(response.message || "Không thể cập nhật gói VIP");
+        setIsModalOpen(false);
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -113,6 +114,7 @@ export const useVipPackage = (initialPage = 1, pageSize = 5) => {
         setIsDeleteModalOpen(false);
       } else {
         toast.error(response.message || "Không thể xóa gói VIP");
+        setIsDeleteModalOpen(false);
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -145,26 +147,6 @@ export const useVipPackage = (initialPage = 1, pageSize = 5) => {
           : "Đã xảy ra lỗi";
       toast.error(errorMessage || "Đã xảy ra lỗi khi xóa vĩnh viễn gói VIP");
       setIsPermanentDeleteModalOpen(false);
-    }
-  };
-
-  // Xử lý toggle trạng thái active
-  const handleToggleActiveStatus = async (vipPackage: VipPackage) => {
-    try {
-      const response = await toggleActiveStatus(vipPackage.id);
-
-      if (response.status === 200) {
-        toast.success(`${vipPackage.isActive ? 'Tắt' : 'Bật'} gói VIP thành công`);
-        fetchVipPackages(); // Tải lại danh sách
-      } else {
-        toast.error(response.message || "Không thể thay đổi trạng thái gói VIP");
-      }
-    } catch (error: unknown) {
-      const errorMessage =
-        error && typeof error === "object" && "error" in error
-          ? (error.error as string)
-          : "Đã xảy ra lỗi";
-      toast.error(errorMessage || "Đã xảy ra lỗi khi thay đổi trạng thái gói VIP");
     }
   };
 
@@ -247,7 +229,6 @@ export const useVipPackage = (initialPage = 1, pageSize = 5) => {
     handleUpdateVipPackage,
     handleDeleteVipPackage,
     handlePermanentDeleteVipPackage,
-    handleToggleActiveStatus,
     handleSearch,
     handleStatusFilterChange,
     fetchVipPackages,
