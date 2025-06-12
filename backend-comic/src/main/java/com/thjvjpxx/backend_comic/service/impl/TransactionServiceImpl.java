@@ -17,6 +17,7 @@ import com.thjvjpxx.backend_comic.constant.PaymentConstants;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
+import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.enums.TransactionStatus;
 import com.thjvjpxx.backend_comic.exception.BaseException;
@@ -273,8 +274,31 @@ public class TransactionServiceImpl implements TransactionService {
                 .id(transaction.getId())
                 .transactionCode(transaction.getPayosOrderCode())
                 .amount(transaction.getAmount())
+                .payosAmountVnd(transaction.getPayosAmountVnd())
                 .status(transaction.getStatus().toString())
                 .description(transaction.getDescription())
+                .paymentMethod(transaction.getPaymentMethod())
+                .durationDays(transaction.getDurationDays())
+                .updatedAt(transaction.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * Chuyển đổi Transaction entity sang TransactionResponse DTO với thông tin user
+     * (cho admin)
+     */
+    private TransactionResponse convertToTransactionResponseWithUser(Transaction transaction) {
+        return TransactionResponse.builder()
+                .id(transaction.getId())
+                .transactionCode(transaction.getPayosOrderCode())
+                .amount(transaction.getAmount())
+                .payosAmountVnd(transaction.getPayosAmountVnd())
+                .status(transaction.getStatus().toString())
+                .description(transaction.getDescription())
+                .paymentMethod(transaction.getPaymentMethod())
+                .durationDays(transaction.getDurationDays())
+                .userId(transaction.getUser().getId())
+                .username(transaction.getUser().getUsername())
                 .updatedAt(transaction.getUpdatedAt())
                 .build();
     }
@@ -317,5 +341,108 @@ public class TransactionServiceImpl implements TransactionService {
             result.append(chars.charAt(random.nextInt(chars.length())));
         }
         return result.toString();
+    }
+
+    // === IMPLEMENTATION CÁC PHƯƠNG THỨC MỚI ===
+
+    @Override
+    public BaseResponse<List<TransactionResponse>> getAllTransactionsWithFilter(
+            int page, int limit, String search, String status, String paymentMethod) {
+        try {
+            log.info(
+                    "Lấy danh sách giao dịch với filter - page: {}, limit: {}, search: {}, status: {}, paymentMethod: {}",
+                    page, limit, search, status, paymentMethod);
+
+            // Tạo Pageable với sắp xếp
+            Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "createdAt", Sort.Direction.DESC);
+
+            Page<Transaction> transactionPage;
+
+            // Áp dụng filter đơn giản
+            if (status != null && !status.isEmpty()) {
+                // Filter theo status
+                TransactionStatus transactionStatus = TransactionStatus.valueOf(status.toUpperCase());
+                transactionPage = transactionRepository.findByStatus(transactionStatus, pageable);
+            } else {
+                // Không có filter, lấy tất cả
+                transactionPage = transactionRepository.findAll(pageable);
+            }
+
+            // Filter thêm theo search và paymentMethod trong memory nếu cần
+            List<Transaction> filteredTransactions = transactionPage.getContent();
+
+            if (search != null && !search.isEmpty()) {
+                filteredTransactions = filteredTransactions.stream()
+                        .filter(t -> (t.getUser().getUsername().toLowerCase().contains(search.toLowerCase()) ||
+                                (t.getDescription() != null
+                                        && t.getDescription().toLowerCase().contains(search.toLowerCase()))))
+                        .collect(Collectors.toList());
+            }
+
+            if (paymentMethod != null && !paymentMethod.isEmpty()) {
+                filteredTransactions = filteredTransactions.stream()
+                        .filter(t -> paymentMethod.equalsIgnoreCase(t.getPaymentMethod()))
+                        .collect(Collectors.toList());
+            }
+
+            // Chuyển đổi sang TransactionResponse với thông tin user cho admin
+            List<TransactionResponse> transactions = filteredTransactions.stream()
+                    .map(this::convertToTransactionResponseWithUser)
+                    .collect(Collectors.toList());
+
+            log.info("Tìm thấy {} giao dịch phù hợp với filter", transactions.size());
+
+            return BaseResponse.success(
+                    transactions,
+                    page,
+                    (int) transactionPage.getTotalElements(),
+                    limit,
+                    transactionPage.getTotalPages());
+
+        } catch (Exception e) {
+            log.error("Lỗi khi lấy danh sách giao dịch với filter: {}", e.getMessage(), e);
+            throw new BaseException(ErrorCode.HAS_ERROR);
+        }
+    }
+
+    @Override
+    public BaseResponse<TransactionStatsResponse> getTransactionStats() {
+        try {
+            log.info("Lấy thống kê giao dịch");
+
+            // 1. Tính tổng số giao dịch
+            Long totalTransactions = transactionRepository.count();
+
+            // 2. Tính tổng doanh thu (chỉ tính giao dịch PayOS COMPLETED và amount > 0 -
+            // nạp tiền qua PayOS)
+            Double totalAmount = transactionRepository.findAll().stream()
+                    .filter(t -> t.getStatus() == TransactionStatus.COMPLETED
+                            && t.getAmount() > 0
+                            && "PayOS".equals(t.getPaymentMethod()))
+                    .mapToDouble(Transaction::getAmount)
+                    .sum();
+
+            // 3. Đếm số giao dịch đã thanh toán (COMPLETED)
+            Long paidCount = transactionRepository.countByStatus(TransactionStatus.COMPLETED);
+
+            // 4. Đếm số giao dịch đang chờ (PENDING)
+            Long pendingCount = transactionRepository.countByStatus(TransactionStatus.PENDING);
+
+            // Tạo response
+            TransactionStatsResponse stats = new TransactionStatsResponse();
+            stats.setTotalTransactions(totalTransactions);
+            stats.setTotalAmount(totalAmount);
+            stats.setPaidCount(paidCount);
+            stats.setPendingCount(pendingCount);
+
+            log.info("Thống kê giao dịch: {} tổng, {} Linh Thạch doanh thu (PayOS), {} đã thanh toán, {} đang chờ",
+                    totalTransactions, totalAmount, paidCount, pendingCount);
+
+            return BaseResponse.success(stats, "Lấy thống kê giao dịch thành công!");
+
+        } catch (Exception e) {
+            log.error("Lỗi khi lấy thống kê giao dịch: {}", e.getMessage(), e);
+            throw new BaseException(ErrorCode.HAS_ERROR);
+        }
     }
 }

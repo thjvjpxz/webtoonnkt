@@ -1,4 +1,4 @@
-import { PopupResponse, TransactionResponse } from "@/types/payment";
+import { PopupResponse, TransactionResponse, TransactionStatsResponse } from "@/types/payment";
 import { fetchApi } from "./api";
 
 export const createPaymentLink = async (amount: number) => {
@@ -28,4 +28,26 @@ export const getMyTransactions = async (page: number, limit: number) => {
   const endpoint = `/transactions/me?page=${page}&limit=${limit}`;
 
   return await fetchApi<TransactionResponse[]>(endpoint);
+}
+
+// Admin
+export const getAllTransactions = async (page: number, limit: number, search: string, status: string, paymentMethod: string) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString()
+  });
+
+  if (search) params.append('search', search);
+  if (status) params.append('status', status);
+  if (paymentMethod) params.append('paymentMethod', paymentMethod);
+
+  const endpoint = `/transactions/filter?${params.toString()}`;
+
+  return await fetchApi<TransactionResponse[]>(endpoint);
+}
+
+export const getTransactionStats = async () => {
+  const endpoint = `/transactions/stats`;
+
+  return await fetchApi<TransactionStatsResponse>(endpoint);
 }

@@ -20,9 +20,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class TransactionResponse {
 
     String id;
-    Long transactionCode;
-    Double amount;
+    Long transactionCode; // PayOS order code
+    Double amount; // Số linh thạch
+    Double payosAmountVnd; // Số tiền VND thực tế
     String status;
     String description;
+    String paymentMethod;
+    Integer durationDays; // Số ngày VIP (nếu là gói VIP)
+
+    // Thông tin user (chỉ hiển thị cho admin)
+    String userId;
+    String username;
+
+    // Timestamps
     LocalDateTime updatedAt;
 }

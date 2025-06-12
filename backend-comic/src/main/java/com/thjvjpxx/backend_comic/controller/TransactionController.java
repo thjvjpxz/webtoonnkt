@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
+import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.TransactionService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
@@ -68,27 +69,25 @@ public class TransactionController {
     }
 
     /**
-     * Lấy thông tin giao dịch theo ID
-     * GET /transactions/{id}
+     * Lấy tất cả giao dịch với filtering nâng cao (dành cho admin)
+     * GET /transactions/filter
      */
-    @GetMapping("/{id}")
-    public BaseResponse<TransactionResponse> getTransactionById(
-            @PathVariable String id) {
-
-        User currentUser = securityUtils.getCurrentUser();
-        return transactionService.getTransactionById(id, currentUser);
+    @GetMapping("/filter")
+    public BaseResponse<List<TransactionResponse>> getAllTransactionsWithFilter(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String paymentMethod) {
+        return transactionService.getAllTransactionsWithFilter(page, limit, search, status, paymentMethod);
     }
 
     /**
-     * Lấy tất cả giao dịch (dành cho admin)
-     * GET /transactions?page=0&limit=10&status=COMPLETED
+     * Lấy thống kê giao dịch (dành cho admin)
+     * GET /transactions/stats
      */
-    @GetMapping
-    public BaseResponse<List<TransactionResponse>> getAllTransactions(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) String status) {
-
-        return transactionService.getAllTransactions(page, limit, status);
+    @GetMapping("/stats")
+    public BaseResponse<TransactionStatsResponse> getTransactionStats() {
+        return transactionService.getTransactionStats();
     }
 }
