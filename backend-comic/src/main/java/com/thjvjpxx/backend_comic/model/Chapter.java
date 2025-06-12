@@ -87,4 +87,8 @@ public class Chapter {
     @Column(name = "updated_at")
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
+    public boolean isFree() {
+        return this.status == ChapterStatus.FREE;
+    }
 }

@@ -39,10 +39,6 @@ public class UserVipSubscription {
     @JoinColumn(name = "user_id", nullable = false)
     User user; // FK đến bảng users
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vip_package_id", nullable = false)
-    VipPackage vipPackage; // FK đến vip_packages
-
     @Column(name = "start_date", nullable = false)
     LocalDateTime startDate; // Ngày bắt đầu kích hoạt VIP
 
@@ -62,16 +58,6 @@ public class UserVipSubscription {
     LocalDateTime updatedAt;
 
     /**
-     * Kiểm tra xem subscription có đang hoạt động không
-     * 
-     * @return true nếu subscription đang hoạt động và chưa hết hạn
-     */
-    public boolean isActive() {
-        return status == VipSubscriptionStatus.ACTIVE &&
-                LocalDateTime.now().isBefore(endDate);
-    }
-
-    /**
      * Kiểm tra xem subscription có đã hết hạn không
      * 
      * @return true nếu đã hết hạn
@@ -79,20 +65,6 @@ public class UserVipSubscription {
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(endDate) ||
                 status == VipSubscriptionStatus.EXPIRED;
-    }
-
-    /**
-     * Tính số ngày còn lại của subscription
-     * 
-     * @return số ngày còn lại, 0 nếu đã hết hạn
-     */
-    public long getDaysRemaining() {
-        if (isExpired()) {
-            return 0;
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-        return java.time.Duration.between(now, endDate).toDays();
     }
 
     /**
@@ -110,13 +82,6 @@ public class UserVipSubscription {
             this.endDate = this.endDate.plusDays(additionalDays);
         }
         this.status = VipSubscriptionStatus.ACTIVE;
-    }
-
-    /**
-     * Hủy subscription
-     */
-    public void cancelSubscription() {
-        this.status = VipSubscriptionStatus.CANCELLED;
     }
 
     /**

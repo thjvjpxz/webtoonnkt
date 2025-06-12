@@ -51,6 +51,10 @@ public enum ErrorCode {
     CHAPTER_REQUEST_NOT_NULL(HttpStatus.BAD_REQUEST, "Chương request không được trống!"),
     CHAPTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Chương không tồn tại!"),
     CHAPTER_NUMBER_EXISTS(HttpStatus.BAD_REQUEST, "Số chương đã tồn tại!"),
+    CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "chương đã được mua!"),
+    CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "chương này miễn phí!"),
+    CHAPTER_NOT_PURCHASED(HttpStatus.FORBIDDEN, "Bạn cần mua chapter này hoặc có gói VIP để có thể đọc!"),
+    CHAPTER_REQUIRES_LOGIN(HttpStatus.BAD_REQUEST, "Vui lòng đăng nhập để đọc chapter có phí!"),
 
     // Detail Chapter
     DETAIL_CHAPTER_IMAGE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Ảnh không được trống!"),
@@ -136,8 +140,6 @@ public enum ErrorCode {
     TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Giao dịch không tồn tại!"),
     TRANSACTION_INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "Số tiền không hợp lệ!"),
     TRANSACTION_INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, "Số dư không đủ!"),
-    CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "chương đã được mua!"),
-    CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "chương này miễn phí!"),
 
     // Topup
     TOPUP_AMOUNT_NOT_NULL(HttpStatus.BAD_REQUEST, "Số tiền nạp không được trống!"),
@@ -150,6 +152,7 @@ public enum ErrorCode {
     VIP_PACKAGE_INVALID(HttpStatus.BAD_REQUEST, "Thông tin gói VIP không hợp lệ!"),
     VIP_PACKAGE_NAME_EXISTS(HttpStatus.BAD_REQUEST, "Tên gói VIP đã tồn tại!"),
     VIP_PACKAGE_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên gói VIP không được trống!"),
+    VIP_PACKAGE_ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "ID gói VIP không được trống!"),
     ORIGINAL_PRICE_NOT_NULL(HttpStatus.BAD_REQUEST, "Giá gốc không được trống!"),
     ORIGINAL_PRICE_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Giá gốc phải lớn hơn 0!"),
     DURATION_DAYS_NOT_NULL(HttpStatus.BAD_REQUEST, "Thời hạn không được trống!"),

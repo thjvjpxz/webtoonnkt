@@ -188,6 +188,7 @@ export default function TransactionsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Mã giao dịch</TableHead>
+                      <TableHead>Mô tả</TableHead>
                       <TableHead>Linh thạch</TableHead>
                       <TableHead>Trạng thái</TableHead>
                       <TableHead>Thời gian</TableHead>
@@ -197,6 +198,7 @@ export default function TransactionsPage() {
                     {transactions.map((transaction) => (
                       <TableRow key={transaction.id}>
                         <TableCell className="font-medium">{transaction.transactionCode}</TableCell>
+                        <TableCell>{transaction.description}</TableCell>
                         <TableCell>{formatCurrency(transaction.amount)}</TableCell>
                         <TableCell>{renderStatus(transaction.status)}</TableCell>
                         <TableCell>{formatDate(transaction.updatedAt)}</TableCell>

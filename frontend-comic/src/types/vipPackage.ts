@@ -24,3 +24,10 @@ export interface VipPackageCreateUpdate {
   discountEndDate: string; // không bắt buộc
   durationDays: number; // bắt buộc
 }
+
+export interface VipSubscription {
+  startDate: string;
+  endDate: string;
+  daysRemaining: number;
+  isActive: boolean;
+}

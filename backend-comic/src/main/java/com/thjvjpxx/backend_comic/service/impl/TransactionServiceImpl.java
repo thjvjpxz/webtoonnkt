@@ -274,6 +274,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .transactionCode(transaction.getPayosOrderCode())
                 .amount(transaction.getAmount())
                 .status(transaction.getStatus().toString())
+                .description(transaction.getDescription())
                 .updatedAt(transaction.getUpdatedAt())
                 .build();
     }

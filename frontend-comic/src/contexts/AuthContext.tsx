@@ -82,7 +82,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.status === 200) {
         const data = response.data;
-        localStorage.setItem("accessToken", data?.accessToken || "");
+        if (data) {
+          localStorage.setItem("accessToken", data?.accessToken || "");
+          const userData: User = {
+            id: data.id,
+            username: data.username,
+            imgUrl: data.imgUrl,
+            vip: data.vip,
+            role: data.role,
+          };
+
+          // Lưu user data vào localStorage và state
+          localStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
+        }
+
         if (data?.refreshToken) {
           localStorage.setItem("refreshToken", data.refreshToken);
         }
@@ -182,6 +196,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Lưu user data vào localStorage và state
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
+    // Reload page
+    window.location.reload();
   };
 
   const value = {

@@ -58,7 +58,7 @@ public class PurchasedChapter {
 	Transaction transaction;
 
 	@Column(name = "purchase_price", nullable = false)
-	Double purchasePrice; // Giá mua chapter tại thời điểm mua (tính bằng linh thạch)
+	Double purchasePrice;
 
 	@Column(name = "purchased_at")
 	@CreationTimestamp

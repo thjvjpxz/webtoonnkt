@@ -276,6 +276,11 @@ public class ChapterServiceImpl implements ChapterService {
         List<DetailChapter> detailChapters = new ArrayList<>();
 
         for (var item : chapterRequest.getDetailChapters()) {
+
+            if ("https://sv1.otruyencdn.com".contains(item.getImgUrl())) {
+                item.setImgUrl(extractFilenameFromCdnUrl(item.getImgUrl()));
+            }
+
             DetailChapter detailChapter = DetailChapter.builder()
                     .chapter(chapter)
                     .imgUrl(item.getImgUrl())
@@ -307,12 +312,17 @@ public class ChapterServiceImpl implements ChapterService {
         }
 
         // Kiểm tra nếu là CDN URL
-        if (fullUrl.contains("cdn.kimthi1708.id.vn") || fullUrl.contains(B2Constants.URL_PREFIX)) {
+        if (fullUrl.contains(B2Constants.URL_PREFIX)) {
             // Tìm vị trí cuối cùng của dấu "/"
             int lastSlashIndex = fullUrl.lastIndexOf('/');
             if (lastSlashIndex != -1 && lastSlashIndex < fullUrl.length() - 1) {
                 return fullUrl.substring(lastSlashIndex + 1);
             }
+        }
+
+        if (fullUrl.contains("https://sv1.otruyencdn.com")) {
+            String[] splitUrl = fullUrl.split("/");
+            return splitUrl[splitUrl.length - 1];
         }
 
         // Trả về URL gốc nếu không phải CDN URL

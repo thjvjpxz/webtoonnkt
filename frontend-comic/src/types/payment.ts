@@ -7,6 +7,6 @@ export interface TransactionResponse {
   transactionCode: number;
   amount: number;
   status: string;
-  createdAt: string;
+  description: string;
   updatedAt: string;
 }

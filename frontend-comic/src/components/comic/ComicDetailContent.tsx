@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useComicDetail from "@/hooks/useComicDetail";
-import { ChapterStatus } from "@/types/chapter";
+import { Chapter, ChapterStatus } from "@/types/chapter";
 import { ComicDetailResponse } from "@/types/comic";
 import { formatDate } from "@/utils/helpers";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +28,7 @@ import {
   FiHome,
   FiPlay,
   FiSearch,
+  FiShoppingCart,
   FiStar,
   FiTag,
   FiUser,
@@ -49,7 +50,9 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
     filteredChapters,
     displayedChapters,
     followersCount,
+    buyingChapters,
     handleFollow,
+    handleBuyChapter,
     clearSearch,
     setShowAllChapters,
     setSearchTerm
@@ -71,24 +74,63 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
     );
   };
 
-  const renderChapterStatus = (status: ChapterStatus, price?: number) => {
-    return status === ChapterStatus.FEE ? (
-      <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-auto" >
-        {price ? (
-          <div className="flex items-center gap-1">
-            <Image
-              src="/images/linh-thach.webp"
-              alt="Linh thạch"
-              width={12}
-              height={12}
-              className="flex-shrink-0"
-            />
-            <span>{price.toLocaleString('vi-VN')}</span>
-          </div>
-        ) : 'Trả phí'}
-      </Badge>
-    ) : (
-      <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 ml-auto" >
+  const renderChapterStatus = (chapter: Chapter) => {
+    const isBuying = buyingChapters.has(chapter.id);
+
+    if (chapter.status === ChapterStatus.FEE) {
+      if (chapter.hasPurchased) {
+        return (
+          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 ml-auto">
+            Đã sở hữu
+          </Badge>
+        );
+      }
+
+      return (
+        <div className="flex items-center gap-2 ml-auto">
+          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+            {chapter.price ? (
+              <div className="flex items-center gap-1">
+                <Image
+                  src="/images/linh-thach.webp"
+                  alt="Linh thạch"
+                  width={12}
+                  height={12}
+                  className="flex-shrink-0"
+                />
+                <span>{chapter.price.toLocaleString('vi-VN')}</span>
+              </div>
+            ) : 'Trả phí'}
+          </Badge>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleBuyChapter(chapter.id);
+            }}
+            disabled={isBuying}
+            className="h-6 px-2 text-xs sm:h-7 sm:px-3 sm:text-sm"
+          >
+            {isBuying ? (
+              <>
+                <div className="animate-spin w-3 h-3 border border-current border-t-transparent rounded-full mr-1" />
+                Đang mua...
+              </>
+            ) : (
+              <>
+                <FiShoppingCart className="w-3 h-3 mr-1" />
+                Mua
+              </>
+            )}
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 ml-auto">
         Miễn phí
       </Badge>
     );
@@ -364,15 +406,15 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                           </div>
 
                           {/* Price badge on mobile */}
-                          <div className="flex sm:hidden items-center">
-                            {renderChapterStatus(chapter.status, chapter.price)}
+                          <div className="flex sm:hidden items-center w-full justify-end">
+                            {renderChapterStatus(chapter)}
                           </div>
                         </div>
                       </div>
 
                       {/* Price badge on desktop */}
                       <div className="hidden sm:flex items-center gap-2">
-                        {renderChapterStatus(chapter.status, chapter.price)}
+                        {renderChapterStatus(chapter)}
                       </div>
                     </div>
                   </Link>

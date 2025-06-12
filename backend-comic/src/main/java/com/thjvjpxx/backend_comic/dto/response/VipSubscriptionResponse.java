@@ -2,6 +2,8 @@ package com.thjvjpxx.backend_comic.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,20 +11,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TransactionResponse {
+public class VipSubscriptionResponse {
 
-    String id;
-    Long transactionCode;
-    Double amount;
-    String status;
-    String description;
-    LocalDateTime updatedAt;
+    LocalDateTime startDate;
+    LocalDateTime endDate;
+    Long daysRemaining;
+    Boolean isActive;
 }

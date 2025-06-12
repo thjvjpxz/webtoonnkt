@@ -13,6 +13,7 @@ export interface Chapter {
   imageCount: number;
   createdAt: string;
   updatedAt: string;
+  hasPurchased: boolean;
   chapterSummaries?: ChapterSummary[];
   publisherName?: string;
   publisherLevel?: LevelResponse;

@@ -74,6 +74,9 @@ public class Transaction {
     @Column(name = "payment_method")
     String paymentMethod;
 
+    @Column(name = "duration_days")
+    Integer durationDays;
+
     @Column(name = "created_at")
     @CreationTimestamp
     LocalDateTime createdAt;

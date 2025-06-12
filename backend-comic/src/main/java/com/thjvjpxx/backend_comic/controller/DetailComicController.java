@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.DetailComicService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
 
@@ -25,7 +26,13 @@ public class DetailComicController {
 
     @GetMapping("/{slug}")
     public BaseResponse<?> getComicDetail(@PathVariable String slug) {
-        return detailComicService.getComicDetail(slug);
+        User user = null;
+        try {
+            user = securityUtils.getCurrentUser();
+        } catch (Exception e) {
+            // User chưa đăng nhập, user = null
+        }
+        return detailComicService.getComicDetail(slug, user);
     }
 
     @PostMapping("/{comicId}/follow")
@@ -47,7 +54,14 @@ public class DetailComicController {
     }
 
     @GetMapping("/{slug}/{chapterId}")
-    public BaseResponse<?> getChapterDetail(@PathVariable String chapterId) {
-        return detailComicService.getChapterDetail(chapterId);
+    public BaseResponse<?> getChapterDetail(@PathVariable String slug, @PathVariable String chapterId) {
+        // Lấy user hiện tại (có thể null nếu là anonymous user)
+        String currentUserId = null;
+        try {
+            currentUserId = securityUtils.getCurrentUserId();
+        } catch (Exception e) {
+            // User chưa đăng nhập, currentUserId = null
+        }
+        return detailComicService.getChapterDetail(chapterId, currentUserId);
     }
 }
