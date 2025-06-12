@@ -18,9 +18,8 @@ import Image from "next/image";
 import { FiHome, FiDollarSign, FiCreditCard, FiInfo, FiArrowRight, FiLoader, FiCheckCircle, FiX } from "react-icons/fi";
 import toast from "react-hot-toast";
 
-interface PaymentPageProps { }
 
-function PaymentPage({ }: PaymentPageProps) {
+function PaymentPage() {
   const { isAuthenticated } = useAuthState();
   const [amount, setAmount] = useState<number>(2); // Số linh thạch, tối thiểu 2
   const [isLoading, setIsLoading] = useState(false);
@@ -334,7 +333,7 @@ function PaymentPage({ }: PaymentPageProps) {
                 )}
 
                 <p className="text-xs text-muted-foreground text-center">
-                  Bằng cách nhấn "Thanh toán ngay", bạn đồng ý với{" "}
+                  Bằng cách nhấn &quot;Thanh toán ngay&quot;, bạn đồng ý với{" "}
                   <Link href="#" className="text-primary hover:underline">
                     điều khoản sử dụng
                   </Link>{" "}

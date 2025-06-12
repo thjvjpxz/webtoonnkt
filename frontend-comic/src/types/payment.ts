@@ -4,6 +4,7 @@ export interface PopupResponse {
 
 export interface TransactionResponse {
   id: string;
+  transactionCode: number;
   amount: number;
   status: string;
   createdAt: string;

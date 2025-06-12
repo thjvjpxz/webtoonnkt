@@ -5,7 +5,7 @@ import { CommentResponse } from "@/types/comment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/utils/helpers";
-import { FiMessageCircle, FiTrash2, FiChevronDown, FiChevronRight, FiBookOpen, FiUser } from "react-icons/fi";
+import { FiMessageCircle, FiTrash2, FiChevronDown, FiChevronRight, FiBookOpen } from "react-icons/fi";
 import UserName from "@/components/ui/UserName";
 import { chooseImageUrl } from "@/utils/string";
 

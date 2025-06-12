@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FiBell, FiHome, FiLogOut } from "react-icons/fi";
+import { FiHome, FiLogOut } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

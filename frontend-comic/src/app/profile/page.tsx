@@ -319,7 +319,12 @@ export default function ProfilePage() {
                         <FiDollarSign className="w-5 h-5 text-yellow-500" />
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Số dư</p>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{userProfile.balance?.toLocaleString() || 0} coin</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">
+                            {userProfile.balance?.toLocaleString() || 0} coin
+                            <Link href="/transactions" className="ml-2 text-sm text-primary hover:underline">
+                              Xem lịch sử giao dịch
+                            </Link>
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">

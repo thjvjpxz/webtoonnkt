@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Logout function - đặt trước refreshToken để tránh lỗi "used before declaration"
   const logout = useCallback(() => {
     handleLogout();
-  }, [redirectToHome]);
+  }, []);
 
   // Refresh token function
   const refreshToken = useCallback(async (): Promise<boolean> => {

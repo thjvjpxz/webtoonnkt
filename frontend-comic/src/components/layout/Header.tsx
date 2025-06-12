@@ -19,7 +19,8 @@ import {
   FiLogOut,
   FiX,
   FiSettings,
-  FiBookOpen
+  FiBookOpen,
+  FiDollarSign
 } from "react-icons/fi";
 import { useState } from "react";
 import LoginModal from "../auth/LoginModal";
@@ -141,6 +142,15 @@ export default function Header() {
               <FiBookOpen className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
             </div>
             <span className="font-medium">Truyện đã đọc</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link href="/transactions" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <FiDollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+            </div>
+            <span className="font-medium">Lịch sử giao dịch</span>
           </Link>
         </DropdownMenuItem>
 

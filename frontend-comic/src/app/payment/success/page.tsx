@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,9 +16,7 @@ import { getTransactionByOrderCode } from "@/services/paymentService";
 import { TransactionResponse } from "@/types/payment";
 import toast from "react-hot-toast";
 
-interface PaymentSuccessPageProps { }
-
-function PaymentSuccessPage({ }: PaymentSuccessPageProps) {
+function PaymentSuccessPage() {
   const { isAuthenticated } = useAuthState();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +32,6 @@ function PaymentSuccessPage({ }: PaymentSuccessPageProps) {
         // Lấy orderCode từ URL params
         const orderCode = searchParams.get("orderCode");
         const code = searchParams.get("code");
-        const status = searchParams.get("status");
 
         if (!orderCode) {
           setError("Không tìm thấy mã đơn hàng");

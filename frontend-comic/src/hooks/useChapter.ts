@@ -159,7 +159,7 @@ export const useChapter = () => {
 
         toast.error(errorMessage);
       }
-    } catch (error: unknown) {
+    } catch {
       const actionText = chapterRequest.id ? "Cập nhật" : "Thêm";
       toast.error(`${actionText} chương thất bại!`);
     }

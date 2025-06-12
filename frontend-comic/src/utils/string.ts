@@ -73,7 +73,7 @@ export const chooseImageUrl = (url: string) => {
     // Kiểm tra URL hợp lệ trước khi encode
     new URL(url);
     return `/api/image-proxy?url=${encodeURIComponent(url)}`;
-  } catch (error) {
+  } catch {
     return '/images/placeholder.svg';
   }
 }

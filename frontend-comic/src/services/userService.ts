@@ -12,7 +12,7 @@ export const getUsers = async (
   role?: string,
   deleted: boolean = false
 ) => {
-  const params: any = { page, limit, search, roleId: role, deleted };
+  const params: Record<string, string | number | boolean | undefined> = { page, limit, search, roleId: role, deleted };
 
   if (search) {
     params.search = search;

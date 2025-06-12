@@ -23,3 +23,9 @@ export const cancelTransaction = async (orderCode: string) => {
     method: "PUT",
   });
 }
+
+export const getMyTransactions = async (page: number, limit: number) => {
+  const endpoint = `/transactions/me?page=${page}&limit=${limit}`;
+
+  return await fetchApi<TransactionResponse[]>(endpoint);
+}

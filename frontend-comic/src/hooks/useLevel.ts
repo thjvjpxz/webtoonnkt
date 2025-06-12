@@ -144,11 +144,7 @@ export const useLevel = (initialPage = 1, pageSize = 5) => {
   useEffect(() => {
     fetchLevels();
     fetchLevelTypes();
-  }, [fetchLevels, fetchLevelTypes]);
-
-  useEffect(() => {
-    fetchLevels();
-  }, [levelCurrentPage]);
+  }, [fetchLevels, fetchLevelTypes, levelCurrentPage]);
 
   // Xử lý thêm Level Type mới
   const handleAddLevelType = async (data: LevelTypeRequest) => {

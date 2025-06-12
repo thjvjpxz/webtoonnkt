@@ -8,15 +8,11 @@ import {
   FiSearch,
   FiAlertCircle,
   FiPackage,
-  FiToggleLeft,
-  FiToggleRight,
-  FiTrash,
   FiEye,
   FiEyeOff,
 } from "react-icons/fi";
 import VipPackageModal from "@/components/admin/vip-packages/VipPackageModal";
 import DeleteVipPackageModal from "@/components/admin/vip-packages/DeleteVipPackageModal";
-import ViewVipPackageModal from "@/components/admin/vip-packages/ViewVipPackageModal";
 import Pagination from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -3,7 +3,6 @@
 import { CommentResponse } from "@/types/comment";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
@@ -15,7 +14,6 @@ import {
   FiClock,
   FiHash,
   FiCornerDownRight,
-  FiX,
 } from "react-icons/fi";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";

@@ -11,7 +11,7 @@ export async function getComics(
   category: string = '',
   publisherId?: string
 ): Promise<ApiResponse<ComicResponse[]>> {
-  const params: any = { search, page, limit };
+  const params: Record<string, string | number> = { search, page, limit };
 
   if (status) params.status = status;
   if (category) params.category = category;

@@ -12,7 +12,6 @@ import Pagination from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useComic } from "@/hooks/useComic";
-import { CategoryResponse } from "@/types/category";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
 import { renderComicStatus, renderComicCategory, renderComicAuthor, renderBadge } from "@/components/ui/comic-render";

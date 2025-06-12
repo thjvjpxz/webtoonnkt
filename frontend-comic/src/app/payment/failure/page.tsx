@@ -14,9 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiAlertTriangle, FiArrowLeft, FiClock, FiDollarSign, FiHome, FiRefreshCw, FiXCircle } from "react-icons/fi";
 
-interface PaymentFailurePageProps { }
-
-function PaymentFailurePage({ }: PaymentFailurePageProps) {
+function PaymentFailurePage() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [transaction, setTransaction] = useState<TransactionResponse | null>(null);

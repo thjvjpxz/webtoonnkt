@@ -219,7 +219,7 @@ export const useChapterModal = (
     try {
       new URL(url);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -325,7 +325,7 @@ export const useChapterModal = (
       await onSubmit(chapterData, images);
       setIsUploading(false);
       setIsSubmitting(false);
-    } catch (error) {
+    } catch {
       setIsUploading(false);
       setIsSubmitting(false);
     }

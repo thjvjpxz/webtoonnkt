@@ -6,7 +6,7 @@ import {
   WithdrawalRequest,
   WithdrawalRequestDto
 } from "@/types/publisher";
-import { Chapter } from "@/types/chapter";
+import { Chapter, ChapterCreateUpdate } from "@/types/chapter";
 import { fetchApi, fetchApiWithFormData } from "./api";
 
 // ==================== DASHBOARD ====================
@@ -35,7 +35,7 @@ export async function getMyComics(
   page: number = 0,
   size: number = 10
 ): Promise<ApiResponse<PublisherComicResponse[]>> {
-  const params: any = { page, size };
+  const params: Record<string, string | number> = { page, size };
 
   // Chỉ thêm param nếu có giá trị
   if (search.trim()) {
@@ -65,7 +65,7 @@ export async function getMyComic(comicId: string): Promise<ApiResponse<Publisher
 export async function createComicWithCover(
   data: PublisherComicRequest,
   file?: File
-): Promise<ApiResponse<any>> {
+): Promise<ApiResponse<PublisherComicResponse>> {
   const formData = new FormData();
   formData.append(
     "data",
@@ -75,7 +75,7 @@ export async function createComicWithCover(
     formData.append("cover", file);
   }
 
-  return fetchApiWithFormData<any>("/publisher/comics", {
+  return fetchApiWithFormData<PublisherComicResponse>("/publisher/comics", {
     method: "POST",
     data: formData,
   });
@@ -86,7 +86,7 @@ export async function updateComicWithCover(
   comicId: string,
   data: PublisherComicRequest,
   file?: File
-): Promise<ApiResponse<any>> {
+): Promise<ApiResponse<PublisherComicResponse>> {
   const formData = new FormData();
   formData.append(
     "data",
@@ -96,7 +96,7 @@ export async function updateComicWithCover(
     formData.append("cover", file);
   }
 
-  return fetchApiWithFormData<any>(`/publisher/comics/${comicId}`, {
+  return fetchApiWithFormData<PublisherComicResponse>(`/publisher/comics/${comicId}`, {
     method: "PUT",
     data: formData,
   });
@@ -126,7 +126,7 @@ export async function getChaptersByComic(
 // Tạo chapter mới
 export async function createChapter(
   comicId: string,
-  chapterData: any
+  chapterData: ChapterCreateUpdate
 ): Promise<ApiResponse<Chapter>> {
   return fetchApi<Chapter>(`/publisher/comics/${comicId}/chapters`, {
     method: 'POST',
@@ -137,7 +137,7 @@ export async function createChapter(
 // Cập nhật chapter
 export async function updateChapter(
   chapterId: string,
-  chapterData: any
+  chapterData: ChapterCreateUpdate
 ): Promise<ApiResponse<Chapter>> {
   return fetchApi<Chapter>(`/publisher/chapters/${chapterId}`, {
     method: 'PUT',

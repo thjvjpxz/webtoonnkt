@@ -15,7 +15,6 @@ import Image from "next/image";
 import {
   FiAlertTriangle,
   FiTrash2,
-  FiX,
   FiMessageCircle,
 } from "react-icons/fi";
 import { chooseImageUrl } from "@/utils/string";

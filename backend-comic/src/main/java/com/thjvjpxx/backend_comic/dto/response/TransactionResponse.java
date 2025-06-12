@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class TransactionResponse {
 
     String id; // ID giao dịch
+    Long transactionCode; // Mã giao dịch
     Double amount; // Số linh thạch
     String status; // Trạng thái giao dịch
     LocalDateTime updatedAt; // Thời gian cập nhật

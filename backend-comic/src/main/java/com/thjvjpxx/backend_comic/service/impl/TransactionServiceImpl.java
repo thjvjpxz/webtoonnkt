@@ -26,6 +26,7 @@ import com.thjvjpxx.backend_comic.repository.TransactionRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.PayOSService;
 import com.thjvjpxx.backend_comic.service.TransactionService;
+import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,6 @@ public class TransactionServiceImpl implements TransactionService {
 
             // Tạo payment link với PayOS
             CheckoutResponseData paymentData = payOSService.createPaymentLink(transaction);
-
             Map<String, String> response = new HashMap<>();
             response.put("paymentLink", paymentData.getCheckoutUrl());
 
@@ -160,7 +160,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public BaseResponse<List<TransactionResponse>> getUserTransactions(User user, int page, int limit) {
         try {
-            Pageable pageable = PageRequest.of(page, limit, Sort.by("createdAt").descending());
+            Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
             Page<Transaction> transactionPage = transactionRepository.findByUser(user, pageable);
 
             List<TransactionResponse> transactions = transactionPage.getContent().stream()
@@ -271,6 +271,7 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
+                .transactionCode(transaction.getPayosOrderCode())
                 .amount(transaction.getAmount())
                 .status(transaction.getStatus().toString())
                 .updatedAt(transaction.getUpdatedAt())

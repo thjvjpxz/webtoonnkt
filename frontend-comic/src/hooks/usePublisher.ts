@@ -96,7 +96,7 @@ export const usePublisher = () => {
         setComics([]);
         toast.error(response.message || "Không thể tải danh sách truyện");
       }
-    } catch (error) {
+    } catch {
       setComics([]);
       toast.error("Đã xảy ra lỗi khi tải danh sách truyện");
     } finally {
@@ -111,7 +111,7 @@ export const usePublisher = () => {
       if (response.status === 200 && response.data) {
         setCategories(response.data);
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi tải danh sách thể loại");
     }
   }, []);
@@ -125,7 +125,7 @@ export const usePublisher = () => {
       if (response.status === 200 && response.data) {
         setWithdrawalRequests(response.data);
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi tải danh sách yêu cầu rút tiền");
     }
   }, [isPublisher]);
@@ -145,7 +145,7 @@ export const usePublisher = () => {
       } else {
         toast.error(response.message || "Không thể thêm truyện");
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi thêm truyện");
     }
   };
@@ -168,7 +168,7 @@ export const usePublisher = () => {
       } else {
         toast.error(response.message || "Không thể cập nhật truyện");
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi cập nhật truyện");
     }
   };
@@ -189,7 +189,7 @@ export const usePublisher = () => {
       } else {
         toast.error(response.message || "Không thể xóa truyện");
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi xóa truyện");
     } finally {
       setIsDeleting(false);
@@ -211,7 +211,7 @@ export const usePublisher = () => {
       } else {
         toast.error(response.message || "Không thể tạo yêu cầu rút tiền");
       }
-    } catch (error) {
+    } catch {
       toast.error("Đã xảy ra lỗi khi tạo yêu cầu rút tiền");
     }
   };

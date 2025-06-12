@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthState } from "@/hooks/useAuthState";
 import { getPublicVipPackages } from "@/services/vipPackageService";
 import { VipPackage } from "@/types/vipPackage";
-import { FiStar, FiCalendar, FiDollarSign, FiPercent, FiLoader, FiGift } from "react-icons/fi";
+import { FiStar, FiCalendar, FiPercent, FiLoader, FiGift } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Main from "@/components/layout/Main";
 import Image from "next/image";
