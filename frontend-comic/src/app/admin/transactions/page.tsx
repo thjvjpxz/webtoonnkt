@@ -37,45 +37,62 @@ const formatPrice = (price: number | undefined | null) => {
 
 // Hàm helper để render trạng thái giao dịch
 const renderTransactionStatus = (status: string) => {
-  const statusConfig = {
-    COMPLETED: { label: "Đã thanh toán", variant: "default" as const, className: "bg-green-100 text-green-800 border-green-200" },
-    PENDING: { label: "Đang xử lý", variant: "secondary" as const, className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-    CANCELLED: { label: "Đã hủy", variant: "destructive" as const, className: "bg-red-100 text-red-800 border-red-200" },
-    FAILED: { label: "Thất bại", variant: "destructive" as const, className: "bg-red-100 text-red-800 border-red-200" },
-  };
-
-  const config = statusConfig[status as keyof typeof statusConfig] || {
-    label: status,
-    variant: "outline" as const,
-    className: "bg-gray-100 text-gray-800 border-gray-200"
-  };
-
-  return (
-    <Badge variant={config.variant} className={config.className}>
-      {config.label}
-    </Badge>
-  );
+  switch (status) {
+    case "COMPLETED":
+      return (
+        <Badge className="text-xs bg-emerald-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-emerald-600 transition-all duration-300 hover:scale-105 font-medium">
+          Đã thanh toán
+        </Badge>
+      );
+    case "PENDING":
+      return (
+        <Badge className="text-xs bg-yellow-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-yellow-600 transition-all duration-300 hover:scale-105 font-medium">
+          Đang xử lý
+        </Badge>
+      );
+    case "CANCELLED":
+      return (
+        <Badge className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium">
+          Đã hủy
+        </Badge>
+      );
+    case "FAILED":
+      return (
+        <Badge className="text-xs bg-red-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-red-600 transition-all duration-300 hover:scale-105 font-medium">
+          Thất bại
+        </Badge>
+      );
+    default:
+      return (
+        <Badge className="text-xs bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+          {status}
+        </Badge>
+      );
+  }
 };
 
 // Hàm helper để render phương thức thanh toán
 const renderPaymentMethod = (method: string) => {
-  const methodConfig = {
-    BALANCE: { label: "Số dư", icon: "💰", className: "bg-blue-100 text-blue-800 border-blue-200" },
-    PayOS: { label: "PayOS", icon: "💳", className: "bg-purple-100 text-purple-800 border-purple-200" },
-  };
-
-  const config = methodConfig[method as keyof typeof methodConfig] || {
-    label: method,
-    icon: "💰",
-    className: "bg-gray-100 text-gray-800 border-gray-200"
-  };
-
-  return (
-    <Badge variant="outline" className={config.className}>
-      <span className="mr-1">{config.icon}</span>
-      {config.label}
-    </Badge>
-  );
+  switch (method) {
+    case "BALANCE":
+      return (
+        <Badge className="text-xs bg-blue-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-105 font-medium">
+          💰 Số dư
+        </Badge>
+      );
+    case "PayOS":
+      return (
+        <Badge className="text-xs bg-purple-500 text-white border-0 shadow-md hover:shadow-lg hover:bg-purple-600 transition-all duration-300 hover:scale-105 font-medium">
+          💳 PayOS
+        </Badge>
+      );
+    default:
+      return (
+        <Badge className="text-xs bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition-all duration-200 hover:scale-105">
+          💰 {method}
+        </Badge>
+      );
+  }
 };
 
 export default function Transactions() {
@@ -158,6 +175,12 @@ export default function Transactions() {
                   className="flex-shrink-0"
                 />
                 <span>{formatPrice(stats.totalAmount)}</span>
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Tương đương: {new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND'
+                }).format(stats.totalAmount * 1000)}
               </div>
             </CardContent>
           </Card>
