@@ -344,7 +344,7 @@ export default function Transactions() {
                       Thời hạn (ngày)
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
-                      Ngày cập nhật
+                      Thời gian giao dịch
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
                       Thao tác
