@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ComicResponse } from "@/types/comic";
-import { renderBadge, renderComicAuthor, renderComicCategory, renderComicStatus } from "@/utils/comic-render";
+import { renderBadge, renderComicAuthor, renderComicCategory, renderComicStatus } from "@/components/ui/comic-render";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";

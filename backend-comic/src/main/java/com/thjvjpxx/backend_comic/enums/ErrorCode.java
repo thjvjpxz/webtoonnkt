@@ -139,6 +139,12 @@ public enum ErrorCode {
     CHAPTER_ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "chương đã được mua!"),
     CHAPTER_IS_FREE(HttpStatus.BAD_REQUEST, "chương này miễn phí!"),
 
+    // Topup
+    TOPUP_AMOUNT_NOT_NULL(HttpStatus.BAD_REQUEST, "Số tiền nạp không được trống!"),
+    TOPUP_AMOUNT_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Số tiền nạp phải lớn hơn 0!"),
+    TOPUP_AMOUNT_TOO_LOW(HttpStatus.BAD_REQUEST, "Số tiền nạp tối thiểu là 10 Linh Thạch!"),
+    PAYOS_CREATE_PAYMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Tạo link thanh toán thất bại!"),
+
     // Vip Package
     VIP_PACKAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Gói VIP không tồn tại!"),
     VIP_PACKAGE_INVALID(HttpStatus.BAD_REQUEST, "Thông tin gói VIP không hợp lệ!"),

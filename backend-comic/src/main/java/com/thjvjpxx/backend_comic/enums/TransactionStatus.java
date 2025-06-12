@@ -4,6 +4,5 @@ public enum TransactionStatus {
     PENDING, // Đang chờ xử lý
     COMPLETED, // Hoàn thành
     FAILED, // Thất bại
-    CANCELLED, // Đã hủy
-    PROCESSING // Đang xử lý
+    CANCELLED // Đã hủy
 }

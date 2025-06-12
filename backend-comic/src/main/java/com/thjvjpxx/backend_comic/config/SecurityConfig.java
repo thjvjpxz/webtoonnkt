@@ -60,7 +60,10 @@ public class SecurityConfig {
 								"/comments/comic/*",
 								"/comments/comic/*/parents",
 								"/comments/chapter/*",
-								"/comments/*/replies")
+								"/comments/*/replies",
+								"/topup/callback",
+								"/transactions/webhook/**",
+								"/webhook/payos/**")
 						.permitAll()
 
 						// Các API cần xác thực với vai trò ADMIN

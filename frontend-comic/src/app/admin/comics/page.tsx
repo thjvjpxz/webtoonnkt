@@ -15,7 +15,7 @@ import { useComic } from "@/hooks/useComic";
 import { CategoryResponse } from "@/types/category";
 import { formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
-import { renderComicStatus, renderComicCategory, renderComicAuthor, renderBadge } from "@/utils/comic-render";
+import { renderComicStatus, renderComicCategory, renderComicAuthor, renderBadge } from "@/components/ui/comic-render";
 import Image from "next/image";
 import {
   FiAlertCircle,

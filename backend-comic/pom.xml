@@ -33,6 +33,8 @@
 		<google-api-services-drive.version>v3-rev197-1.25.0</google-api-services-drive.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<aws-sdk.version>2.31.37</aws-sdk.version>
+		<payos.version>1.0.3</payos.version>
+		<java-dotenv.version>5.2.2</java-dotenv.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -114,6 +116,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>vn.payos</groupId>
+			<artifactId>payos-java</artifactId>
+			<version>${payos.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv</artifactId>
+			<version>${java-dotenv.version}</version>
 		</dependency>
 
 	</dependencies>

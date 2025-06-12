@@ -6,7 +6,7 @@ public class PaymentConstants {
     public static final double VND_TO_LINHHACH_RATE = 1000.0;
 
     // Số linh thạch nhỏ nhất có thể nạp
-    public static final double MIN_TOPUP_LINHHACH = 10.0; // 10 linh thạch = 10,000 VND
+    public static final double MIN_TOPUP_LINHHACH = 2.0; // 2 linh thạch = 2,000 VND
 
     // Số linh thạch lớn nhất có thể nạp một lần
     public static final double MAX_TOPUP_LINHHACH = 10000.0; // 10,000 linh thạch = 10,000,000 VND
@@ -16,12 +16,6 @@ public class PaymentConstants {
 
     // Số tiền VND lớn nhất có thể nạp một lần
     public static final double MAX_TOPUP_VND = MAX_TOPUP_LINHHACH * VND_TO_LINHHACH_RATE;
-
-    // Phí rút tiền cho publisher (%)
-    public static final double WITHDRAWAL_FEE_RATE = 0.05; // 5%
-
-    // Số tiền VND nhỏ nhất có thể rút
-    public static final double MIN_WITHDRAWAL_VND = 50000.0; // 50,000 VND
 
     // PayOS currency code
     public static final String PAYOS_CURRENCY = "VND";
@@ -44,25 +38,5 @@ public class PaymentConstants {
      */
     public static double convertLinhThachToVnd(double linhThachAmount) {
         return linhThachAmount * VND_TO_LINHHACH_RATE;
-    }
-
-    /**
-     * Tính phí rút tiền
-     * 
-     * @param amount Số tiền cần rút (VND)
-     * @return Phí rút tiền (VND)
-     */
-    public static double calculateWithdrawalFee(double amount) {
-        return amount * WITHDRAWAL_FEE_RATE;
-    }
-
-    /**
-     * Tính số tiền thực nhận sau khi trừ phí rút tiền
-     * 
-     * @param amount Số tiền cần rút (VND)
-     * @return Số tiền thực nhận (VND)
-     */
-    public static double calculateNetWithdrawalAmount(double amount) {
-        return amount - calculateWithdrawalFee(amount);
     }
 }

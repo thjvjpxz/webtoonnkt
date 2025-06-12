@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thjvjpxx.backend_comic.enums.TransactionStatus;
-import com.thjvjpxx.backend_comic.enums.TransactionType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +36,6 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(indexes = {
         @Index(name = "idx_transaction_user", columnList = "user_id"),
-        @Index(name = "idx_transaction_type", columnList = "transaction_type"),
         @Index(name = "idx_transaction_status", columnList = "status"),
         @Index(name = "idx_transaction_created", columnList = "created_at"),
         @Index(name = "idx_transaction_payos_order", columnList = "payos_order_code")
@@ -54,11 +52,7 @@ public class Transaction {
     User user;
 
     @Column(name = "amount", nullable = false)
-    Double amount; // Số linh thạch cho TOPUP/PURCHASE, số VND cho WITHDRAWAL
-
-    @Column(name = "transaction_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    TransactionType transactionType;
+    Double amount; // Số linh thạch
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -71,11 +65,8 @@ public class Transaction {
     @Column(name = "payos_order_code")
     Long payosOrderCode;
 
-    @Column(name = "payos_transaction_id")
+    @Column(name = "payos_transaction_id", unique = true)
     String payosTransactionId;
-
-    @Column(name = "payos_reference")
-    String payosReference;
 
     @Column(name = "payos_amount_vnd")
     Double payosAmountVnd; // Số tiền VND thực tế thanh toán qua PayOS
