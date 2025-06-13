@@ -150,4 +150,31 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
     @Query("SELECT c FROM comics c JOIN c.categories cat WHERE c.publisher = :publisher AND cat.id = :categoryId")
     Page<Comic> findByPublisherAndCategory(@Param("publisher") User publisher, @Param("categoryId") String categoryId,
             Pageable pageable);
+
+    // === QUERIES CHO ADMIN STATISTICS ===
+
+    // Đếm tổng số comic
+    @Query("SELECT COUNT(c) FROM comics c")
+    Long countTotalComics();
+
+    // Top publisher theo doanh thu (tính từ purchased chapters)
+    @Query(value = """
+            SELECT
+                u.id as publisher_id,
+                u.username as publisher_name,
+                COUNT(DISTINCT c.id) as total_comics,
+                COALESCE(SUM(pc.purchase_price), 0) as total_revenue,
+                COALESCE(SUM(cvh.view_count), 0) as total_views
+            FROM users u
+            INNER JOIN comics c ON u.id = c.publisher_id
+            LEFT JOIN chapters ch ON c.id = ch.comic_id
+            LEFT JOIN purchased_chapters pc ON ch.id = pc.chapter_id
+            LEFT JOIN comic_views_history cvh ON c.id = cvh.comic_id
+            INNER JOIN roles r ON u.role_id = r.id
+            WHERE r.name = 'PUBLISHER'
+            GROUP BY u.id, u.username
+            ORDER BY total_revenue DESC, total_views DESC
+            LIMIT 10
+            """, nativeQuery = true)
+    List<Object[]> getTopPublishersByRevenue();
 }

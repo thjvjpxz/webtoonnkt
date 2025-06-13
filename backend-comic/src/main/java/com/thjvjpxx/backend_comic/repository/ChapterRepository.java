@@ -70,4 +70,10 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 	Page<Chapter> findByComicOrderByChapterNumberAsc(Comic comic, Pageable pageable);
 
 	Page<Chapter> findByComicOrderByChapterNumberDesc(Comic comic, Pageable pageable);
+
+	// === QUERIES CHO ADMIN STATISTICS ===
+
+	// Đếm tổng số chapter
+	@Query("SELECT COUNT(ch) FROM chapters ch")
+	Long countTotalChapters();
 }

@@ -79,3 +79,12 @@ export const buyChapter = async (chapterId: string) => {
     data: data,
   });
 }
+
+// Gửi yêu cầu làm publisher
+export const sendRequestPublisher = async () => {
+  const endpoint = `/publisher-request`
+
+  return await fetchApi<null>(endpoint, {
+    method: "POST",
+  });
+}

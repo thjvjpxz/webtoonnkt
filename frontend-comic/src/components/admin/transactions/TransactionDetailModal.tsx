@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { TransactionResponse } from "@/types/payment";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatDate } from "@/utils/helpers";
-import { FiX, FiUser, FiCreditCard, FiCalendar, FiHash, FiDollarSign, FiInfo } from "react-icons/fi";
+import { FiUser, FiCreditCard, FiCalendar, FiHash, FiDollarSign, FiInfo } from "react-icons/fi";
 import Image from "next/image";
 
 interface TransactionDetailModalProps {

@@ -9,8 +9,11 @@ import {
   FiX,
   FiStar,
   FiCreditCard,
+  FiEdit,
 } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
+import PublisherRequestModal from "../profile/PublisherRequestModal";
+import { useAuthState } from "@/hooks/useAuthState";
 
 interface NavItem {
   label: string;
@@ -45,6 +48,8 @@ const navItems: NavItem[] = [
 
 export default function Nav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showPublisherModal, setShowPublisherModal] = useState(false);
+  const { isAuthenticated, isAdmin, isPublisher } = useAuthState();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -68,7 +73,7 @@ export default function Nav() {
     <nav className="bg-primary text-primary-foreground border-b border-primary-foreground/10">
       <div className="container mx-auto">
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center py-2">
+        <div className="hidden md:flex items-center justify-between py-2">
           <ul className="flex items-center gap-1">
             {navItems.map((item) => (
               <li key={item.href}>
@@ -76,6 +81,19 @@ export default function Nav() {
               </li>
             ))}
           </ul>
+
+          {/* Publisher Request Button */}
+          {isAuthenticated && !isAdmin && !isPublisher && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPublisherModal(true)}
+              className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 hover:border-primary-foreground/30"
+            >
+              <FiEdit className="w-4 h-4 mr-2" />
+              Trở thành nhà xuất bản
+            </Button>
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -139,10 +157,32 @@ export default function Nav() {
                   )}
                 </li>
               ))}
+
+              {/* Publisher Request Button for Mobile */}
+              {isAuthenticated && !isAdmin && !isPublisher && (
+                <li className="pt-2 border-t border-primary-foreground/10">
+                  <button
+                    onClick={() => {
+                      setShowPublisherModal(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-primary-foreground hover:bg-primary-foreground/10 px-3 py-2 rounded-lg transition-all duration-200 font-medium w-full text-left"
+                  >
+                    <FiEdit className="w-4 h-4" />
+                    <span>Trở thành nhà xuất bản</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         )}
       </div>
+
+      {/* Publisher Request Modal */}
+      <PublisherRequestModal
+        isOpen={showPublisherModal}
+        onClose={() => setShowPublisherModal(false)}
+      />
     </nav>
   );
 }

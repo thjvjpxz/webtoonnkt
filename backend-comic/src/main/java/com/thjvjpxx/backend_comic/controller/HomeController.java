@@ -15,6 +15,7 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.service.HomeService;
+import com.thjvjpxx.backend_comic.service.PublisherRequestService;
 import com.thjvjpxx.backend_comic.service.PurchaseService;
 import com.thjvjpxx.backend_comic.service.VipPackageService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
@@ -32,17 +33,39 @@ public class HomeController {
     SecurityUtils securityUtils;
     VipPackageService vipPackageService;
     PurchaseService purchaseService;
+    PublisherRequestService publisherRequestService;
 
+    /**
+     * API lấy danh sách comic mới nhất
+     * GET /
+     * 
+     * @return Response chứa danh sách comic mới nhất
+     */
     @GetMapping
     public BaseResponse<?> getHomeComic() {
         return homeService.getHomeComic();
     }
 
+    /**
+     * API lấy danh sách category
+     * GET /category
+     * 
+     * @return Response chứa danh sách category
+     */
     @GetMapping("category")
     public BaseResponse<?> getAllCategory() {
         return homeService.getAllCategory();
     }
 
+    /**
+     * API lấy danh sách comic theo category
+     * GET /category/{slug}
+     * 
+     * @param slug Slug của category
+     * @param page Số trang
+     * @param size Số lượng trong 1 trang
+     * @return Response chứa danh sách comic theo category
+     */
     @GetMapping("category/{slug}")
     public BaseResponse<?> getComicByCategory(@PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
@@ -50,6 +73,15 @@ public class HomeController {
         return homeService.getComicByCategory(slug, page, size);
     }
 
+    /**
+     * API tìm kiếm comic
+     * GET /search
+     * 
+     * @param query Từ khóa tìm kiếm
+     * @param page  Số trang
+     * @param size  Số lượng
+     * @return Response chứa danh sách comic tìm kiếm
+     */
     @GetMapping("search")
     public BaseResponse<?> searchComic(@RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
@@ -57,6 +89,14 @@ public class HomeController {
         return homeService.searchComic(query, page, size);
     }
 
+    /**
+     * API lấy danh sách yêu thích
+     * GET /favorites
+     * 
+     * @param page Số trang
+     * @param size Số lượng
+     * @return Response chứa danh sách yêu thích
+     */
     @GetMapping("favorites")
     public BaseResponse<?> getFavorites(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -64,12 +104,25 @@ public class HomeController {
         return homeService.getFavorites(currentUserId, page, size);
     }
 
+    /**
+     * API lấy thông tin cá nhân
+     * GET /profile
+     * 
+     * @return Response chứa thông tin cá nhân
+     */
     @GetMapping("profile")
     public BaseResponse<?> getProfile() {
         String currentUserId = securityUtils.getCurrentUserId();
         return homeService.getProfile(currentUserId);
     }
 
+    /**
+     * API cập nhật thông tin cá nhân
+     * PUT /profile
+     * 
+     * @param request DTO chứa levelTypeId
+     * @return Response thông báo thành công
+     */
     @PutMapping("profile")
     public BaseResponse<?> updateProfile(@RequestBody Map<String, String> request) {
         String currentUserId = securityUtils.getCurrentUserId();
@@ -77,12 +130,25 @@ public class HomeController {
         return homeService.updateProfile(currentUserId, levelTypeId);
     }
 
+    /**
+     * API thay đổi mật khẩu
+     * POST /change-password
+     * 
+     * @param request DTO chứa oldPassword và newPassword
+     * @return Response thông báo thành công
+     */
     @PostMapping("change-password")
     public BaseResponse<?> changePassword(@RequestBody ChangePassRequest request) {
         String currentUserId = securityUtils.getCurrentUserId();
         return homeService.changePassword(currentUserId, request);
     }
 
+    /**
+     * API lấy danh sách gói VIP công khai
+     * GET /public/vip-packages
+     * 
+     * @return Response chứa danh sách gói VIP công khai
+     */
     @GetMapping("/public/vip-packages")
     public BaseResponse<?> getPublicVipPackages() {
         return vipPackageService.getPublicVipPackages();
@@ -129,5 +195,10 @@ public class HomeController {
     @GetMapping("my-vip")
     public BaseResponse<?> getMyVipPackage() {
         return purchaseService.getMyPurchasedVipPackage(securityUtils.getCurrentUser());
+    }
+
+    @PostMapping("publisher-request")
+    public BaseResponse<?> sendPublisherRequest() {
+        return publisherRequestService.sendPublisherRequest(securityUtils.getCurrentUser());
     }
 }

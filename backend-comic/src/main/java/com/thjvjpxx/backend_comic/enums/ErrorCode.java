@@ -151,6 +151,13 @@ public enum ErrorCode {
     DURATION_DAYS_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Thời hạn phải lớn hơn 0!"),
     IS_ACTIVE_NOT_NULL(HttpStatus.BAD_REQUEST, "Trạng thái không được trống!"),
 
+    // Publisher Request
+    ALREADY_ADMIN(HttpStatus.BAD_REQUEST, "Bạn là admin, không thể gửi yêu cầu!"),
+    ALREADY_PUBLISHER(HttpStatus.BAD_REQUEST, "Bạn đã là nhà xuất bản, không thể gửi yêu cầu!"),
+    ALREADY_REQUESTED(HttpStatus.BAD_REQUEST, "Bạn đã gửi yêu cầu trước đó, vui lòng chờ duyệt!"),
+    PUBLISHER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Yêu cầu trở thành nhà xuất bản không tồn tại!"),
+    PUBLISHER_REQUEST_ALREADY_UPDATED(HttpStatus.BAD_REQUEST, "Yêu cầu đã được cập nhật trước đó!"),
+
     // Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi máy chủ!");
     ;

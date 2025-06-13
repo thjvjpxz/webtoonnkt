@@ -266,7 +266,7 @@ export default function Chapters() {
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
                       {/* Thumbnail */}
-                      <TableCell className="py-4 flex items-center w-[100px]">
+                      <TableCell className="py-4 flex items-center w-[200px]">
                         <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
                           {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
                             <Image

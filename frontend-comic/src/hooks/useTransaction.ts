@@ -44,7 +44,7 @@ export function useTransaction() {
         setTransactions([]);
         setTotalPages(1);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Lỗi khi tải danh sách giao dịch:", error);
       setError("Không thể tải danh sách giao dịch");
       toast.error("Không thể tải danh sách giao dịch");
@@ -60,7 +60,7 @@ export function useTransaction() {
       if (response && response.data) {
         setStats(response.data);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Lỗi khi tải thống kê giao dịch:", error);
       toast.error("Không thể tải thống kê giao dịch");
     }

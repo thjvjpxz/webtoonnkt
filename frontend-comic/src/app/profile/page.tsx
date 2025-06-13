@@ -13,8 +13,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { FiCalendar, FiDollarSign, FiEdit3, FiHome, FiKey, FiMail, FiShield, FiStar, FiTrendingUp, FiUser } from "react-icons/fi";
+import { FiCalendar, FiDollarSign, FiEdit3, FiHome, FiKey, FiMail, FiShield, FiStar, FiTrendingUp, FiUser, FiEdit } from "react-icons/fi";
 import { chooseImageUrl } from "@/utils/string";
+import PublisherRequestModal from "@/components/profile/PublisherRequestModal";
 
 export default function ProfilePage() {
   const { isAuthenticated } = useAuthState();
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [showPublisherModal, setShowPublisherModal] = useState(false);
 
   // Redirect nếu chưa đăng nhập
   useEffect(() => {
@@ -230,7 +232,7 @@ export default function ProfilePage() {
                               </span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Button
                               variant="outline"
                               size="sm"
@@ -247,6 +249,17 @@ export default function ProfilePage() {
                               <FiKey className="w-4 h-4 mr-2" />
                               Đổi mật khẩu
                             </Button>
+                            {userProfile.role.name !== 'ADMIN' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowPublisherModal(true)}
+                                className="bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+                              >
+                                <FiEdit className="w-4 h-4 mr-2" />
+                                Trở thành Publisher
+                              </Button>
+                            )}
                           </div>
                         </div>
 
@@ -413,6 +426,12 @@ export default function ProfilePage() {
           onProfileUpdated={handleProfileUpdated}
         />
       )}
+
+      {/* Publisher Request Modal */}
+      <PublisherRequestModal
+        isOpen={showPublisherModal}
+        onClose={() => setShowPublisherModal(false)}
+      />
     </Main>
   )
 }
