@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * DTO response cho home
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder

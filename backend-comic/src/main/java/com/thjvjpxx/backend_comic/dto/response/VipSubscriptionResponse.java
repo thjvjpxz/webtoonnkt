@@ -11,6 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho subscription VIP
+ */
 @Data
 @Builder
 @NoArgsConstructor

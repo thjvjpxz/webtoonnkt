@@ -20,6 +20,13 @@ import lombok.experimental.FieldDefaults;
 public class CrawlerController {
     CrawlerService crawlerService;
 
+    /**
+     * Bắt đầu crawl comic
+     * POST /crawler
+     * 
+     * @param request DTO chứa thông tin comic
+     * @return Response chứa comic đã crawl
+     */
     @PostMapping
     public BaseResponse<?> startCrawlComic(@RequestBody CrawlerComicRequest request) {
         return crawlerService.crawlComic(request);

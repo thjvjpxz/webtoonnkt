@@ -27,6 +27,17 @@ import lombok.experimental.FieldDefaults;
 public class ComicController {
     ComicService comicService;
 
+    /**
+     * Lấy tất cả comic
+     * GET /comics
+     * 
+     * @param page     Trang hiện tại
+     * @param limit    Số lượng mỗi trang
+     * @param search   Tìm kiếm theo tên
+     * @param status   Trạng thái
+     * @param category ID danh mục
+     * @return Response chứa danh sách comic
+     */
     @GetMapping
     public BaseResponse<?> getAllComics(
             @RequestParam(defaultValue = "0") int page,
@@ -37,16 +48,14 @@ public class ComicController {
         return comicService.getAllComics(page, limit, search, status, category);
     }
 
-    @GetMapping("/{id}/chapters")
-    public BaseResponse<?> getAllChapters(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status) {
-        return comicService.getAllChapters(page, limit, search, status, id);
-    }
-
+    /**
+     * Tạo comic mới
+     * POST /comics
+     * 
+     * @param comicRequest DTO chứa thông tin comic
+     * @param cover        File ảnh cover
+     * @return Response chứa comic đã tạo
+     */
     @PostMapping
     public BaseResponse<?> createComic(
             @Valid @RequestPart("data") ComicRequest comicRequest,
@@ -54,6 +63,15 @@ public class ComicController {
         return comicService.createComic(comicRequest, cover, null);
     }
 
+    /**
+     * Cập nhật comic
+     * PUT /comics/{id}
+     * 
+     * @param id           ID comic
+     * @param comicRequest DTO chứa thông tin comic
+     * @param cover        File ảnh cover
+     * @return Response chứa comic đã cập nhật
+     */
     @PutMapping(value = "/{id}")
     public BaseResponse<?> updateComic(@PathVariable String id,
             @Valid @RequestPart("data") ComicRequest comicRequest,
@@ -61,6 +79,13 @@ public class ComicController {
         return comicService.updateComic(id, comicRequest, cover, null);
     }
 
+    /**
+     * Xóa comic
+     * DELETE /comics/{id}
+     * 
+     * @param id ID comic
+     * @return Response chứa comic đã xóa
+     */
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteComic(@PathVariable String id) {
         return comicService.deleteComic(id, null);

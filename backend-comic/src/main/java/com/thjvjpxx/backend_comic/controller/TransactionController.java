@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
-import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.TransactionService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
@@ -36,6 +35,9 @@ public class TransactionController {
     /**
      * Tạo giao dịch nạp tiền
      * POST /transactions/topup
+     * 
+     * @param request Dữ liệu nạp tiền
+     * @return Response chứa thông báo thành công
      */
     @PostMapping("/topup")
     public BaseResponse<?> createTopup(@Valid @RequestBody TopupRequest request) {
@@ -44,12 +46,26 @@ public class TransactionController {
         return transactionService.createTopup(request, currentUser);
     }
 
+    /**
+     * Kiểm tra trạng thái thanh toán
+     * GET /transactions/status/{orderCode}
+     * 
+     * @param orderCode Mã đơn hàng
+     * @return Response chứa thông tin giao dịch
+     */
     @GetMapping("/status/{orderCode}")
     public BaseResponse<TransactionResponse> checkPaymentStatus(
             @PathVariable Long orderCode) {
         return transactionService.getTransactionByOrderCode(orderCode, securityUtils.getCurrentUser());
     }
 
+    /**
+     * Hủy giao dịch
+     * PUT /transactions/cancel/{orderCode}
+     * 
+     * @param orderCode Mã đơn hàng
+     * @return Response chứa thông báo thành công
+     */
     @PutMapping("/cancel/{orderCode}")
     public BaseResponse<?> cancelPayment(@PathVariable Long orderCode) {
         return transactionService.cancelPayment(orderCode);
@@ -58,6 +74,10 @@ public class TransactionController {
     /**
      * Lấy lịch sử giao dịch của user hiện tại
      * GET /transactions/me?page=0&limit=10
+     * 
+     * @param page  Trang hiện tại
+     * @param limit Số lượng mỗi trang
+     * @return Response chứa danh sách giao dịch của user
      */
     @GetMapping("/me")
     public BaseResponse<List<TransactionResponse>> getMyTransactions(
@@ -71,6 +91,13 @@ public class TransactionController {
     /**
      * Lấy tất cả giao dịch với filtering nâng cao (dành cho admin)
      * GET /transactions/filter
+     * 
+     * @param page          Trang hiện tại
+     * @param limit         Số lượng mỗi trang
+     * @param search        Từ khóa tìm kiếm
+     * @param status        Trạng thái giao dịch
+     * @param paymentMethod Phương thức thanh toán
+     * @return Response chứa danh sách giao dịch đã lọc
      */
     @GetMapping("/filter")
     public BaseResponse<List<TransactionResponse>> getAllTransactionsWithFilter(
@@ -82,12 +109,4 @@ public class TransactionController {
         return transactionService.getAllTransactionsWithFilter(page, limit, search, status, paymentMethod);
     }
 
-    /**
-     * Lấy thống kê giao dịch (dành cho admin)
-     * GET /transactions/stats
-     */
-    @GetMapping("/stats")
-    public BaseResponse<TransactionStatsResponse> getTransactionStats() {
-        return transactionService.getTransactionStats();
-    }
 }

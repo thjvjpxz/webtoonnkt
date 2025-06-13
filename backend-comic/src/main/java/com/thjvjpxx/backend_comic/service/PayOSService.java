@@ -6,6 +6,9 @@ import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
+/**
+ * Service xử lý thanh toán qua PayOS
+ */
 public interface PayOSService {
 
     /**

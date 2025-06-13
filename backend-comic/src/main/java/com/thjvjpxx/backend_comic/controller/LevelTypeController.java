@@ -25,21 +25,49 @@ import lombok.experimental.FieldDefaults;
 public class LevelTypeController {
     LevelTypeService levelTypeService;
 
+    /**
+     * Lấy tất cả level type
+     * GET /level-types
+     * 
+     * @return Response chứa danh sách level type
+     */
     @GetMapping
     public BaseResponse<?> getAllLevelType() {
         return levelTypeService.getAllLevelType();
     }
 
+    /**
+     * Tạo level type mới
+     * POST /level-types
+     * 
+     * @param request DTO chứa thông tin level type
+     * @return Response chứa level type đã tạo
+     */
     @PostMapping
     public BaseResponse<?> createLevelType(@Valid @RequestBody LevelTypeRequest request) {
         return levelTypeService.createLevelType(request);
     }
 
+    /**
+     * Cập nhật level type
+     * PUT /level-types/{id}
+     * 
+     * @param id      ID level type
+     * @param request DTO chứa thông tin level type
+     * @return Response chứa level type đã cập nhật
+     */
     @PutMapping("/{id}")
     public BaseResponse<?> updateLevelType(@PathVariable String id, @Valid @RequestBody LevelTypeRequest request) {
         return levelTypeService.updateLevelType(id, request);
     }
 
+    /**
+     * Xóa level type
+     * DELETE /level-types/{id}
+     * 
+     * @param id ID level type
+     * @return Response chứa thông báo thành công
+     */
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteLevelType(@PathVariable String id) {
         return levelTypeService.deleteLevelType(id);

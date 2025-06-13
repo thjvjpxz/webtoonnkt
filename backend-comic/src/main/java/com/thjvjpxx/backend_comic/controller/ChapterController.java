@@ -29,6 +29,16 @@ import lombok.experimental.FieldDefaults;
 public class ChapterController {
     ChapterService chapterService;
 
+    /**
+     * Lấy tất cả chương
+     * GET /chapters
+     * 
+     * @param page    Trang hiện tại
+     * @param limit   Số lượng mỗi trang
+     * @param search  Tìm kiếm theo tên
+     * @param comicId ID comic
+     * @return Response chứa danh sách chương
+     */
     @GetMapping
     public BaseResponse<?> getAllChapters(
             @RequestParam(defaultValue = "1") int page,
@@ -38,6 +48,14 @@ public class ChapterController {
         return chapterService.getAllChapters(page, limit, search, comicId);
     }
 
+    /**
+     * Tạo chương mới
+     * POST /chapters
+     * 
+     * @param chapterRequest DTO chứa thông tin chương
+     * @param files          Danh sách file ảnh
+     * @return Response chứa chương đã tạo
+     */
     @PostMapping
     public BaseResponse<?> createChapter(
             @Valid @RequestPart("data") ChapterRequest chapterRequest,
@@ -45,6 +63,15 @@ public class ChapterController {
         return chapterService.createChapter(chapterRequest, files, null);
     }
 
+    /**
+     * Cập nhật chương
+     * PUT /chapters/{id}
+     * 
+     * @param id             ID chương
+     * @param chapterRequest DTO chứa thông tin chương
+     * @param files          Danh sách file ảnh
+     * @return Response chứa chương đã cập nhật
+     */
     @PutMapping("/{id}")
     public BaseResponse<?> updateChapter(@PathVariable String id,
             @Valid @RequestPart("data") ChapterRequest chapterRequest,
@@ -52,6 +79,13 @@ public class ChapterController {
         return chapterService.updateChapter(id, chapterRequest, files, null);
     }
 
+    /**
+     * Xóa chương
+     * DELETE /chapters/{id}
+     * 
+     * @param id ID chương
+     * @return Response chứa chương đã xóa
+     */
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteChapter(@PathVariable String id) {
         return chapterService.deleteChapter(id, null);

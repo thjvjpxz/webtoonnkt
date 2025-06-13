@@ -16,12 +16,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Xử lý khi người dùng chưa đăng nhập
+ */
 @Component
 @RequiredArgsConstructor
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
+    /**
+     * Xử lý khi người dùng chưa đăng nhập thì trả về lỗi 401
+     * 
+     * @param request       Request
+     * @param response      Response
+     * @param authException Exception
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {

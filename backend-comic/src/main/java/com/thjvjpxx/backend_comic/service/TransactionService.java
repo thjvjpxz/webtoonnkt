@@ -5,10 +5,12 @@ import java.util.List;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
-import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.model.Transaction;
 import com.thjvjpxx.backend_comic.model.User;
 
+/**
+ * Service xử lý API quản lý giao dịch
+ */
 public interface TransactionService {
 
     /**
@@ -89,10 +91,4 @@ public interface TransactionService {
     BaseResponse<List<TransactionResponse>> getAllTransactionsWithFilter(
             int page, int limit, String search, String status, String paymentMethod);
 
-    /**
-     * Lấy thống kê giao dịch
-     * 
-     * @return Thống kê giao dịch
-     */
-    BaseResponse<TransactionStatsResponse> getTransactionStats();
 }

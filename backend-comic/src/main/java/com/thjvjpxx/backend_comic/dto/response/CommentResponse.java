@@ -13,6 +13,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho comment
+ */
 @Data
 @Builder
 @AllArgsConstructor

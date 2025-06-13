@@ -73,11 +73,6 @@ public class AuthServiceImpl implements AuthService {
             throw new BaseException(ErrorCode.USER_ALREADY_DELETED);
         }
 
-        // // Kiểm tra trạng thái tài khoản
-        // if (!user.getActive() && !user.getRole().getName().equals("ADMIN")) {
-        // throw new BaseException(ErrorCode.USER_INACTIVE);
-        // }
-
         // Tạo token
         String accessToken = jwtConfig.generateToken(user.getUsername());
         String refreshToken = jwtConfig.generateRefreshToken(user.getUsername());
@@ -119,37 +114,6 @@ public class AuthServiceImpl implements AuthService {
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken)
-                .id(user.getId())
-                .username(user.getUsername())
-                .imgUrl(user.getImgUrl())
-                .vip(user.getVip())
-                .role(user.getRole())
-                .build();
-
-        return BaseResponse.success(loginResponse);
-    }
-
-    @Override
-    public BaseResponse<?> validateToken(String token) {
-        if (token == null || token.isEmpty()) {
-            throw new BaseException(ErrorCode.TOKEN_REQUIRED);
-        }
-
-        // Xử lý "Bearer " nếu có
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        if (!jwtConfig.validateToken(token)) {
-            throw new BaseException(ErrorCode.INVALID_TOKEN);
-        }
-
-        String username = jwtConfig.extractUsername(token);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
-
-        LoginResponse loginResponse = LoginResponse.builder()
-                .accessToken(token)
                 .id(user.getId())
                 .username(user.getUsername())
                 .imgUrl(user.getImgUrl())

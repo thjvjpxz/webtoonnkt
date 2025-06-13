@@ -33,6 +33,12 @@ public class VipPackageController {
     /**
      * Lấy danh sách tất cả gói VIP (có phân trang và tìm kiếm)
      * GET /vip-packages?page=0&limit=10&search=premium
+     * 
+     * @param page     Trang hiện tại
+     * @param limit    Số lượng mỗi trang
+     * @param search   Từ khóa tìm kiếm
+     * @param isActive Trạng thái hoạt động
+     * @return Response chứa danh sách gói VIP
      */
     @GetMapping
     public BaseResponse<List<VipPackage>> getAllVipPackages(
@@ -46,6 +52,9 @@ public class VipPackageController {
     /**
      * Lấy gói VIP theo ID
      * GET /vip-packages/{id}
+     * 
+     * @param id ID gói VIP
+     * @return Response chứa gói VIP
      */
     @GetMapping("/{id}")
     public BaseResponse<VipPackage> getVipPackageById(@PathVariable String id) {
@@ -55,6 +64,9 @@ public class VipPackageController {
     /**
      * Tạo gói VIP mới
      * POST /vip-packages
+     * 
+     * @param request Dữ liệu gói VIP
+     * @return Response chứa gói VIP đã tạo
      */
     @PostMapping
     public BaseResponse<VipPackage> createVipPackage(@Valid @RequestBody VipPackageRequest request) {
@@ -64,6 +76,10 @@ public class VipPackageController {
     /**
      * Cập nhật gói VIP
      * PUT /vip-packages/{id}
+     * 
+     * @param id      ID gói VIP
+     * @param request Dữ liệu gói VIP
+     * @return Response chứa gói VIP đã cập nhật
      */
     @PutMapping("/{id}")
     public BaseResponse<VipPackage> updateVipPackage(
@@ -75,6 +91,9 @@ public class VipPackageController {
     /**
      * Xóa gói VIP (soft delete - chuyển thành inactive)
      * DELETE /vip-packages/{id}
+     * 
+     * @param id ID gói VIP
+     * @return Response chứa gói VIP đã xóa
      */
     @DeleteMapping("/{id}")
     public BaseResponse<VipPackage> deleteVipPackage(@PathVariable String id) {
@@ -84,6 +103,9 @@ public class VipPackageController {
     /**
      * Xóa hoàn toàn gói VIP khỏi database
      * DELETE /vip-packages/{id}/permanent
+     * 
+     * @param id ID gói VIP
+     * @return Response chứa gói VIP đã xóa
      */
     @DeleteMapping("/{id}/permanent")
     public BaseResponse<String> permanentDeleteVipPackage(@PathVariable String id) {

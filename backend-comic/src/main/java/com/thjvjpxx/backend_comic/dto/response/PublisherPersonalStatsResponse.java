@@ -10,6 +10,9 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO response cho thống kê cá nhân của publisher
+ */
 @Data
 @Builder
 @NoArgsConstructor

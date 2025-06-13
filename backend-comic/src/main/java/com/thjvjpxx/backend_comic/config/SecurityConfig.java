@@ -19,6 +19,9 @@ import com.thjvjpxx.backend_comic.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Cấu hình bảo mật
+ */
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {

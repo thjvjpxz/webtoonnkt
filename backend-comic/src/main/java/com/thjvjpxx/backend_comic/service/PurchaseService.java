@@ -3,6 +3,9 @@ package com.thjvjpxx.backend_comic.service;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.model.User;
 
+/**
+ * Service xử lý API mua truyện
+ */
 public interface PurchaseService {
 
     /**

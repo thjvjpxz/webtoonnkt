@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO cho response của OTruyen
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -25,6 +25,10 @@ public class StorageUtils {
 
     /**
      * Upload thumbnail với validation
+     * 
+     * @param coverFile File ảnh cover
+     * @param slug      Slug của comic
+     * @return URL của ảnh cover đã upload
      */
     public String uploadThumbnail(MultipartFile coverFile, String slug) {
         if (coverFile == null || coverFile.isEmpty()) {
@@ -45,6 +49,8 @@ public class StorageUtils {
 
     /**
      * Xóa thumbnail cũ
+     * 
+     * @param thumbUrl URL của ảnh cover cũ
      */
     public void removeOldThumbnail(String thumbUrl) {
         if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
@@ -57,6 +63,10 @@ public class StorageUtils {
 
     /**
      * Rename thumbnail
+     * 
+     * @param currentThumbUrl URL của ảnh cover cũ
+     * @param newSlug         Slug mới của comic
+     * @return URL của ảnh cover đã đổi tên
      */
     public String renameThumbnail(String currentThumbUrl, String newSlug) {
         if (currentThumbUrl == null || currentThumbUrl.isEmpty()) {
@@ -73,6 +83,12 @@ public class StorageUtils {
 
     /**
      * Xử lý upload file mới (xóa cũ nếu cần)
+     * 
+     * @param currentThumbUrl URL của ảnh cover cũ
+     * @param slug            Slug của comic
+     * @param cover           File ảnh cover mới
+     * @param shouldRemoveOld true nếu cần xóa ảnh cover cũ
+     * @return URL của ảnh cover đã upload
      */
     public String handleNewImageUpload(String currentThumbUrl, String slug, MultipartFile cover,
             boolean shouldRemoveOld) {
@@ -87,6 +103,9 @@ public class StorageUtils {
 
     /**
      * Kiểm tra xem URL có phải là file từ B2 storage không
+     * 
+     * @param url URL cần kiểm tra
+     * @return true nếu URL là từ B2 storage, ngược lại false
      */
     public boolean isB2StorageUrl(String url) {
         return url != null && !url.isEmpty() && url.startsWith(B2Constants.URL_PREFIX);
@@ -94,6 +113,12 @@ public class StorageUtils {
 
     /**
      * Upload multiple files cho chapter images
+     * 
+     * @param image         File ảnh chapter
+     * @param comicSlug     Slug của comic
+     * @param chapterNumber Số thứ tự chapter
+     * @param pageIndex     Số thứ tự trang
+     * @return URL của ảnh chapter đã upload
      */
     public String uploadChapterImage(MultipartFile image, String comicSlug, Double chapterNumber, int pageIndex) {
         if (image == null || image.isEmpty()) {

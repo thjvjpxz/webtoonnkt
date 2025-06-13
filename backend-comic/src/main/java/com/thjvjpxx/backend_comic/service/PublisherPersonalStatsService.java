@@ -5,6 +5,9 @@ import com.thjvjpxx.backend_comic.model.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service xử lý thống kê cá nhân của publisher
+ */
 public interface PublisherPersonalStatsService {
 
     /**

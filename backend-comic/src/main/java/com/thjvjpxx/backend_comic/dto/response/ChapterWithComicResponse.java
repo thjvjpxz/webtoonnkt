@@ -9,6 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho chapter và comic
+ */
 @Data
 @Builder
 @AllArgsConstructor

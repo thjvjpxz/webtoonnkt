@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO response cho file item
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

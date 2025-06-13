@@ -8,6 +8,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
+/**
+ * DTO cho comic detail của OTruyen
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

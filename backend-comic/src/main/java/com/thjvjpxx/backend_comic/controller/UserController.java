@@ -2,7 +2,6 @@ package com.thjvjpxx.backend_comic.controller;
 
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +30,17 @@ import lombok.experimental.FieldDefaults;
 public class UserController {
     UserService userService;
 
+    /**
+     * Lấy danh sách user
+     * GET /users
+     * 
+     * @param page    Trang hiện tại
+     * @param limit   Số lượng mỗi trang
+     * @param roleId  ID vai trò
+     * @param search  Từ khóa tìm kiếm
+     * @param deleted Trạng thái xóa
+     * @return Response chứa danh sách user
+     */
     @GetMapping
     public BaseResponse<List<User>> getUsers(
             @RequestParam(defaultValue = "0") Integer page,
@@ -41,14 +51,31 @@ public class UserController {
         return userService.getUsers(page, limit, search, roleId, deleted);
     }
 
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    /**
+     * Tạo user mới
+     * POST /users
+     * 
+     * @param request Dữ liệu user
+     * @param avatar  Ảnh đại diện
+     * @return Response chứa user đã tạo
+     */
+    @PostMapping
     public BaseResponse<User> createUser(
             @Valid @RequestPart("data") UserRequest request,
             @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
         return userService.createUser(request, avatar);
     }
 
-    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    /**
+     * Cập nhật user
+     * PUT /users/{id}
+     * 
+     * @param id      ID user
+     * @param request Dữ liệu user
+     * @param avatar  Ảnh đại diện
+     * @return Response chứa user đã cập nhật
+     */
+    @PutMapping(value = "/{id}")
     public BaseResponse<User> updateUser(
             @PathVariable String id,
             @Valid @RequestPart("data") UserRequest request,
@@ -56,16 +83,37 @@ public class UserController {
         return userService.updateUser(id, request, avatar);
     }
 
+    /**
+     * Khóa user
+     * PUT /users/{id}/block
+     * 
+     * @param id ID user
+     * @return Response chứa user đã khóa
+     */
     @PutMapping("/{id}/block")
     public BaseResponse<User> blockUser(@PathVariable String id) {
         return userService.blockUser(id);
     }
 
+    /**
+     * Mở khóa user
+     * PUT /users/{id}/unblock
+     * 
+     * @param id ID user
+     * @return Response chứa user đã mở khóa
+     */
     @PutMapping("/{id}/unblock")
     public BaseResponse<User> unblockUser(@PathVariable String id) {
         return userService.unblockUser(id);
     }
 
+    /**
+     * Xóa user
+     * DELETE /users/{id}
+     * 
+     * @param id ID user
+     * @return Response chứa user đã xóa
+     */
     @DeleteMapping("/{id}")
     public BaseResponse<User> deleteUser(@PathVariable String id) {
         return userService.deleteUser(id);

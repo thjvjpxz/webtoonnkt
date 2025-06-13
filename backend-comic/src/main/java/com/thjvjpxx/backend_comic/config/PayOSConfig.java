@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 import vn.payos.PayOS;
 
+/**
+ * Cấu hình PayOS
+ */
 @Configuration
 public class PayOSConfig {
 

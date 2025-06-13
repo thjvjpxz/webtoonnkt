@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * DTO cho chapter detail của OTruyen
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

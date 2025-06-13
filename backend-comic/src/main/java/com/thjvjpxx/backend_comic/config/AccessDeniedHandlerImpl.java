@@ -16,12 +16,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Xử lý khi người dùng không có quyền truy cập
+ */
 @Component
 @RequiredArgsConstructor
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
+    /**
+     * Xử lý khi người dùng không có quyền truy cập thì trả về lỗi 403
+     * 
+     * @param request               Request
+     * @param response              Response
+     * @param accessDeniedException Exception
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException, ServletException {

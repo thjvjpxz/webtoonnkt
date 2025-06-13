@@ -46,6 +46,13 @@ public class PublisherController {
     PublisherPersonalStatsService publisherPersonalStatsService;
 
     // ==================== PERSONAL STATISTICS ====================
+
+    /**
+     * Lấy thống kê cá nhân
+     * GET /publisher/stats/personal
+     * 
+     * @return Response chứa thống kê cá nhân
+     */
     @GetMapping("/stats/personal")
     public BaseResponse<PublisherPersonalStatsResponse> getPersonalStats() {
         User currentUser = securityUtils.getCurrentUser();
@@ -54,6 +61,14 @@ public class PublisherController {
         return BaseResponse.success(stats, "Lấy thống kê cá nhân thành công");
     }
 
+    /**
+     * Lấy thống kê cá nhân theo khoảng thời gian
+     * GET /publisher/stats/personal/range
+     * 
+     * @param startDate Ngày bắt đầu
+     * @param endDate   Ngày kết thúc
+     * @return Response chứa thống kê cá nhân theo khoảng thời gian
+     */
     @GetMapping("/stats/personal/range")
     public BaseResponse<PublisherPersonalStatsResponse> getPersonalStatsInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -66,6 +81,18 @@ public class PublisherController {
     }
 
     // ==================== COMIC MANAGEMENT ====================
+
+    /**
+     * Lấy danh sách comic của user
+     * GET /publisher/comics
+     * 
+     * @param page     Trang hiện tại
+     * @param limit    Số lượng mỗi trang
+     * @param search   Từ khóa tìm kiếm
+     * @param status   Trạng thái comic
+     * @param category ID danh mục
+     * @return Response chứa danh sách comic của user
+     */
     @GetMapping("/comics")
     public BaseResponse<?> getMyComics(
             @RequestParam(defaultValue = "0") int page,
@@ -77,6 +104,14 @@ public class PublisherController {
         return publisherService.getMyComics(currentUser, search, status, category, page, limit);
     }
 
+    /**
+     * Tạo comic mới
+     * POST /publisher/comics
+     * 
+     * @param comicRequest Dữ liệu comic
+     * @param cover        Ảnh bìa
+     * @return Response chứa comic đã tạo
+     */
     @PostMapping(value = "/comics")
     public BaseResponse<?> createComic(
             @Valid @RequestPart("data") ComicRequest comicRequest,
@@ -85,6 +120,15 @@ public class PublisherController {
         return comicService.createComic(comicRequest, cover, currentUser);
     }
 
+    /**
+     * Cập nhật comic
+     * PUT /publisher/comics/{comicId}
+     * 
+     * @param comicId      ID comic
+     * @param comicRequest Dữ liệu comic
+     * @param cover        Ảnh bìa
+     * @return Response chứa comic đã cập nhật
+     */
     @PutMapping(value = "/comics/{comicId}")
     public BaseResponse<?> updateComic(@PathVariable String comicId,
             @Valid @RequestPart("data") ComicRequest comicRequest,
@@ -93,6 +137,13 @@ public class PublisherController {
         return comicService.updateComic(comicId, comicRequest, cover, currentUser);
     }
 
+    /**
+     * Xóa comic
+     * DELETE /publisher/comics/{comicId}
+     * 
+     * @param comicId ID comic
+     * @return Response chứa comic đã xóa
+     */
     @DeleteMapping("/comics/{comicId}")
     public BaseResponse<?> deleteComic(@PathVariable String comicId) {
         User currentUser = securityUtils.getCurrentUser();
@@ -100,6 +151,17 @@ public class PublisherController {
     }
 
     // ==================== CHAPTER MANAGEMENT ====================
+
+    /**
+     * Lấy danh sách chapter của user
+     * GET /publisher/chapters
+     * 
+     * @param page    Trang hiện tại
+     * @param limit   Số lượng mỗi trang
+     * @param search  Từ khóa tìm kiếm
+     * @param comicId ID comic
+     * @return Response chứa danh sách chapter của user
+     */
     @GetMapping("/chapters")
     public BaseResponse<?> getAllChapters(
             @RequestParam(defaultValue = "1") int page,
@@ -110,6 +172,14 @@ public class PublisherController {
         return publisherService.getAllChapters(currentUser, page, limit, search, comicId);
     }
 
+    /**
+     * Tạo chapter mới
+     * POST /publisher/chapters
+     * 
+     * @param request Dữ liệu chapter
+     * @param files   Danh sách ảnh
+     * @return Response chứa chapter đã tạo
+     */
     @PostMapping("/chapters")
     public BaseResponse<?> createChapter(
             @Valid @RequestPart("data") ChapterRequest request,
@@ -118,6 +188,15 @@ public class PublisherController {
         return chapterService.createChapter(request, files, currentUser);
     }
 
+    /**
+     * Cập nhật chapter
+     * PUT /publisher/chapters/{chapterId}
+     * 
+     * @param chapterId ID chapter
+     * @param request   Dữ liệu chapter
+     * @param files     Danh sách ảnh
+     * @return Response chứa chapter đã cập nhật
+     */
     @PutMapping("/chapters/{chapterId}")
     public BaseResponse<?> updateChapterWithImages(
             @PathVariable String chapterId,
@@ -127,6 +206,13 @@ public class PublisherController {
         return chapterService.updateChapter(chapterId, request, files, currentUser);
     }
 
+    /**
+     * Xóa chapter
+     * DELETE /publisher/chapters/{chapterId}
+     * 
+     * @param chapterId ID chapter
+     * @return Response chứa chapter đã xóa
+     */
     @DeleteMapping("/chapters/{chapterId}")
     public BaseResponse<?> deleteChapter(
             @PathVariable String chapterId) {

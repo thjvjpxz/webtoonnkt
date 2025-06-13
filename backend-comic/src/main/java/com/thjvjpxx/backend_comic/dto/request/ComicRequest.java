@@ -7,6 +7,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa comic
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ComicRequest {

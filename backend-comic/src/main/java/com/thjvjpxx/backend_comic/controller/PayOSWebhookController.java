@@ -12,7 +12,6 @@ import com.thjvjpxx.backend_comic.service.TransactionService;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
@@ -23,7 +22,6 @@ import vn.payos.type.WebhookData;
 @RestController
 @RequestMapping("/webhook/payos")
 @RequiredArgsConstructor
-@Slf4j
 public class PayOSWebhookController {
 
     private final PayOSService payOSService;
@@ -34,22 +32,18 @@ public class PayOSWebhookController {
 
     /**
      * Đăng ký webhook URL với PayOS khi ứng dụng khởi động
+     * 
+     * POST /webhook/payos
+     * 
+     * @return Response chứa thông báo thành công
      */
     @PostConstruct
     public void registerWebhook() {
         try {
             String finalWebhookUrl = backendUrl + "/api/webhook/payos/payment";
-
-            log.info("Đăng ký webhook URL với PayOS: {}", finalWebhookUrl);
-
-            String result = payOSService.confirmWebhook(finalWebhookUrl);
-
-            log.info("Đăng ký webhook thành công: {}", result);
-
+            payOSService.confirmWebhook(finalWebhookUrl);
         } catch (Exception e) {
-            log.error("Lỗi khi đăng ký webhook với PayOS: {}", e.getMessage(), e);
-            // Không throw exception để app vẫn có thể khởi động
-            // throw new BaseException(ErrorCode.HAS_ERROR);
+            e.printStackTrace();
         }
     }
 
@@ -57,29 +51,24 @@ public class PayOSWebhookController {
      * Xử lý webhook notification từ PayOS
      * PayOS sẽ gọi endpoint này khi có thay đổi trạng thái thanh toán
      * 
+     * POST /webhook/payos/payment
+     * 
      * @param webhookBody Dữ liệu webhook từ PayOS
      * @return Response xác nhận đã nhận webhook
      */
     @PostMapping("/payment")
     public ResponseEntity<String> handlePaymentWebhook(@RequestBody Webhook webhookBody) {
         try {
-            log.info("Nhận webhook từ PayOS: code={}, desc={}",
-                    webhookBody.getCode(), webhookBody.getDesc());
-
             // Bước 1: Xác minh tính xác thực của webhook
             WebhookData webhookData = payOSService.verifyPaymentWebhookData(webhookBody);
 
             if (webhookData == null) {
-                log.warn("Webhook data không hợp lệ - signature không khớp");
                 return ResponseEntity.badRequest().body("Invalid webhook signature");
             }
 
             // Bước 2: Xử lý theo trạng thái thanh toán
             String paymentStatus = webhookData.getCode();
             Long orderCode = webhookData.getOrderCode();
-
-            log.info("Xử lý webhook cho order code: {}, status: {}, amount: {} VND",
-                    orderCode, paymentStatus, webhookData.getAmount());
 
             switch (paymentStatus) {
                 case "00": // Thanh toán thành công
@@ -95,7 +84,6 @@ public class PayOSWebhookController {
                     break;
 
                 default:
-                    log.warn("Nhận được webhook với status không xác định: {}", paymentStatus);
                     break;
             }
 
@@ -103,8 +91,6 @@ public class PayOSWebhookController {
             return ResponseEntity.ok("OK");
 
         } catch (Exception e) {
-            log.error("Lỗi khi xử lý webhook từ PayOS: {}", e.getMessage(), e);
-
             // Trả về lỗi để PayOS thử gửi lại webhook
             return ResponseEntity.internalServerError().body("Internal server error");
         }
@@ -112,6 +98,8 @@ public class PayOSWebhookController {
 
     /**
      * Xử lý thanh toán thành công
+     * 
+     * @param webhookData Dữ liệu webhook từ PayOS
      */
     private void handleSuccessfulPayment(WebhookData webhookData) {
         try {
@@ -119,37 +107,27 @@ public class PayOSWebhookController {
             String payosTransactionId = webhookData.getReference();
             String reference = webhookData.getReference();
 
-            log.info("Xử lý thanh toán thành công cho order: {}, transaction: {}",
-                    orderCode, payosTransactionId);
-
             // Gọi service để confirm payment và cập nhật số dư user
             transactionService.confirmPayment(orderCode, payosTransactionId, reference);
 
-            log.info("Đã cập nhật thành công giao dịch cho order: {}", orderCode);
-
         } catch (Exception e) {
-            log.error("Lỗi khi xử lý thanh toán thành công: {}", e.getMessage(), e);
             throw e; // Re-throw để PayOS gửi lại webhook
         }
     }
 
     /**
      * Xử lý thanh toán thất bại hoặc bị hủy
+     * 
+     * @param webhookData Dữ liệu webhook từ PayOS
      */
     private void handleFailedPayment(WebhookData webhookData) {
         try {
             Long orderCode = webhookData.getOrderCode();
-            String reason = webhookData.getDesc();
-
-            log.info("Xử lý thanh toán thất bại cho order: {}, lý do: {}", orderCode, reason);
 
             // Gọi service để cancel payment
             transactionService.cancelPayment(orderCode);
 
-            log.info("Đã hủy giao dịch cho order: {}", orderCode);
-
         } catch (Exception e) {
-            log.error("Lỗi khi xử lý thanh toán thất bại: {}", e.getMessage(), e);
             throw e; // Re-throw để PayOS gửi lại webhook
         }
     }
