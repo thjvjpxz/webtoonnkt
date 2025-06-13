@@ -28,7 +28,6 @@ export type SidebarProps = {
   toggleSidebar: () => void;
 };
 
-
 export type PaginationProps = {
   currentPage: number;
   totalPages: number;

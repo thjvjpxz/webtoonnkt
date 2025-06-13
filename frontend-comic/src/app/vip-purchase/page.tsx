@@ -45,7 +45,7 @@ export default function VipPurchasePage() {
             }
           } catch (error) {
             // Không hiển thị lỗi nếu user chưa có VIP
-            console.log("User chưa có VIP subscription");
+            console.log("User chưa có VIP subscription", error);
           }
         }
       } catch (error) {
@@ -81,7 +81,7 @@ export default function VipPurchasePage() {
             refreshToken();
           }
         } catch (error) {
-          console.log("Không thể tải lại thông tin VIP");
+          console.log("Không thể tải lại thông tin VIP", error);
         }
       } else {
         toast.error(response.message || "Có lỗi xảy ra khi mua gói VIP");

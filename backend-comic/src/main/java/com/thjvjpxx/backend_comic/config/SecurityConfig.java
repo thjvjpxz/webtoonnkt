@@ -76,6 +76,7 @@ public class SecurityConfig {
 						.requestMatchers("/comments/user/*").hasRole("ADMIN")
 						.requestMatchers("/comments?*").hasRole("ADMIN")
 						.requestMatchers("/vip-packages/**").hasRole("ADMIN")
+						.requestMatchers("/admin/statistics/**").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
 						.requestMatchers("/publisher/**").hasAnyRole("PUBLISHER", "ADMIN")
