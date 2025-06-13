@@ -15,6 +15,7 @@ import {
   FiAward,
   FiPackage,
   FiCreditCard,
+  FiUserCheck,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 
@@ -72,6 +73,11 @@ export default function Sidebar({
       path: "/admin/users",
       icon: <FiUsers size={20} />,
       label: "Quản lý người dùng",
+    },
+    {
+      path: "/admin/publisher-requests",
+      icon: <FiUserCheck size={20} />,
+      label: "Yêu cầu nhà xuất bản",
     },
     {
       path: "/admin/transactions",
