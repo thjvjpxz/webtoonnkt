@@ -3,6 +3,7 @@ import Image from "next/image";
 import { IoMdClose } from "react-icons/io";
 import { formatDate, constructImageUrl } from "@/utils/helpers";
 import { Button } from "@/components/ui/button";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ViewChapterModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ export default function ViewChapterModal({
       <div className="relative max-w-4xl w-full bg-white rounded-lg shadow-xl dark:bg-gray-800 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-            {chapter.title} - Chương {chapter.chapterNumber}
+            {chapter.title} - Chapter {chapter.chapterNumber}
           </h3>
           <button
             onClick={onClose}
@@ -35,7 +36,7 @@ export default function ViewChapterModal({
         <div className="p-6">
           <div className="mb-4">
             <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-              Thông tin chương
+              Thông tin chapter
             </p>
             <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -43,7 +44,7 @@ export default function ViewChapterModal({
                 <p className="font-medium text-gray-900 dark:text-white">{chapter.comicName}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Chương số</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Chapter số</p>
                 <p className="font-medium text-gray-900 dark:text-white">{chapter.chapterNumber}</p>
               </div>
               <div>
@@ -81,7 +82,7 @@ export default function ViewChapterModal({
 
           <div className="mt-6">
             <p className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
-              Nội dung chương
+              Nội dung chapter
             </p>
 
             <div className="mt-4 space-y-8">
@@ -92,7 +93,7 @@ export default function ViewChapterModal({
                     <div key={image.id} className="mb-0">
                       <div className="relative w-full">
                         <Image
-                          src={constructImageUrl(chapter, image.imgUrl)}
+                          src={chooseImageUrl(constructImageUrl(chapter, image.imgUrl))}
                           alt={`Trang ${image.orderNumber}`}
                           width={1500}
                           height={2400}
@@ -106,7 +107,7 @@ export default function ViewChapterModal({
                   ))
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 italic">
-                  Không có hình ảnh nào cho chương này
+                  Không có hình ảnh nào cho chapter này
                 </p>
               )}
             </div>

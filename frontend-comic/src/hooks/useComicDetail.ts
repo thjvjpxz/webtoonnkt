@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 import { useState } from "react";
 import { checkFollowComic, followComic, unfollowComic } from "@/services/comicDetailService";
+import { buyChapter } from "@/services/homeService";
 import toast from "react-hot-toast";
 import { ComicDetailResponse } from "@/types/comic";
 
@@ -12,8 +13,9 @@ export default function useComicDetail(comicDetailResponse: ComicDetailResponse)
   const [showAllChapters, setShowAllChapters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [followersCount, setFollowersCount] = useState(comicDetailResponse.followersCount);
+  const [buyingChapters, setBuyingChapters] = useState<Set<string>>(new Set());
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -77,6 +79,49 @@ export default function useComicDetail(comicDetailResponse: ComicDetailResponse)
     }
   };
 
+  const handleBuyChapter = async (chapterId: string) => {
+    if (!isAuthenticated || !user) {
+      toast.error("Vui lòng đăng nhập để mua chương");
+      return;
+    }
+
+    // Tìm chapter để kiểm tra hasPurchased
+    const chapter = comicDetailResponse.chapters.find(ch => ch.id === chapterId);
+    if (chapter?.hasPurchased) {
+      toast.error("Bạn đã sở hữu chương này");
+      return;
+    }
+
+    if (buyingChapters.has(chapterId)) {
+      return; // Đang trong quá trình mua
+    }
+
+    setBuyingChapters(prev => new Set(prev).add(chapterId));
+
+    try {
+      const response = await buyChapter(chapterId);
+      if (response.status === 200) {
+        toast.success("Mua chương thành công!");
+
+        // Cập nhật hasPurchased trong chapter
+        if (chapter) {
+          chapter.hasPurchased = true;
+        }
+      } else {
+        toast.error(response.message || "Lỗi khi mua chương");
+      }
+    } catch (error) {
+      console.error("Error buying chapter:", error);
+      toast.error("Có lỗi xảy ra khi mua chương");
+    } finally {
+      setBuyingChapters(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(chapterId);
+        return newSet;
+      });
+    }
+  };
+
   const clearSearch = () => {
     setSearchTerm("");
   };
@@ -89,8 +134,10 @@ export default function useComicDetail(comicDetailResponse: ComicDetailResponse)
     filteredChapters,
     displayedChapters,
     followersCount,
+    buyingChapters,
 
     handleFollow,
+    handleBuyChapter,
     clearSearch,
     setShowAllChapters,
     setSearchTerm,

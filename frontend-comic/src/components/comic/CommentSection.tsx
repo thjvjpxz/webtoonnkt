@@ -51,7 +51,7 @@ export default function CommentSection({
     toggleReplies,
   } = useCommentUser({ comicId, chapterId, mode });
 
-  const sectionTitle = title || (mode === "comic" ? "Bình luận truyện" : "Bình luận chương");
+  const sectionTitle = title || (mode === "comic" ? "Bình luận truyện" : "Bình luận chapter");
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -79,7 +79,7 @@ export default function CommentSection({
               </span>
             </div>
             <Textarea
-              placeholder={mode === "comic" ? "Chia sẻ cảm nghĩ của bạn về bộ truyện này..." : "Chia sẻ cảm nghĩ của bạn về chương này..."}
+              placeholder={mode === "comic" ? "Chia sẻ cảm nghĩ của bạn về bộ truyện này..." : "Chia sẻ cảm nghĩ của bạn về chapter này..."}
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className="mb-3 min-h-[100px] border-gray-300 dark:border-gray-600 focus:border-primary text-sm sm:text-base rounded"

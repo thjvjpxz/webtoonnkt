@@ -30,3 +30,13 @@ export const verifyEmail = async (token: string) => {
 
   return response;
 };
+
+export const refreshTokenService = async (refreshToken: string) => {
+  const url = '/auth/refresh';
+  const response = await fetchApi<LoginResponse>(url, {
+    method: 'POST',
+    data: { refreshToken },
+  });
+
+  return response;
+};

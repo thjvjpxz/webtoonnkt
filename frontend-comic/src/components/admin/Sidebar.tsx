@@ -13,17 +13,21 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiAward,
+  FiPackage,
+  FiCreditCard,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 
 export interface SidebarProps {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+  isPublisher: boolean;
 }
 
 export default function Sidebar({
   isSidebarOpen,
   toggleSidebar,
+  isPublisher,
 }: SidebarProps) {
   const pathname = usePathname();
 
@@ -32,36 +36,52 @@ export default function Sidebar({
   };
 
   const navItems = [
-    { path: "/admin/dashboard", icon: <FiHome size={20} />, label: "Tổng quan" },
+    {
+      path: "/admin/dashboard",
+      icon: <FiHome size={20} />,
+      label: "Tổng quan",
+    },
     {
       path: "/admin/categories",
       icon: <FiTag size={20} />,
-      label: "Thể loại",
+      label: "Quản lý thể loại",
     },
     {
       path: "/admin/comics",
       icon: <FiBook size={20} />,
       label: "Quản lý truyện",
-    },
-    {
-      path: "/admin/levels",
-      icon: <FiAward size={20} />,
-      label: "Cấp độ",
+      show: isPublisher
     },
     {
       path: "/admin/chapters",
       icon: <FiFileText size={20} />,
       label: "Quản lý chương",
+      show: isPublisher
+    },
+    {
+      path: "/admin/vip-packages",
+      icon: <FiPackage size={20} />,
+      label: "Quản lý gói VIP",
+    },
+    {
+      path: "/admin/levels",
+      icon: <FiAward size={20} />,
+      label: "Quản lý cấp độ",
     },
     {
       path: "/admin/users",
       icon: <FiUsers size={20} />,
-      label: "Người dùng",
+      label: "Quản lý người dùng",
+    },
+    {
+      path: "/admin/transactions",
+      icon: <FiCreditCard size={20} />,
+      label: "Lịch sử giao dịch",
     },
     {
       path: "/admin/comments",
       icon: <FiMessageSquare size={20} />,
-      label: "Bình luận",
+      label: "Quản lý bình luận",
     },
   ];
 
@@ -109,22 +129,41 @@ export default function Sidebar({
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar">
         <ul className="space-y-2 px-3">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                href={item.path}
-                className={`flex items-center p-3 rounded-lg transition-all duration-200 ${isActive(item.path)
-                  ? "text-sidebar-primary bg-sidebar-accent font-medium shadow-soft"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                  }`}
-              >
-                <span className={isActive(item.path) ? "text-primary" : ""}>
-                  {item.icon}
-                </span>
-                {isSidebarOpen && <span className="ml-3">{item.label}</span>}
-              </Link>
-            </li>
-          ))}
+          {!isPublisher ?
+            navItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  className={`flex items-center p-3 rounded-lg transition-all duration-200 ${isActive(item.path)
+                    ? "text-sidebar-primary bg-sidebar-accent font-medium shadow-soft"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    }`}
+                >
+                  <span className={isActive(item.path) ? "text-primary" : ""}>
+                    {item.icon}
+                  </span>
+                  {isSidebarOpen && <span className="ml-3">{item.label}</span>}
+                </Link>
+              </li>
+            ))
+            :
+            navItems.map((item) => (
+              <li key={item.path} className={item.show ? "block" : "hidden"}>
+                <Link
+                  href={item.path}
+                  className={`flex items-center p-3 rounded-lg transition-all duration-200 ${isActive(item.path)
+                    ? "text-sidebar-primary bg-sidebar-accent font-medium shadow-soft"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    }`}
+                >
+                  <span className={isActive(item.path) ? "text-primary" : ""}>
+                    {item.icon}
+                  </span>
+                  {isSidebarOpen && <span className="ml-3">{item.label}</span>}
+                </Link>
+              </li>
+            ))
+          }
         </ul>
       </nav>
     </div>

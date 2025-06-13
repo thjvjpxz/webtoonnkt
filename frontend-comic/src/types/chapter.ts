@@ -1,3 +1,5 @@
+import { LevelResponse } from "./level";
+
 export interface Chapter {
   id: string;
   chapterNumber: number;
@@ -11,7 +13,10 @@ export interface Chapter {
   imageCount: number;
   createdAt: string;
   updatedAt: string;
+  hasPurchased: boolean;
   chapterSummaries?: ChapterSummary[];
+  publisherName?: string;
+  publisherLevel?: LevelResponse;
 }
 
 export interface ChapterSummary {
@@ -32,6 +37,7 @@ export interface ChapterCreateUpdate {
   status: ChapterStatus;
   price?: number;
   detailChapters: DetailChapterCreateUpdate[];
+  isFileUploaded: boolean;
 }
 
 export interface ChapterImage {
@@ -61,8 +67,6 @@ export enum ChapterStatus {
 export interface DetailChapterCreateUpdate {
   imgUrl: string;
   orderNumber: number;
-  newImage: boolean;
-  hasRemove: boolean;
 }
 
 export interface DetailChapter {

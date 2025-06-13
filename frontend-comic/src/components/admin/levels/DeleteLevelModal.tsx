@@ -33,13 +33,13 @@ export default function DeleteLevelModal({
     try {
       await onConfirm();
     } catch (error) {
-      console.error("Lỗi khi xóa level:", error);
+      console.error("Lỗi khi xóa cấp độ:", error);
       setIsDeleting(false);
       onClose();
     }
   };
 
-  const itemTypeText = itemType === "level" ? "level" : "loại level";
+  const itemTypeText = itemType === "level" ? "cấp độ" : "loại cấp độ";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

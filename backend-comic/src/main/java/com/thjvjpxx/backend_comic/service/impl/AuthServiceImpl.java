@@ -65,10 +65,18 @@ public class AuthServiceImpl implements AuthService {
             throw new BaseException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
-        // Kiểm tra trạng thái tài khoản
-        if (!user.getActive() && !user.getRole().getName().equals("ADMIN")) {
-            throw new BaseException(ErrorCode.USER_INACTIVE);
+        if (user.getBlocked()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_BLOCKED);
         }
+
+        if (user.getDeleted()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
+        // // Kiểm tra trạng thái tài khoản
+        // if (!user.getActive() && !user.getRole().getName().equals("ADMIN")) {
+        // throw new BaseException(ErrorCode.USER_INACTIVE);
+        // }
 
         // Tạo token
         String accessToken = jwtConfig.generateToken(user.getUsername());

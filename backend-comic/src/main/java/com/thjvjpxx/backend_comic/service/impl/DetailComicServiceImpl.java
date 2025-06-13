@@ -2,7 +2,9 @@ package com.thjvjpxx.backend_comic.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,12 +22,14 @@ import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.ComicViewsHistory;
 import com.thjvjpxx.backend_comic.model.DetailChapter;
+import com.thjvjpxx.backend_comic.model.PurchasedChapter;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.model.UserFollow;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.repository.ComicViewsHistoryRepository;
 import com.thjvjpxx.backend_comic.repository.DetailChapterRepository;
+import com.thjvjpxx.backend_comic.repository.PurchasedChapterRepository;
 import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.DetailComicService;
@@ -45,9 +49,10 @@ public class DetailComicServiceImpl implements DetailComicService {
     UserRepository userRepo;
     DetailChapterRepository detailChapterRepo;
     ComicViewsHistoryRepository comicViewsHistoryRepo;
+    PurchasedChapterRepository purchasedChapterRepo;
 
     @Override
-    public BaseResponse<?> getComicDetail(String slug) {
+    public BaseResponse<?> getComicDetail(String slug, User user) {
         Optional<Comic> comicOpt = comicRepo.findBySlug(slug);
         if (comicOpt.isEmpty()) {
             throw new BaseException(ErrorCode.COMIC_NOT_FOUND);
@@ -55,6 +60,17 @@ public class DetailComicServiceImpl implements DetailComicService {
         Comic comic = comicOpt.get();
 
         List<Chapter> chapters = chapterRepo.findByComicId(comic.getId());
+
+        // Tạo Map chứa thông tin chapter đã mua nếu user đăng nhập
+        Map<String, Boolean> purchasedChaptersMap = new HashMap<>();
+        if (user != null) {
+            List<PurchasedChapter> purchasedChapters = purchasedChapterRepo.findByUserAndComic(user, comic);
+            purchasedChaptersMap = purchasedChapters.stream()
+                    .collect(Collectors.toMap(
+                            pc -> pc.getChapter().getId(),
+                            pc -> true));
+        }
+        final Map<String, Boolean> finalPurchasedChaptersMap = purchasedChaptersMap;
 
         List<ChapterSummary> chapterSummaries = chapters.stream()
                 .map(chapter -> ChapterSummary.builder()
@@ -65,8 +81,11 @@ public class DetailComicServiceImpl implements DetailComicService {
                         .chapterNumber(chapter.getChapterNumber())
                         .price(chapter.getPrice())
                         .status(chapter.getStatus().name())
-                        .createdAt(chapter.getCreatedAt().toString())
-                        .updatedAt(chapter.getUpdatedAt().toString())
+                        .hasPurchased(
+                                user != null ? finalPurchasedChaptersMap.getOrDefault(chapter.getId(), chapter.isFree())
+                                        : null)
+                        .createdAt(chapter.getCreatedAt())
+                        .updatedAt(chapter.getUpdatedAt())
                         .build())
                 .sorted((a, b) -> Double.compare(a.getChapterNumber(), b.getChapterNumber()))
                 .collect(Collectors.toList());
@@ -82,9 +101,10 @@ public class DetailComicServiceImpl implements DetailComicService {
                 .followersCount(comic.getFollowersCount())
                 .viewsCount(comic.getViewsCount())
                 .description(comic.getDescription())
-                .lastChapterId(comic.getLastChapterId())
                 .categories(comic.getCategories().stream().collect(Collectors.toList()))
                 .chapters(chapterSummaries)
+                .createdAt(comic.getCreatedAt())
+                .updatedAt(comic.getUpdatedAt())
                 .build();
 
         return BaseResponse.success(response);
@@ -154,13 +174,30 @@ public class DetailComicServiceImpl implements DetailComicService {
     }
 
     @Override
-    public BaseResponse<?> getChapterDetail(String chapterId) {
+    public BaseResponse<?> getChapterDetail(String chapterId, String currentUserId) {
         Chapter chapter = chapterRepo.findById(chapterId)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
+
+        // Kiểm tra quyền truy cập chapter có phí
+        if (!chapter.isFree() && currentUserId != null) {
+            // User đã đăng nhập, kiểm tra đã mua chapter chưa
+            User currentUser = userRepo.findById(currentUserId)
+                    .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+
+            boolean hasPurchased = purchasedChapterRepo.existsByUserAndChapter(currentUser, chapter);
+            if (!hasPurchased && !currentUser.getVip()) {
+                throw new BaseException(ErrorCode.CHAPTER_NOT_PURCHASED);
+            }
+        } else if (!chapter.isFree() && currentUserId == null) {
+            // User chưa đăng nhập và chapter có phí
+            throw new BaseException(ErrorCode.CHAPTER_REQUIRES_LOGIN);
+        }
+
         List<DetailChapter> detailChapters = detailChapterRepo.findByChapterId(chapterId);
         if (detailChapters.isEmpty()) {
             throw new BaseException(ErrorCode.DETAIL_CHAPTER_NOT_FOUND);
         }
+
         // Tăng số lượt xem truyện
         Comic comic = chapter.getComic();
         incrementViewsCount(comic);

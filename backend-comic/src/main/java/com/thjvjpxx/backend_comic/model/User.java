@@ -54,6 +54,8 @@ public class User {
 
     Boolean blocked = false;
 
+    Boolean deleted = false;
+
     @Column(name = "verification_token")
     String verificationToken;
 
@@ -62,7 +64,7 @@ public class User {
     Role role;
 
     @Column(name = "balance", nullable = false)
-    Double balance = 0.0;
+    Double balance = 0.0; // Số linh thạch hiện có (1 linh thạch = 1000 VND)
 
     @Column(name = "last_topup")
     Timestamp lastTopup;

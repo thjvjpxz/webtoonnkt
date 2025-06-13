@@ -6,14 +6,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.model.User;
 
 public interface ChapterService {
 
     BaseResponse<?> getAllChapters(int page, int limit, String search, String comicId);
 
-    BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files);
+    BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files, User publisher);
 
-    BaseResponse<?> updateChapter(String id, ChapterRequest chapterRequest, List<MultipartFile> files);
+    BaseResponse<?> updateChapter(String id, ChapterRequest chapterRequest, List<MultipartFile> files, User publisher);
 
-    BaseResponse<?> deleteChapter(String id);
+    BaseResponse<?> deleteChapter(String id, User publisher);
 }

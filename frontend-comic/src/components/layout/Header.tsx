@@ -19,7 +19,8 @@ import {
   FiLogOut,
   FiX,
   FiSettings,
-  FiBookOpen
+  FiBookOpen,
+  FiDollarSign
 } from "react-icons/fi";
 import { useState } from "react";
 import LoginModal from "../auth/LoginModal";
@@ -27,13 +28,14 @@ import RegisterModal from "../auth/RegisterModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useRouter } from "next/navigation";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { user, isAuthenticated, logout, isAdmin } = useAuthState();
+  const { user, isAuthenticated, logout, isAdmin, isPublisher } = useAuthState();
   const router = useRouter();
 
   // Auth modals
@@ -63,7 +65,7 @@ export default function Header() {
         >
           {user?.imgUrl ? (
             <Image
-              src={user.imgUrl}
+              src={chooseImageUrl(user.imgUrl)}
               alt={user.username}
               fill
               sizes="36px"
@@ -88,7 +90,7 @@ export default function Header() {
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
           {user?.imgUrl ? (
             <Image
-              src={user.imgUrl}
+              src={chooseImageUrl(user.imgUrl)}
               alt={user.username}
               width={48}
               height={48}
@@ -143,6 +145,15 @@ export default function Header() {
           </Link>
         </DropdownMenuItem>
 
+        <DropdownMenuItem asChild>
+          <Link href="/transactions" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <FiDollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+            </div>
+            <span className="font-medium">Lịch sử giao dịch</span>
+          </Link>
+        </DropdownMenuItem>
+
         {/* Menu Admin - chỉ hiển thị cho ADMIN */}
         {isAdmin() && (
           <DropdownMenuItem asChild>
@@ -151,6 +162,16 @@ export default function Header() {
                 <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               </div>
               <span className="font-medium">Quản lý Admin</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {isPublisher() && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/comics" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="font-medium">Quản lý truyện</span>
             </Link>
           </DropdownMenuItem>
         )}

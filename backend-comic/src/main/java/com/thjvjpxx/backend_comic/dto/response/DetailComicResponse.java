@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.thjvjpxx.backend_comic.model.Category;
@@ -30,8 +31,8 @@ public class DetailComicResponse {
     String lastChapterId;
     List<Category> categories;
     List<ChapterSummary> chapters;
-    String createdAt;
-    String updatedAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 
     @Data
     @NoArgsConstructor
@@ -46,7 +47,8 @@ public class DetailComicResponse {
         Double chapterNumber;
         Double price;
         String status;
-        String createdAt;
-        String updatedAt;
+        Boolean hasPurchased;
+        LocalDateTime createdAt;
+        LocalDateTime updatedAt;
     }
 }

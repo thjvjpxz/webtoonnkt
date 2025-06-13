@@ -20,4 +20,9 @@ public class ComicRequest {
     String thumbUrl;
     String originName;
     List<String> categories;
+
+    Boolean isSlugChanged = false;
+    Boolean isThumbUrlChanged = false;
+    Boolean isCategoriesChanged = false;
+    Boolean shouldRemoveThumbnail = false;
 }

@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
@@ -43,5 +44,6 @@ public class DetailChapter {
 
     @ManyToOne
     @JoinColumn(name = "chapter_id", nullable = false)
+    @JsonIgnore
     Chapter chapter;
 }

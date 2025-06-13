@@ -7,6 +7,8 @@ import {
   FiGrid,
   FiMenu,
   FiX,
+  FiStar,
+  FiCreditCard,
 } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 
@@ -28,6 +30,16 @@ const navItems: NavItem[] = [
     label: "Thể loại",
     href: "/category",
     icon: <FiGrid className="w-4 h-4" />,
+  },
+  {
+    label: "Mua VIP",
+    href: "/vip-purchase",
+    icon: <FiStar className="w-4 h-4" />,
+  },
+  {
+    label: "Nạp tiền",
+    href: "/payment",
+    icon: <FiCreditCard className="w-4 h-4" />,
   },
 ];
 

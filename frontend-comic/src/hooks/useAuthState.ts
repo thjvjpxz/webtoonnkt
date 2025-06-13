@@ -5,7 +5,7 @@ import { login as loginAPI, register as registerAPI } from "@/services/authServi
 import toast from "react-hot-toast";
 
 export function useAuthState() {
-  const { login: authLogin, logout: authLogout, user, isAuthenticated, isLoading, redirectToHome } = useAuth();
+  const { login: authLogin, logout: authLogout, user, isAuthenticated, isLoading, redirectToHome, refreshToken: authRefreshToken } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Login với better error handling
@@ -30,6 +30,12 @@ export function useAuthState() {
       setIsSubmitting(false);
     }
   }, [authLogin]);
+
+  // Re-login with refresh token
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    const response = await authRefreshToken();
+    return response;
+  }, [authRefreshToken]);
 
   // Register với better error handling
   const register = useCallback(async (credentials: RegisterRequest): Promise<boolean> => {
@@ -97,6 +103,7 @@ export function useAuthState() {
     login,
     register,
     logout,
+    refreshToken,
 
     // Helper functions
     hasRole,

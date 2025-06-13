@@ -35,6 +35,7 @@ import {
   FiPause,
   FiPlay
 } from 'react-icons/fi';
+import { chooseImageUrl } from '@/utils/string';
 
 interface ReadComicProps {
   chapter: Chapter;
@@ -257,7 +258,7 @@ export default function ReadComic({
             {detailChapters.map((image, index) => (
               <div key={image.id} className="relative">
                 <Image
-                  src={constructImageUrl(chapter, image.imgUrl)}
+                  src={chooseImageUrl(constructImageUrl(chapter, image.imgUrl))}
                   alt={`Trang ${index + 1}`}
                   width={800}
                   height={1200}
@@ -329,7 +330,7 @@ export default function ReadComic({
             {/* Container ảnh chính */}
             <div className="flex-1 relative flex items-center justify-center bg-gray-50 dark:bg-gray-900">
               <Image
-                src={constructImageUrl(chapter, detailChapters[currentPage].imgUrl)}
+                src={chooseImageUrl(constructImageUrl(chapter, detailChapters[currentPage].imgUrl))}
                 alt={`Trang ${currentPage + 1}`}
                 fill
                 className="object-contain"

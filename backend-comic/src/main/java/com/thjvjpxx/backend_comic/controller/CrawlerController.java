@@ -1,6 +1,9 @@
 package com.thjvjpxx.backend_comic.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.thjvjpxx.backend_comic.dto.request.CrawlerComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
@@ -10,8 +13,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/crawler")
@@ -19,19 +20,9 @@ import java.util.UUID;
 public class CrawlerController {
     CrawlerService crawlerService;
 
-    @PostMapping("/start")
+    @PostMapping
     public BaseResponse<?> startCrawlComic(@RequestBody CrawlerComicRequest request) {
-        String sessionId = UUID.randomUUID().toString();
-        return crawlerService.startCrawlComic(request, sessionId);
+        return crawlerService.crawlComic(request);
     }
 
-    @GetMapping("/status/{sessionId}")
-    public BaseResponse<?> getCrawlStatus(@PathVariable String sessionId) {
-        return crawlerService.getCrawlStatus(sessionId);
-    }
-
-    @PostMapping("/stop/{sessionId}")
-    public BaseResponse<?> stopCrawlTask(@PathVariable String sessionId) {
-        return crawlerService.stopCrawlTask(sessionId);
-    }
 }

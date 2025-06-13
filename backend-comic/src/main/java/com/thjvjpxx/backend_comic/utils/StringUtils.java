@@ -42,4 +42,8 @@ public class StringUtils {
     public static String generateVerificationToken() {
         return UUID.randomUUID().toString();
     }
+
+    public static String getExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
 }

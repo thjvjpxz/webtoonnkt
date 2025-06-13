@@ -17,7 +17,7 @@ public interface LevelRepository extends JpaRepository<Level, String> {
 
     Page<Level> findAll(Pageable pageable);
 
-    Page<Level> findByNameContaining(String name, Pageable pageable);
+    Page<Level> findByNameContainingOrLevelTypeNameContaining(String name, String levelTypeName, Pageable pageable);
 
     Optional<Level> findByName(String name);
 

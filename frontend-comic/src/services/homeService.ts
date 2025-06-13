@@ -1,6 +1,7 @@
-import { ChangePasswordRequest, ComicHome, PopulerToday } from "@/types/home"
-import { fetchApi } from "./api"
+import { ChangePasswordRequest, ComicHome, PopulerToday } from "@/types/home";
 import { UserResponse } from "@/types/user";
+import { fetchApi } from "./api";
+import { VipPackage, VipSubscription } from "@/types/vipPackage";
 
 export const getComicHome = async () => {
   const response = await fetchApi<ComicHome>('/');
@@ -21,11 +22,6 @@ export const getFavoritesComic = async (page: number, limit: number) => {
   const response = await fetchApi<PopulerToday[]>(`/favorites?page=${page}&limit=${limit}`);
   return response;
 }
-
-// export const getHistoryComic = async (page: number, limit: number) => {
-//   const response = await fetchApi<PopulerToday[]>(`/history?page=${page}&limit=${limit}`);
-//   return response;
-// }
 
 export const getProfile = async () => {
   const response = await fetchApi<UserResponse>('/profile');
@@ -49,4 +45,37 @@ export const changePassword = async (data: ChangePasswordRequest) => {
   return response;
 }
 
+// Mua vip
+export const buyVipPackage = async (vipPackageId: string) => {
+  const endpoint = `/purchase/vip`;
 
+  const data = {
+    vipPackageId: vipPackageId,
+  }
+
+  return await fetchApi<VipPackage>(endpoint, {
+    method: "POST",
+    data: data,
+  });
+}
+
+export const getMyVipSubscription = async () => {
+  const endpoint = `/my-vip`
+
+  return await fetchApi<VipSubscription>(endpoint);
+}
+
+
+// Mua chương
+export const buyChapter = async (chapterId: string) => {
+  const endpoint = `/purchase/chapter`;
+
+  const data = {
+    chapterId: chapterId,
+  }
+
+  return await fetchApi<null>(endpoint, {
+    method: "POST",
+    data: data,
+  });
+}

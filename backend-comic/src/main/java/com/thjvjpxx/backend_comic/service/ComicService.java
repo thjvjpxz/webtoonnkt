@@ -1,25 +1,20 @@
 package com.thjvjpxx.backend_comic.service;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
-import com.thjvjpxx.backend_comic.model.Comic;
+import com.thjvjpxx.backend_comic.model.User;
 
 public interface ComicService {
-    BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category);
+    BaseResponse<?> getAllComics(int page, int limit, String search, String status, String category);
 
-    BaseResponse<List<ChapterResponse>> getAllChapters(int page, int limit, String search, String status,
+    BaseResponse<?> getAllChapters(int page, int limit, String search, String status,
             String comicId);
 
-    BaseResponse<Comic> getComicById(String id);
+    BaseResponse<?> createComic(ComicRequest comic, MultipartFile cover, User publisher);
 
-    BaseResponse<Comic> createComic(ComicRequest comic, MultipartFile cover);
+    BaseResponse<?> updateComic(String id, ComicRequest comic, MultipartFile cover, User publisher);
 
-    BaseResponse<Comic> updateComic(String id, ComicRequest comic, MultipartFile cover);
-
-    BaseResponse<Comic> deleteComic(String id);
+    BaseResponse<?> deleteComic(String id, User publisher);
 }

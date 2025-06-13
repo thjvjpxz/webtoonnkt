@@ -1,7 +1,8 @@
 // Service cơ bản để gọi API
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@/types/api';
-import { handleInvalidToken, getAccessToken } from '@/utils/authUtils';
+import { getAccessToken, handleLogout } from '@/utils/authUtils';
+import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -115,8 +116,10 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Token hết hạn hoặc không hợp lệ, xử lý logout và redirect
-      handleInvalidToken();
+      
+      toast.error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      handleLogout();
     }
     return Promise.reject(error);
   }

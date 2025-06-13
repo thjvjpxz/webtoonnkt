@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { chooseImageUrl } from "@/utils/string";
 
 export default function Levels() {
   const {
@@ -77,7 +78,7 @@ export default function Levels() {
   } = useLevel();
 
   return (
-    <DashboardLayout title="Quản lý Level và Loại Level">
+    <DashboardLayout title="Quản lý cấp độ và loại cấp độ">
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "level" | "levelType")} className="mb-6">
         <TabsList className="grid w-full grid-cols-2 bg-muted/50">
@@ -86,14 +87,14 @@ export default function Levels() {
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             <FiAward className="mr-2" size={16} />
-            Quản lý Level
+            Quản lý cấp độ
           </TabsTrigger>
           <TabsTrigger
             value="levelType"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             <FiLayers className="mr-2" size={16} />
-            Quản lý Loại Level
+            Quản lý Loại cấp độ
           </TabsTrigger>
         </TabsList>
 
@@ -104,7 +105,7 @@ export default function Levels() {
             <form onSubmit={handleLevelSearch} className="relative">
               <Input
                 type="text"
-                placeholder="Tìm kiếm level..."
+                placeholder="Tìm kiếm cấp độ..."
                 value={levelSearchTerm}
                 onChange={(e) => setLevelSearchTerm(e.target.value)}
                 className="pl-10 w-full sm:w-80 border-border focus:border-primary"
@@ -118,11 +119,11 @@ export default function Levels() {
             <Button
               onClick={handleOpenAddLevelModal}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              aria-label="Thêm level mới"
-              title="Thêm level mới"
+              aria-label="Thêm cấp độ mới"
+              title="Thêm cấp độ mới"
             >
               <FiPlus className="mr-2" size={18} />
-              Thêm level mới
+              Thêm cấp độ mới
             </Button>
           </div>
 
@@ -131,7 +132,7 @@ export default function Levels() {
             <CardHeader className="border-b border-border/50">
               <CardTitle className="text-foreground flex items-center gap-2">
                 <FiAward className="text-primary" size={20} />
-                Danh sách level
+                Danh sách cấp độ
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -154,17 +155,17 @@ export default function Levels() {
                 <div className="p-12 text-center">
                   <FiAward className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Không có level nào
+                    Không có cấp độ nào
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Chưa có level nào được thêm vào hệ thống.
+                    Chưa có cấp độ nào được thêm vào hệ thống.
                   </p>
                   <Button
                     onClick={handleOpenAddLevelModal}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     <FiPlus className="mr-2" size={18} />
-                    Thêm level mới
+                    Thêm cấp độ mới
                   </Button>
                 </div>
               ) : (
@@ -173,13 +174,13 @@ export default function Levels() {
                     <TableHeader>
                       <TableRow className="border-border/50 hover:bg-muted/30">
                         <TableHead className="font-semibold text-foreground">
-                          Tên level
+                          Tên cấp độ
                         </TableHead>
                         <TableHead className="font-semibold text-foreground text-center">
                           Loại
                         </TableHead>
                         <TableHead className="font-semibold text-foreground text-center">
-                          Số level
+                          Số cấp độ
                         </TableHead>
                         <TableHead className="font-semibold text-foreground text-center">
                           Điểm KN
@@ -201,6 +202,7 @@ export default function Levels() {
                           key={level.id}
                           className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                         >
+                          {/* Tên cấp độ */}
                           <TableCell className="py-4">
                             <div className="font-semibold text-foreground"
                               style={{
@@ -214,21 +216,25 @@ export default function Levels() {
                               {level.name}
                             </div>
                           </TableCell>
+                          {/* Loại cấp độ */}
                           <TableCell className="py-4 text-center">
                             <div className="text-foreground">
                               {level.levelType.name}
                             </div>
                           </TableCell>
+                          {/* Số cấp độ */}
                           <TableCell className="py-4 text-center">
                             <div className="text-foreground">
                               {level.levelNumber}
                             </div>
                           </TableCell>
+                          {/* Điểm KN */}
                           <TableCell className="py-4 text-center">
                             <div className="text-foreground">
                               {level.expRequired.toLocaleString()}
                             </div>
                           </TableCell>
+                          {/* Màu sắc */}
                           <TableCell className="py-4 text-center">
                             <div className="flex justify-center">
                               <div
@@ -237,11 +243,12 @@ export default function Levels() {
                               ></div>
                             </div>
                           </TableCell>
+                          {/* Hình ảnh */}
                           <TableCell className="py-4 text-center">
                             <div className="flex justify-center">
                               {level.urlGif && level.levelNumber !== 1 ? (
                                 <Image
-                                  src={level.urlGif}
+                                  src={chooseImageUrl(level.urlGif)}
                                   alt={level.name}
                                   width={40}
                                   height={40}
@@ -309,7 +316,7 @@ export default function Levels() {
             <form onSubmit={handleLevelTypeSearch} className="relative">
               <Input
                 type="text"
-                placeholder="Tìm kiếm loại level..."
+                placeholder="Tìm kiếm loại cấp độ..."
                 value={levelTypeSearchTerm}
                 onChange={(e) => setLevelTypeSearchTerm(e.target.value)}
                 className="pl-10 w-full sm:w-80 border-border focus:border-primary"
@@ -323,11 +330,11 @@ export default function Levels() {
             <Button
               onClick={handleOpenAddLevelTypeModal}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              aria-label="Thêm loại level mới"
-              title="Thêm loại level mới"
+              aria-label="Thêm loại cấp độ mới"
+              title="Thêm loại cấp độ mới"
             >
               <FiPlus className="mr-2" size={18} />
-              Thêm loại level mới
+              Thêm loại cấp độ mới
             </Button>
           </div>
 
@@ -335,7 +342,7 @@ export default function Levels() {
             <CardHeader className="border-b border-border/50">
               <CardTitle className="text-foreground flex items-center gap-2">
                 <FiLayers className="text-primary" size={20} />
-                Danh sách loại level
+                Danh sách loại cấp độ
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -356,17 +363,17 @@ export default function Levels() {
                 <div className="p-12 text-center">
                   <FiLayers className="w-16 h-16 text-muted-foreground mb-4 mx-auto" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Không có loại level nào
+                    Không có loại cấp độ nào
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Chưa có loại level nào được thêm vào hệ thống.
+                    Chưa có loại cấp độ nào được thêm vào hệ thống.
                   </p>
                   <Button
                     onClick={handleOpenAddLevelTypeModal}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     <FiPlus className="mr-2" size={18} />
-                    Thêm loại level mới
+                    Thêm loại cấp độ mới
                   </Button>
                 </div>
               ) : (
@@ -375,7 +382,7 @@ export default function Levels() {
                     <TableHeader>
                       <TableRow className="border-border/50 hover:bg-muted/30">
                         <TableHead className="font-semibold text-foreground">
-                          Tên loại level
+                          Tên loại cấp độ
                         </TableHead>
                         <TableHead className="font-semibold text-foreground text-center">
                           Ngày tạo

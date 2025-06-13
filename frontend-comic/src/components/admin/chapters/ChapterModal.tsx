@@ -1,21 +1,21 @@
-import { FiPlus, FiUpload, FiX, FiSearch } from "react-icons/fi";
-import Image from "next/image";
 import { useChapterModal } from "@/hooks/useChapterModal";
 import { Chapter, ChapterCreateUpdate, ChapterStatus } from "@/types/chapter";
 import { ComicResponse } from "@/types/comic";
+import Image from "next/image";
+import { useRef } from "react";
+import { FiLoader, FiPlus, FiSearch, FiUpload, FiX } from "react-icons/fi";
 
 // Shadcn/ui components
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,13 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { chooseImageUrl } from "@/utils/string";
 
 interface ChapterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (chapterData: ChapterCreateUpdate, images: File[]) => void;
   chapter?: Chapter | null;
-  comicOptions: ComicResponse[];
 }
 
 export default function ChapterModal({
@@ -37,8 +38,9 @@ export default function ChapterModal({
   onClose,
   onSubmit,
   chapter,
-  comicOptions
 }: ChapterModalProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     // States
     title,
@@ -46,7 +48,6 @@ export default function ChapterModal({
     comicId,
     previewUrls,
     isUploading,
-    dropTargetIndex,
     status,
     price,
     isSubmitting,
@@ -69,12 +70,6 @@ export default function ChapterModal({
     handleSelectComic,
     handleImageChange,
     handleRemoveImage,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnter,
-    handleDragLeave,
-    handleDrop,
-    handleDragEnd,
     handleSubmit,
     handleComicDropdownScroll,
 
@@ -83,10 +78,42 @@ export default function ChapterModal({
     uploadMethod,
     imageLink,
     setUploadMethod,
-    setImageLink,
-    hasValidImageLinks,
-    handleAddMultipleImageLinks
-  } = useChapterModal(isOpen, chapter || null, comicOptions, onSubmit);
+    setImageLink
+  } = useChapterModal(isOpen, chapter || null, onSubmit);
+
+  // Xử lý kéo thả ảnh
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length > 0) {
+      // Tạo FileList từ array
+      const fileList = new DataTransfer();
+      imageFiles.forEach(file => fileList.items.add(file));
+
+      // Tạo event giả để sử dụng handleImageChange
+      const mockEvent = {
+        target: {
+          files: fileList.files
+        }
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+      handleImageChange(mockEvent);
+    }
+  };
+
+  // Xử lý click nút chọn ảnh
+  const handleChooseImage = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -107,7 +134,7 @@ export default function ChapterModal({
               <div className="relative w-full">
                 <Input
                   type="text"
-                  value={comicId ? comicOptions.find(c => c.id === comicId)?.name || "Chọn truyện" : "Chọn truyện"}
+                  value={comicId ? filteredComicOptions.find((c: ComicResponse) => c.id === comicId)?.name || "Chọn truyện" : "Chọn truyện"}
                   placeholder="Chọn truyện..."
                   className="pl-10 pr-10 w-full border-border focus:border-primary cursor-pointer"
                   onClick={() => setIsComicDropdownOpen(!isComicDropdownOpen)}
@@ -153,7 +180,7 @@ export default function ChapterModal({
                               {comic.thumbUrl ? (
                                 <div className="relative h-10 w-8">
                                   <Image
-                                    src={comic.thumbUrl}
+                                    src={chooseImageUrl(comic.thumbUrl)}
                                     alt={comic.name}
                                     fill
                                     sizes="32px"
@@ -190,7 +217,7 @@ export default function ChapterModal({
               </div>
             </div>
 
-            {/* Số chương */}
+            {/* Số chapter */}
             <div className="col-span-2 md:col-span-1">
               <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Số chương <span className="text-red-500">*</span>
@@ -202,11 +229,11 @@ export default function ChapterModal({
                 required
                 min="0"
                 step="0.1"
-                placeholder="Nhập số chương (ví dụ: 1, 1.5, 2,...)"
+                placeholder="Nhập số chapter (ví dụ: 1, 1.5, 2,...)"
               />
             </div>
 
-            {/* Tiêu đề chương */}
+            {/* Tiêu đề chapter */}
             <div className="col-span-2">
               <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tiêu đề chương <span className="text-red-500">*</span>
@@ -256,9 +283,17 @@ export default function ChapterModal({
             {/* Upload ảnh */}
             <div className="col-span-2">
               <div className="flex justify-between items-center mb-4">
-                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Thêm hình ảnh <span className="text-red-500">*</span>
-                </Label>
+                <div>
+                  <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Thêm hình ảnh <span className="text-red-500">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {uploadMethod === 'file'
+                      ? 'Chế độ tải ảnh từ máy tính. Chuyển sang "Nhập link" để dùng URL.'
+                      : 'Chế độ nhập link ảnh. Chuyển sang "Tải ảnh" để upload từ máy tính.'
+                    }
+                  </p>
+                </div>
                 <div className="flex items-center gap-2">
                   <Button
                     type="button"
@@ -281,8 +316,22 @@ export default function ChapterModal({
 
               {uploadMethod === 'file' ? (
                 <>
+                  {/* Input file ẩn luôn tồn tại để nút "Thêm ảnh" có thể hoạt động */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+
                   {previewUrls.length === 0 && (
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4">
+                    <div
+                      className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mb-4 hover:border-primary transition-colors"
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                    >
                       <div className="flex flex-col items-center justify-center py-6">
                         <FiUpload className="w-12 h-12 text-gray-400 mb-2" />
                         <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-1">
@@ -291,76 +340,49 @@ export default function ChapterModal({
                         <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
                           Hỗ trợ JPG, PNG, WEBP
                         </p>
-                        <label className="cursor-pointer">
-                          <Button type="button" variant="default">
-                            Chọn ảnh
-                          </Button>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageChange}
-                            className="hidden"
-                            disabled={previewUrls.length >= 20}
-                          />
-                        </label>
+                        <Button
+                          type="button"
+                          variant="default"
+                          onClick={handleChooseImage}
+                        >
+                          Chọn ảnh
+                        </Button>
                       </div>
                     </div>
                   )}
                 </>
               ) : (
                 <div className="mb-4">
-                  <div className="flex flex-col gap-2 mb-3">
-                    <div className="flex-1">
-                      <Textarea
-                        value={imageLink}
-                        onChange={(e) => setImageLink(e.target.value)}
-                        placeholder="Nhập link ảnh, mỗi link một dòng (https://...)"
-                        className="min-h-[80px]"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="flex justify-end">
-                      <Button
-                        type="button"
-                        variant="default"
-                        onClick={handleAddMultipleImageLinks}
-                        disabled={!hasValidImageLinks(imageLink)}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1"
-                      >
-                        <FiPlus size={16} />
-                        <span>Thêm các link</span>
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Hỗ trợ nhập nhiều link ảnh, mỗi link trên một dòng
-                  </p>
+                  <Textarea
+                    value={imageLink}
+                    onChange={(e) => setImageLink(e.target.value)}
+                    placeholder="Nhập link ảnh, mỗi link một dòng (https://...). Ảnh sẽ tự động hiển thị khi bạn dán link hợp lệ"
+                    className="min-h-[100px]"
+                    rows={4}
+                  />
                 </div>
               )}
 
               {previewUrls.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Ảnh đã chọn ({previewUrls.length}): <span className="text-xs text-green-500 ml-1">(Kéo thả để sắp xếp)</span>
+                    Ảnh đã chọn ({previewUrls.length}):
+                    <span className="text-xs text-blue-500 ml-1">
+                      {uploadMethod === 'file'
+                        ? '(Tự động sắp xếp theo tên file)'
+                        : '(Từ URL đã nhập)'
+                      }
+                    </span>
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {previewUrls.map((url, index) => (
                       <div
                         key={index}
-                        className={`relative group cursor-move border-2 transition-all duration-200 ${index === dropTargetIndex ? 'border-green-400 dark:border-green-500 rounded-md' : 'border-transparent'
-                          }`}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragOver={(e) => handleDragOver(e, index)}
-                        onDragEnter={handleDragEnter}
-                        onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, index)}
-                        onDragEnd={handleDragEnd}
+                        className="relative group border-2 border-transparent transition-all duration-200"
                       >
                         <div className="relative w-full pt-[150%] rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
                           <Image
-                            src={url}
+                            src={chooseImageUrl(url)}
                             alt={`Preview ${index}`}
                             fill
                             sizes="100%"
@@ -382,20 +404,17 @@ export default function ChapterModal({
                       </div>
                     ))}
                     {/* Nút thêm ảnh */}
-                    {previewUrls.length < 20 && (
-                      <label className="flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md cursor-pointer aspect-w-2 aspect-h-3 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    {uploadMethod === 'file' && previewUrls.length < 20 && (
+                      <div
+                        className="flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md cursor-pointer aspect-w-2 aspect-h-3 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary transition-colors"
+                        onClick={handleChooseImage}
+                        style={{ aspectRatio: '2/3' }}
+                      >
                         <div className="flex flex-col items-center p-4">
                           <FiPlus size={24} className="text-gray-400 mb-2" />
                           <span className="text-xs text-gray-500">Thêm ảnh</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
                         </div>
-                      </label>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -426,6 +445,7 @@ export default function ChapterModal({
               variant="default"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
+              {isUploading && <FiLoader className="animate-spin ml-2" />}
               {isEditMode ? "Cập nhật" : "Thêm mới"}
             </Button>
           </DialogFooter>
@@ -433,4 +453,4 @@ export default function ChapterModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -2,49 +2,44 @@ import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
 import { fetchApi, fetchApiWithFormData } from "./api";
 
 // Lấy danh sách truyện có phân trang
-export const getComics = async (
-  page: number = 1,
-  limit: number = 5,
+export async function getComics(
+  page: number,
+  limit: number,
   search?: string,
   status?: string,
-  category?: string
-) => {
-  let endpoint = `/comics?page=${page}&limit=${limit}`;
+  category?: string,
+  publisherId?: string
+) {
+  const params: Record<string, string | number> = { page, limit };
 
-  if (search) {
-    endpoint += `&search=${encodeURIComponent(search)}`;
-  }
+  if (search) params.search = search;
+  if (status) params.status = status;
+  if (category) params.category = category;
+  if (publisherId) params.publisherId = publisherId;
 
-  if (status) {
-    endpoint += `&status=${status}`;
-  }
-
-  if (category) {
-    endpoint += `&category=${category}`;
-  }
-
-  return await fetchApi<ComicResponse[]>(endpoint);
-};
+  return fetchApi<ComicResponse[]>('/comics', {
+    method: 'GET',
+    params
+  });
+}
 
 // Lấy chi tiết một truyện
-export const getComic = async (
-  id: string
-) => {
-  return await fetchApi<ComicResponse>(`/comics/${id}`);
-};
+export async function getComic(id: string) {
+  return fetchApi<ComicResponse>(`/comics/${id}`);
+}
 
 // Xóa truyện
-export const deleteComic = async (id: string) => {
-  return await fetchApi(`/comics/${id}`, {
-    method: "DELETE",
+export async function deleteComic(id: string) {
+  return fetchApi<void>(`/comics/${id}`, {
+    method: 'DELETE'
   });
-};
+}
 
 // Tạo truyện mới với ảnh bìa
-export const createComicWithCover = async (
+export async function createComic(
   data: ComicCreateUpdate,
   file?: File
-) => {
+) {
   const formData = new FormData();
   formData.append(
     "data",
@@ -61,11 +56,11 @@ export const createComicWithCover = async (
 };
 
 // Cập nhật truyện với ảnh bìa
-export const updateComicWithCover = async (
+export async function updateComic(
   id: string,
   data: ComicCreateUpdate,
   file?: File
-) => {
+) {
   const formData = new FormData();
   formData.append(
     "data",

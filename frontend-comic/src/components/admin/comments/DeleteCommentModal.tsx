@@ -15,9 +15,9 @@ import Image from "next/image";
 import {
   FiAlertTriangle,
   FiTrash2,
-  FiX,
   FiMessageCircle,
 } from "react-icons/fi";
+import { chooseImageUrl } from "@/utils/string";
 
 interface DeleteCommentModalProps {
   isOpen: boolean;
@@ -71,7 +71,7 @@ export default function DeleteCommentModal({
             <div className="flex items-center gap-3">
               <div className="relative w-8 h-8 rounded-full overflow-hidden">
                 <Image
-                  src={comment.user.imgUrl || "/images/placeholder.svg"}
+                  src={chooseImageUrl(comment.user.imgUrl)}
                   alt={comment.user.username}
                   fill
                   className="object-cover"
@@ -102,7 +102,7 @@ export default function DeleteCommentModal({
               <span className="font-medium">{comment.comic.name}</span>
               {comment.chapter && (
                 <>
-                  <span> - Chương {comment.chapter.chapterNumber}: </span>
+                  <span> - Chapter {comment.chapter.chapterNumber}: </span>
                   <span className="font-medium">{comment.chapter.title}</span>
                 </>
               )}

@@ -1,36 +1,32 @@
 package com.thjvjpxx.backend_comic.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.B2Constants;
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
-import com.thjvjpxx.backend_comic.constant.GoogleDriveConstants;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
+import com.thjvjpxx.backend_comic.dto.response.ComicResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
-import com.thjvjpxx.backend_comic.mapper.ChapterMapper;
-import com.thjvjpxx.backend_comic.mapper.ComicMapper;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
-import com.thjvjpxx.backend_comic.repository.CategoryRepository;
+import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
-import com.thjvjpxx.backend_comic.service.StorageFactory;
+import com.thjvjpxx.backend_comic.utils.ComicUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
-import com.thjvjpxx.backend_comic.utils.StringUtils;
+import com.thjvjpxx.backend_comic.utils.StorageUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
 import lombok.AccessLevel;
@@ -42,15 +38,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComicServiceImpl implements ComicService {
     ComicRepository comicRepository;
-    ComicMapper comicMapper;
-    CategoryRepository categoryRepository;
-    StorageFactory storageFactory;
     ChapterRepository chapterRepository;
-    ChapterMapper chapterMapper;
+
+    // Utility classes
+    ComicUtils comicUtils;
+    StorageUtils storageUtils;
 
     @Override
-    public BaseResponse<List<Comic>> getAllComics(int page, int limit, String search, String status, String category) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
+    public BaseResponse<?> getAllComics(int page, int limit, String search, String status, String category) {
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
         int originalPage = page;
         Page<Comic> comics = null;
         if (search != null && !search.isEmpty()) {
@@ -64,8 +60,12 @@ public class ComicServiceImpl implements ComicService {
             comics = comicRepository.findAll(pageable);
         }
 
+        List<ComicResponse> comicResponses = comics.getContent().stream()
+                .map(comicUtils::convertComicToComicResponse)
+                .collect(Collectors.toList());
+
         return BaseResponse.success(
-                comics.getContent(),
+                comicResponses,
                 originalPage,
                 (int) comics.getTotalElements(),
                 limit,
@@ -73,123 +73,86 @@ public class ComicServiceImpl implements ComicService {
     }
 
     @Override
-    public BaseResponse<Comic> getComicById(String id) {
-        ValidationUtils.checkNullId(id);
+    public BaseResponse<Comic> createComic(ComicRequest comicRequest, MultipartFile cover, User publisher) {
+        // Validate slug uniqueness
+        comicUtils.validateSlugUniqueness(comicRequest.getSlug());
 
-        Comic comic = comicRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
-        return BaseResponse.success(comic);
-    }
+        // Validate và lấy categories
+        List<Category> categories = comicUtils.validateAndGetCategories(comicRequest.getCategories());
 
-    @Override
-    public BaseResponse<Comic> createComic(ComicRequest comicRequest, MultipartFile cover) {
-        validateComicRequest(comicRequest);
-        String thumbUrl = null;
-        if (cover != null) {
-            var response = storageFactory.getStorageService().uploadFile(
-                    cover,
-                    GlobalConstants.TYPE_THUMBNAIL,
-                    comicRequest.getSlug() + "_thumb");
-            if (response.getStatus() != HttpStatus.OK.value()) {
-                throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-            }
-            thumbUrl = response.getMessage();
-        }
-        String folderId = null;
-        if (storageFactory.getStorageProvider() == "google") {
-            folderId = storageFactory.getStorageService().createFolder(comicRequest.getSlug(),
-                    GoogleDriveConstants.FOLDER_ID_COMIC);
-        } else {
-            folderId = B2Constants.FOLDER_KEY_COMIC;
-        }
-        Comic comic = comicMapper.toComic(comicRequest);
-        comic.setFolderId(folderId);
-        List<String> categories = comicRequest.getCategories();
-        comic.addCategories(convertCategories(categories));
-        comic.setThumbUrl(thumbUrl);
+        // Handle cover upload
+        String thumbUrl = storageUtils.uploadThumbnail(cover, comicRequest.getSlug());
+
+        Comic comic = Comic.builder()
+                .name(comicRequest.getName())
+                .slug(comicRequest.getSlug())
+                .originName(comicRequest.getOriginName())
+                .author(comicRequest.getAuthor())
+                .description(comicRequest.getDescription())
+                .thumbUrl(thumbUrl)
+                .status(ComicStatus.valueOf(comicRequest.getStatus()))
+                .publisher(publisher)
+                .categories(categories) // nếu có
+                .build();
 
         comicRepository.save(comic);
         return BaseResponse.success(comic);
     }
 
-    private List<Category> convertCategories(List<String> categories) {
-        return categories.stream().map(
-                category -> categoryRepository.findById(category)
-                        .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND)))
-                .collect(Collectors.toList());
-    }
-
-    private void validateComicRequest(ComicRequest comicRequest) {
-        comicRepository.findBySlug(comicRequest.getSlug()).ifPresent(comic -> {
-            throw new BaseException(ErrorCode.COMIC_SLUG_EXISTS);
-        });
-    }
-
     @Override
-    public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover) {
-        return null;
-        // ValidationUtils.checkNullId(id);
-
-        // Comic comic = findComicById(id);
-
-        // if (comicRequest.getSlug() != null && !comicRequest.getSlug().isEmpty()
-        // && !comicRequest.getSlug().equals(comic.getSlug())) {
-        // validateComicRequest(comicRequest);
-        // if (comic.getFolderId() != null && !comic.getFolderId().isEmpty()) {
-        // storageFactory.getStorageService().rename(comic.getFolderId(),
-        // comicRequest.getSlug());
-        // }
-        // }
-
-        // String thumbUrl = comic.getThumbUrl();
-        // if (cover != null) {
-        // var response = googleDriveService.uploadFile(
-        // cover,
-        // GoogleDriveConstants.TYPE_THUMBNAIL,
-        // comicRequest.getSlug() + "_thumb");
-        // if (response.getStatus() != HttpStatus.OK.value()) {
-        // throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
-        // }
-        // thumbUrl = response.getMessage();
-        // }
-
-        // List<Category> categoriesNew =
-        // convertCategories(comicRequest.getCategories());
-
-        // comic.removeCategories(comic.getCategories().stream().collect(Collectors.toList()));
-
-        // comic.addCategories(categoriesNew);
-        // comic.setSlug(comicRequest.getSlug());
-        // comic.setName(comicRequest.getName());
-        // comic.setDescription(comicRequest.getDescription());
-        // comic.setAuthor(comicRequest.getAuthor());
-        // comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
-        // comic.setThumbUrl(thumbUrl);
-        // comic.setOriginName(comicRequest.getOriginName());
-
-        // comicRepository.save(comic);
-        // return BaseResponse.success(comic);
-    }
-
-    private Comic findComicById(String id) {
-        ValidationUtils.checkNullId(id);
-        return comicRepository.findById(id).orElseThrow(() -> new BaseException(ErrorCode.COMIC_NOT_FOUND));
-    }
-
-    @Override
-    public BaseResponse<Comic> deleteComic(String id) {
-        ValidationUtils.checkNullId(id);
-
-        Comic comic = findComicById(id);
-
-        comic.removeCategories(new ArrayList<>(comic.getCategories()));
-
-        String thumbUrl = comic.getThumbUrl();
-        if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(GoogleDriveConstants.URL_IMG_GOOGLE_DRIVE)) {
-            storageFactory.getStorageService().remove(StringUtils.getIdFromUrl(thumbUrl));
-        } else if (thumbUrl != null && !thumbUrl.isEmpty() && thumbUrl.startsWith(B2Constants.URL_PREFIX)) {
-            storageFactory.getStorageService().remove(thumbUrl);
+    public BaseResponse<Comic> updateComic(String id, ComicRequest comicRequest, MultipartFile cover, User publisher) {
+        if (publisher != null) {
+            comicUtils.validateComicOwnershipByComicId(publisher, id);
         }
-        comicRepository.delete(comic);
+
+        ValidationUtils.checkNullId(id);
+
+        Comic comic = comicUtils.findComicById(id);
+
+        // Validate slug nếu có thay đổi
+        if (comicRequest.getIsSlugChanged()) {
+            comicUtils.validateSlugUniquenessForUpdate(id, comicRequest.getSlug());
+        }
+
+        // Xử lý thumbnail với logic được tối ưu
+        String newThumbUrl = handleThumbnailUpdateOptimized(comic, comicRequest, cover);
+
+        // Cập nhật categories chỉ khi cần thiết
+        if (comicRequest.getIsCategoriesChanged()) {
+            comicUtils.updateComicCategories(comic, comicRequest.getCategories());
+        }
+
+        // Cập nhật thông tin comic
+        updateComicFields(comic, comicRequest, newThumbUrl);
+
+        comicRepository.save(comic);
+        return BaseResponse.success(comic);
+    }
+
+    @Override
+    public BaseResponse<Comic> deleteComic(String id, User publisher) {
+        if (publisher != null) {
+            comicUtils.validateComicOwnershipByComicId(publisher, id);
+        }
+
+        ValidationUtils.checkNullId(id);
+
+        Comic comic = comicUtils.findComicById(id);
+
+        // Xóa tất cả categories
+        comicUtils.removeAllCategories(comic);
+
+        // Xóa thumbnail từ storage
+        storageUtils.removeOldThumbnail(comic.getThumbUrl());
+
+        try {
+            comicRepository.delete(comic);
+        } catch (DataIntegrityViolationException e) {
+            throw new BaseException(ErrorCode.COMIC_HAS_CHAPTERS);
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.HAS_ERROR);
+        }
+
         return BaseResponse.success(comic);
     }
 
@@ -208,7 +171,14 @@ public class ComicServiceImpl implements ComicService {
         }
 
         List<ChapterResponse> chapterResponses = chapters.getContent().stream()
-                .map(chapterMapper::toChapterResponse)
+                .map(chapter -> ChapterResponse.builder()
+                        .id(chapter.getId())
+                        .title(chapter.getTitle())
+                        .chapterNumber(chapter.getChapterNumber())
+                        .status(chapter.getStatus())
+                        .createdAt(chapter.getCreatedAt().toString())
+                        .updatedAt(chapter.getUpdatedAt().toString())
+                        .build())
                 .collect(Collectors.toList());
 
         return BaseResponse.success(
@@ -217,6 +187,55 @@ public class ComicServiceImpl implements ComicService {
                 (int) chapters.getTotalElements(),
                 limit,
                 chapters.getTotalPages());
+    }
+
+    // ====================== HELPER METHODS ======================
+
+    /**
+     * Xử lý cập nhật thumbnail được tối ưu với flag
+     */
+    private String handleThumbnailUpdateOptimized(Comic comic, ComicRequest comicRequest, MultipartFile cover) {
+        String currentThumbUrl = comic.getThumbUrl();
+
+        // Trường hợp 1: Có file upload mới
+        if (cover != null && !cover.isEmpty()) {
+            return storageUtils.handleNewImageUpload(currentThumbUrl, comicRequest.getSlug(), cover,
+                    comicRequest.getIsSlugChanged());
+        }
+
+        // Trường hợp 2: Muốn xóa thumbnail hiện tại
+        if (comicRequest.getShouldRemoveThumbnail()) {
+            storageUtils.removeOldThumbnail(currentThumbUrl);
+            return null;
+        }
+
+        // Trường hợp 3: URL trong request thay đổi
+        if (comicRequest.getIsThumbUrlChanged()) {
+            // Xóa image cũ nếu có
+            storageUtils.removeOldThumbnail(currentThumbUrl);
+            return comicRequest.getThumbUrl();
+        }
+
+        // Trường hợp 4: Chỉ slug thay đổi, cần rename file
+        if (comicRequest.getIsSlugChanged() && storageUtils.isB2StorageUrl(currentThumbUrl)) {
+            return storageUtils.renameThumbnail(currentThumbUrl, comicRequest.getSlug());
+        }
+
+        // Trường hợp 5: Không có thay đổi gì
+        return currentThumbUrl;
+    }
+
+    /**
+     * Cập nhật các field của comic
+     */
+    private void updateComicFields(Comic comic, ComicRequest comicRequest, String thumbUrl) {
+        comic.setSlug(comicRequest.getSlug());
+        comic.setName(comicRequest.getName());
+        comic.setDescription(comicRequest.getDescription());
+        comic.setAuthor(comicRequest.getAuthor());
+        comic.setStatus(ComicStatus.valueOf(comicRequest.getStatus()));
+        comic.setThumbUrl(thumbUrl);
+        comic.setOriginName(comicRequest.getOriginName());
     }
 
 }

@@ -1,16 +1,21 @@
-import { getCategories } from "@/services/categoryService";
-import { createComicWithCover, deleteComic, getComics, updateComicWithCover } from "@/services/comicService";
+import { getAllCategories } from "@/services/categoryService";
+import * as comicService from "@/services/comicService";
+import * as publisherService from "@/services/publisherService";
 import { CategoryResponse } from "@/types/category";
 import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
+import { useAuth } from "@/contexts/AuthContext";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export const useComic = (initialPage = 1, pageSize = 5) => {
+export const useComic = () => {
+  const { user, isLoading: authLoading } = useAuth();
+  const isPublisher = user?.role?.name === "PUBLISHER";
 
-  // State cho danh sách truyện và phân trang
+  const pageSize = 5;
+
   const [comics, setComics] = useState<ComicResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +36,7 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
   // Lấy danh sách thể loại
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await getCategories(1, 100); // Lấy tất cả thể loại
+      const response = await getAllCategories(); // Lấy tất cả thể loại
 
       if (response.status === 200 && response.data) {
         setCategories(response.data);
@@ -53,13 +58,21 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     setError(null);
 
     try {
-      const response = await getComics(
-        currentPage,
-        pageSize,
-        searchTerm,
-        statusFilter || undefined,
-        categoryFilter
-      );
+      const response = isPublisher
+        ? await publisherService.getMyComics(
+          currentPage,
+          pageSize,
+          searchTerm,
+          statusFilter,
+          categoryFilter
+        )
+        : await comicService.getComics(
+          currentPage,
+          pageSize,
+          searchTerm,
+          statusFilter,
+          categoryFilter
+        );
 
       if (response.status === 200 && response.data) {
         setComics(response.data);
@@ -79,13 +92,14 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, statusFilter, categoryFilter, pageSize]);
+  }, [currentPage, searchTerm, statusFilter, categoryFilter, pageSize, isPublisher]);
 
 
-  // Gọi API khi thay đổi trang hoặc tìm kiếm
   useEffect(() => {
-    fetchComics();
-  }, [fetchComics]);
+    if (!authLoading) {
+      fetchComics();
+    }
+  }, [fetchComics, authLoading]);
 
   // Lấy danh sách thể loại khi component mount
   useEffect(() => {
@@ -95,7 +109,9 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
   // Xử lý thêm truyện mới
   const handleAddComic = async (comicData: ComicCreateUpdate, file?: File) => {
     try {
-      const response = await createComicWithCover(comicData, file);
+      const response = isPublisher
+        ? await publisherService.createComic(comicData, file)
+        : await comicService.createComic(comicData, file);
 
       if (response.status === 200) {
         toast.success("Thêm truyện thành công");
@@ -121,11 +137,17 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     if (!currentComic) return;
 
     try {
-      const response = await updateComicWithCover(
-        currentComic.id,
-        comicData,
-        file
-      );
+      const response = isPublisher
+        ? await publisherService.updateComic(
+          currentComic.id,
+          comicData,
+          file
+        )
+        : await comicService.updateComic(
+          currentComic.id,
+          comicData,
+          file
+        );
 
       if (response.status === 200) {
         toast.success("Cập nhật truyện thành công");
@@ -148,12 +170,13 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     if (!currentComic) return;
     setIsDeleting(true);
     try {
-      const response = await deleteComic(currentComic.id);
+      const response = isPublisher
+        ? await publisherService.deleteComic(currentComic.id)
+        : await comicService.deleteComic(currentComic.id);
 
       if (response.status === 200) {
         toast.success("Xóa truyện thành công");
         fetchComics(); // Tải lại danh sách
-        setIsDeleteModalOpen(false);
       } else {
         toast.error(response.message || "Không thể xóa truyện");
       }
@@ -165,6 +188,8 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
       toast.error(errorMessage || "Đã xảy ra lỗi khi xóa truyện");
     } finally {
       setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setCurrentComic(null);
     }
   };
 
@@ -218,6 +243,7 @@ export const useComic = (initialPage = 1, pageSize = 5) => {
     totalPages,
     isViewModalOpen,
     isDeleting,
+    isPublisher,
 
     // Actions
     setCurrentPage,

@@ -10,18 +10,26 @@ export const getUsers = async (
   limit: number = 5,
   search?: string,
   role?: string,
+  deleted: boolean = false
 ) => {
-  let fullEndpoint = `${endpoint}?page=${page}&limit=${limit}`;
+  const params: Record<string, string | number | boolean | undefined> = { page, limit, search, roleId: role, deleted };
 
   if (search) {
-    fullEndpoint += `&search=${encodeURIComponent(search)}`;
+    params.search = search;
   }
 
   if (role) {
-    fullEndpoint += `&roleId=${role}`;
+    params.roleId = role;
   }
 
-  return await fetchApi<UserResponse[]>(fullEndpoint);
+  if (deleted) {
+    params.deleted = deleted;
+  }
+
+  return await fetchApi<UserResponse[]>(endpoint, {
+    method: "GET",
+    params
+  });
 };
 
 // Lấy thông tin chi tiết một người dùng
@@ -103,6 +111,24 @@ export const deleteUser = async (
 ) => {
   return await fetchApi<UserResponse>(`${endpoint}/${id}`, {
     method: "DELETE",
+  });
+};
+
+// Chặn người dùng
+export const blockUser = async (
+  id: string
+) => {
+  return await fetchApi<UserResponse>(`${endpoint}/${id}/block`, {
+    method: "PUT",
+  });
+};
+
+// Bỏ chặn người dùng
+export const unblockUser = async (
+  id: string
+) => {
+  return await fetchApi<UserResponse>(`${endpoint}/${id}/unblock`, {
+    method: "PUT",
   });
 };
 

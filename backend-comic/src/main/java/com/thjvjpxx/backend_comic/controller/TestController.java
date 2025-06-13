@@ -1,39 +1,42 @@
 package com.thjvjpxx.backend_comic.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.thjvjpxx.backend_comic.constant.B2Constants;
-import com.thjvjpxx.backend_comic.constant.GlobalConstants;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.service.StorageFactory;
+import com.thjvjpxx.backend_comic.service.StorageService;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TestController {
-    private final StorageFactory storageFactory;
+    StorageService storageService;
 
-    @GetMapping
-    public BaseResponse<?> getFilesAndFolders() {
-        return storageFactory.getStorageService().getFilesAndFolders(B2Constants.FOLDER_KEY_AVATAR);
+    @PostMapping("/remove")
+    public BaseResponse<?> remove(@RequestBody Map<String, String> request) {
+        String url = request.get("url");
+        return storageService.remove(url);
     }
 
-    @PostMapping
-    public BaseResponse<?> uploadFile(@RequestParam("file") MultipartFile file) {
-        return storageFactory.getStorageService().uploadFile(file, GlobalConstants.TYPE_AVATAR,
-                file.getOriginalFilename());
+    @PostMapping("/list-files")
+    public BaseResponse<?> listFiles(@RequestBody Map<String, String> request) {
+        String folder = request.get("folder");
+        return storageService.getAllFiles(folder);
     }
 
-    @DeleteMapping
-    public BaseResponse<?> deleteFile(@RequestParam("file") String file) {
-        return storageFactory.getStorageService().remove(file);
+    @PostMapping("/rename")
+    public BaseResponse<?> rename(@RequestBody Map<String, String> request) {
+        String url = request.get("url");
+        String newName = request.get("newName");
+        return storageService.rename(url, newName);
     }
 }

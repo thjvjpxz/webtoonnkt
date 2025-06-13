@@ -42,6 +42,7 @@ public class SecurityConfig {
 						// .requestMatchers("/**").permitAll()
 						// Các API công khai
 						.requestMatchers(
+								"/test/**",
 								"/public/**",
 								"/auth/login",
 								"/auth/register",
@@ -59,7 +60,10 @@ public class SecurityConfig {
 								"/comments/comic/*",
 								"/comments/comic/*/parents",
 								"/comments/chapter/*",
-								"/comments/*/replies")
+								"/comments/*/replies",
+								"/topup/callback",
+								"/transactions/webhook/**",
+								"/webhook/payos/**")
 						.permitAll()
 
 						// Các API cần xác thực với vai trò ADMIN
@@ -67,15 +71,14 @@ public class SecurityConfig {
 						.requestMatchers("/categories/**").hasRole("ADMIN")
 						.requestMatchers("/comics/**").hasRole("ADMIN")
 						.requestMatchers("/chapters/**").hasRole("ADMIN")
-
-						// Các API Comment chỉ dành cho ADMIN
 						.requestMatchers("/comments/*/block").hasRole("ADMIN")
 						.requestMatchers("/comments/*/unblock").hasRole("ADMIN")
 						.requestMatchers("/comments/user/*").hasRole("ADMIN")
 						.requestMatchers("/comments?*").hasRole("ADMIN")
+						.requestMatchers("/vip-packages/**").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
-						.requestMatchers("/publisher/**").hasAnyRole("ADMIN", "PUBLISHER")
+						.requestMatchers("/publisher/**").hasAnyRole("PUBLISHER", "ADMIN")
 
 						// Các API khác cần xác thực
 						.anyRequest().authenticated())

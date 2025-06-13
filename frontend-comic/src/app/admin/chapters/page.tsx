@@ -1,19 +1,21 @@
 'use client'
 
-import { FiPlus, FiEdit, FiTrash2, FiSearch, FiAlertCircle, FiBookOpen, FiEye } from "react-icons/fi";
-import DashboardLayout from "@/components/admin/DashboardLayout";
-import Pagination from "@/components/ui/pagination";
-import { useChapter } from "@/hooks/useChapter";
-import Image from "next/image";
-import { formatDate, constructImageUrl } from "@/utils/helpers";
-import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
-import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
 import ChapterModal from "@/components/admin/chapters/ChapterModal";
+import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
+import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
+import DashboardLayout from "@/components/admin/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import Pagination from "@/components/ui/pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useChapter } from "@/hooks/useChapter";
+import { renderBadge } from "@/components/ui/comic-render";
+import { constructImageUrl, formatDate } from "@/utils/helpers";
+import { chooseImageUrl } from "@/utils/string";
+import Image from "next/image";
+import { FiAlertCircle, FiBookOpen, FiEdit, FiEye, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 
 export default function Chapters() {
 
@@ -24,6 +26,7 @@ export default function Chapters() {
     isLoading,
     error,
     searchTerm,
+    isPublisher,
     // set
     setCurrentPage,
     setSearchTerm,
@@ -64,7 +67,7 @@ export default function Chapters() {
   } = useChapter();
 
   return (
-    <DashboardLayout title="Quản lý Chương">
+    <DashboardLayout title={isPublisher ? "Chương của tôi" : "Quản lý chương"} isPublisher={isPublisher}>
       {/* Search and Add Button */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -139,7 +142,7 @@ export default function Chapters() {
                           {comic.thumbUrl ? (
                             <div className="relative h-10 w-8">
                               <Image
-                                src={comic.thumbUrl}
+                                src={chooseImageUrl(comic.thumbUrl)}
                                 alt={comic.name}
                                 fill
                                 sizes="32px"
@@ -191,7 +194,7 @@ export default function Chapters() {
         <CardHeader className="border-b border-border/50">
           <CardTitle className="text-foreground flex items-center gap-2">
             <FiBookOpen className="text-primary" size={20} />
-            Danh sách chương
+            {isPublisher ? "Chương của tôi" : "Danh sách chương"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -215,7 +218,7 @@ export default function Chapters() {
                 Không có chương nào
               </h3>
               <p className="text-muted-foreground mb-6">
-                Chưa có chương nào được thêm vào hệ thống.
+                Chưa có chapter nào được thêm vào hệ thống.
               </p>
               <Button
                 onClick={handleOpenAddModal}
@@ -243,6 +246,9 @@ export default function Chapters() {
                       Giá
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
+                      Nhà xuất bản
+                    </TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">
                       Ngày tạo
                     </TableHead>
                     <TableHead className="font-semibold text-foreground text-center">
@@ -259,11 +265,12 @@ export default function Chapters() {
                       key={chapter.id}
                       className="border-border/50 hover:bg-muted/20 transition-colors duration-200"
                     >
+                      {/* Thumbnail */}
                       <TableCell className="py-4 flex items-center w-[100px]">
                         <div className="flex-shrink-0 h-[120px] w-[100px] relative overflow-hidden">
                           {chapter.detailChapters && chapter.detailChapters.length > 0 && chapter.detailChapters[0]?.imgUrl ? (
                             <Image
-                              src={constructImageUrl(chapter, chapter.detailChapters[0].imgUrl)}
+                              src={chooseImageUrl(constructImageUrl(chapter, chapter.detailChapters[0].imgUrl))}
                               alt={`Ảnh bìa ${chapter.comicName}`}
                               fill
                               sizes="100px"
@@ -288,29 +295,56 @@ export default function Chapters() {
                           </div>
                         </div>
                       </TableCell>
+
+                      {/* Chapter Number */}
                       <TableCell className="text-center text-foreground font-medium">
                         {chapter.chapterNumber}
                       </TableCell>
+
+                      {/* Trạng thái */}
                       <TableCell className="text-center">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${chapter.status === 'FREE'
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${chapter.status === 'FREE'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                           }`}>
                           {chapter.status === 'FREE' ? 'Miễn phí' : 'Trả phí'}
                         </span>
                       </TableCell>
+
+                      {/* Giá */}
                       <TableCell className="text-center text-foreground">
-                        {chapter.status === 'FEE' && chapter.price
-                          ? `${chapter.price.toLocaleString('vi-VN')} VNĐ`
-                          : '-'
-                        }
+                        {chapter.status === 'FEE' && chapter.price ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <Image
+                              src="/images/linh-thach.webp"
+                              alt="Linh thạch"
+                              width={16}
+                              height={16}
+                              className="flex-shrink-0"
+                            />
+                            <span>{chapter.price.toLocaleString('vi-VN')}</span>
+                          </div>
+                        ) : (
+                          '-'
+                        )}
                       </TableCell>
+
+                      {/* Nhà xuất bản */}
+                      <TableCell className="text-center text-muted-foreground font-medium">
+                        {renderBadge(chapter.publisherName || null)}
+                      </TableCell>
+
+                      {/* Ngày tạo */}
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.createdAt)}
                       </TableCell>
+
+                      {/* Ngày cập nhật */}
                       <TableCell className="text-center text-muted-foreground">
                         {formatDate(chapter.updatedAt)}
                       </TableCell>
+
+                      {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
                           <Button
@@ -388,7 +422,6 @@ export default function Chapters() {
         onClose={() => setIsAddEditModalOpen(false)}
         onSubmit={handleSubmitChapter}
         chapter={selectedChapter}
-        comicOptions={comicOptions}
       />
     </DashboardLayout>
   )

@@ -7,19 +7,19 @@ spring:
     name: backend-comic
 
   datasource:
-    url: jdbc:mysql://localhost:3307/webtoon
-    username: webtoon
-    password: 12345Webtoon
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
   mail:
-    host: smtp.zeptomail.com
-    port: 587
-    username: emailapikey
-    password: wSsVR61z+RDwC6t8zjatJe84n1xcA1inFB98jQf07nT1HKjLpsdtxBbKAQbzSvMcGWRvQmcTp+ohmB8A22EJ29Qvm19UDyiF9mqRe1U4J3x17qnvhDzIWWlckBCILYwMxwlrnmJiFMEn+g==
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -28,7 +28,7 @@ spring:
             enable: true
           ssl:
             protocols: TLSv1.2
-          from: noreply@kimthi1708.id.vn
+          from: ${MAIL_FROM}
           connectiontimeout: 5000
           timeout: 3000
           writetimeout: 5000
@@ -48,6 +48,7 @@ app:
     allowed-origins: http://localhost:3000
   verification-token-expiration: 1800000 # 30p
   forgot-password-token-expiration: 1800000 # 30p
+  backend-url: https://cd67-171-241-8-122.ngrok-free.app
 
 crawler:
   otruyen:
@@ -60,19 +61,21 @@ crawler:
     size: 5
     delay-ms: 0
 
-storage:
-  provider: b2 # nhập 'b2' hoặc 'google'
-
-google-drive:
-  folder-id: 1H89l7BIVVNR3byETuuqZp2OXJpbSsT2R
-
 jwt:
   expiration: 3600000 # 1 giờ
   refresh-expiration: 604800000 # 7 ngày
 
 b2:
-  accessKeyId: 00578cb19b5269e0000000002
-  secretKey: K005p7EbGqGkvr3NSYf5JApC8gQdc9U
-  endpoint: https://s3.us-east-005.backblazeb2.com
-  region: us-east-005
-  bucketName: webtoon-thjvjpxx
+  accessKeyId: ${B2_ACCESS_KEY_ID}
+  secretKey: ${B2_API_KEY}
+  endpoint: ${B2_END_POINT}
+  region: ${B2_REGION}
+  bucketName: ${B2_BUCKET_NAME}
+
+# PayOS Configuration
+payos:
+  client-id: ${PAYOS_CLIENT_ID}
+  api-key: ${PAYOS_API_KEY}
+  checksum-key: ${PAYOS_CHECKSUM_KEY}
+  return-url: ${app.frontend-url}/payment/success
+  cancel-url: ${app.frontend-url}/payment/failure

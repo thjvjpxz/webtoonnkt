@@ -22,3 +22,58 @@ export const getFirstColorFromGradient = (gradient: string) => {
   // Trả về mã màu đầu tiên hoặc màu mặc định
   return hexColorMatch ? hexColorMatch[0] : "#000000";
 }
+
+/**
+ * Format role string thành định dạng readable
+ * @param role - Role string
+ * @returns Role string đã được format
+ */
+export const formatRole = (role: string) => {
+  if (role === "ADMIN") {
+    return "Quản trị viên";
+  } else if (role === "READER") {
+    return "Độc giả";
+  } else if (role === "PUBLISHER") {
+    return "Nhà xuất bản";
+  }
+  return role;
+}
+
+/**
+ * Chọn URL ảnh từ CDN
+ * @param url - URL ảnh
+ * @returns URL ảnh đã được chọn
+ */
+export const chooseImageUrl = (url: string | undefined) => {
+  // Kiểm tra URL hợp lệ
+  if (!url || typeof url !== 'string') {
+    return '/images/placeholder.svg';
+  }
+
+  // Nếu là URL local hoặc blob, trả về nguyên gốc
+  if (url.startsWith('/') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+
+  // Danh sách CDN được tin cậy, không cần proxy
+  const trustedCdnUrls = [
+    "https://cdn.kimthi1708.id.vn",
+    "https://sv1.otruyencdn.com",
+    "https://img.otruyen.xyz",
+    "https://img.otruyenapi.com",
+  ];
+
+  // Kiểm tra nếu URL thuộc CDN tin cậy
+  if (trustedCdnUrls.some(cdnUrl => url.startsWith(cdnUrl))) {
+    return url;
+  }
+
+  // Các URL khác cần đi qua proxy để tránh CORS
+  try {
+    // Kiểm tra URL hợp lệ trước khi encode
+    new URL(url);
+    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+  } catch {
+    return '/images/placeholder.svg';
+  }
+}

@@ -1,9 +1,7 @@
 package com.thjvjpxx.backend_comic.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,30 +23,30 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity(name = "comics")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(indexes = {
-        // Index cho tìm kiếm theo slug (unique đã tự động tạo index)
-        // Index cho tìm kiếm theo name và slug trong
-        // findBySlugContainingOrNameContaining
         @Index(name = "idx_comic_name", columnList = "name"),
-        // Index cho findByStatus
         @Index(name = "idx_comic_status", columnList = "status"),
-        // Index cho sắp xếp theo views_count (ORDER BY c.views_count DESC)
         @Index(name = "idx_comic_views_count", columnList = "views_count"),
-        // Index cho findByUpdatedAtAfter và sắp xếp theo updated_at
         @Index(name = "idx_comic_updated_at", columnList = "updated_at"),
-        // Composite index cho sắp xếp trong các truy vấn phức tạp
         @Index(name = "idx_comic_views_updated", columnList = "views_count, updated_at"),
-        // Index cho tìm kiếm text search
-        @Index(name = "idx_comic_slug_name", columnList = "slug, name")
+        @Index(name = "idx_comic_slug_name", columnList = "slug, name"),
+        @Index(name = "idx_comic_publisher", columnList = "publisher_id")
 })
 public class Comic {
 
@@ -77,20 +75,24 @@ public class Comic {
     ComicStatus status;
 
     @Column(name = "followers_count")
-    int followersCount;
+    @Builder.Default
+    int followersCount = 0;
 
     @Column(name = "views_count")
-    int viewsCount;
+    @Builder.Default
+    int viewsCount = 0;
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "last_chapter_id", columnDefinition = "VARCHAR(36)")
-    String lastChapterId;
-
-    @Column(name = "folder_id", columnDefinition = "VARCHAR(50)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id")
     @JsonIgnore
-    String folderId;
+    User publisher;
+
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @JoinTable(name = "comic_categories", joinColumns = @JoinColumn(name = "comic_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    List<Category> categories;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -99,10 +101,6 @@ public class Comic {
     @Column(name = "updated_at")
     @UpdateTimestamp
     LocalDateTime updatedAt;
-
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
-    @JoinTable(name = "comic_categories", joinColumns = @JoinColumn(name = "comic_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    Set<Category> categories = new HashSet<>();
 
     public void addCategories(List<Category> categories) {
         this.categories.addAll(categories);

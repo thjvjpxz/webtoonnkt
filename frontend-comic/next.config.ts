@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [
+      "localhost",
       "lh3.googleusercontent.com",
       "sv1.otruyencdn.com",
       "img.otruyen.xyz",

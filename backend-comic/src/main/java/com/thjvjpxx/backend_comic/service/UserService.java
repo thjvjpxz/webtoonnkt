@@ -9,7 +9,7 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.model.User;
 
 public interface UserService {
-    BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId);
+    BaseResponse<List<User>> getUsers(int page, int limit, String search, String roleId, Boolean deleted);
 
     BaseResponse<User> createUser(UserRequest request, MultipartFile avatar);
 

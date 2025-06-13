@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.thjvjpxx.backend_comic.enums.ChapterStatus;
 
@@ -65,7 +66,7 @@ public class Chapter {
     Double chapterNumber;
 
     @Column(name = "price")
-    Double price;
+    Double price; // Giá chapter tính bằng linh thạch
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -73,6 +74,7 @@ public class Chapter {
 
     @ManyToOne
     @JoinColumn(name = "comic_id", nullable = false)
+    @JsonIgnore
     Comic comic;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,4 +87,8 @@ public class Chapter {
     @Column(name = "updated_at")
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
+    public boolean isFree() {
+        return this.status == ChapterStatus.FREE;
+    }
 }

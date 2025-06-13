@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { chooseImageUrl } from "@/utils/string";
 
 interface PopulerTodayComponentProps {
   comics: PopulerToday[];
@@ -104,7 +105,7 @@ export default function PopulerTodayComponent({ comics }: PopulerTodayComponentP
               <Link href={`/comic/${comic.slug}`} className="block">
                 <div className="relative overflow-hidden rounded mb-3">
                   <Image
-                    src={comic.thumbUrl || "/images/placeholder.svg"}
+                    src={chooseImageUrl(comic.thumbUrl)}
                     alt={comic.name}
                     width={180}
                     height={230}
@@ -121,7 +122,7 @@ export default function PopulerTodayComponent({ comics }: PopulerTodayComponentP
                     {comic.name.length > 20 ? comic.name.slice(0, 20) + '...' : comic.name}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Chương {comic.latestChapter}
+                    Chapter {comic.latestChapter}
                   </p>
                 </div>
               </Link>

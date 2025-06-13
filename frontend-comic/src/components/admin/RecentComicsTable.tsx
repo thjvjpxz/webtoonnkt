@@ -5,6 +5,7 @@ import { ComicData } from "@/types/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { chooseImageUrl } from "@/utils/string";
 
 const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {
   const getStatusText = (status: string) => {
@@ -60,7 +61,7 @@ const RecentComicsTable = ({ comics }: { comics: ComicData[] }) => {
                     <div className="flex items-center">
                       <div className="h-12 w-12 flex-shrink-0 mr-4">
                         <Image
-                          src={comic.coverImage}
+                          src={chooseImageUrl(comic.coverImage)}
                           alt={comic.title}
                           width={48}
                           height={48}

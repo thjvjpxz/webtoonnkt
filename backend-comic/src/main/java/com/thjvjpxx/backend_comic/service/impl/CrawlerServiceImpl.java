@@ -2,18 +2,13 @@ package com.thjvjpxx.backend_comic.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,10 +21,8 @@ import com.thjvjpxx.backend_comic.dto.otruyen.OTruyenResponse;
 import com.thjvjpxx.backend_comic.dto.otruyen.OTruyenResponse.OTruyenComic;
 import com.thjvjpxx.backend_comic.dto.request.CrawlerComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.dto.websocket.CrawlerProgressMessage;
 import com.thjvjpxx.backend_comic.enums.ChapterStatus;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
-import com.thjvjpxx.backend_comic.enums.CrawlerStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
@@ -41,7 +34,6 @@ import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.repository.DetailChapterRepository;
 import com.thjvjpxx.backend_comic.service.CrawlerService;
-import com.thjvjpxx.backend_comic.task.CrawlerTask;
 import com.thjvjpxx.backend_comic.utils.NumberUtils;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 
@@ -62,9 +54,6 @@ public class CrawlerServiceImpl implements CrawlerService {
     final ChapterRepository chapterRepository;
     // final GoogleDriveService googleDriveService;
     final DetailChapterRepository detailChapterRepository;
-    final SimpMessagingTemplate messagingTemplate;
-    final TaskExecutor taskExecutor;
-    final Map<String, CrawlerTask> activeTasks = new ConcurrentHashMap<>();
 
     @Value("${crawler.otruyen.api-url}")
     String OTRUYEN_API_URL;
@@ -84,8 +73,9 @@ public class CrawlerServiceImpl implements CrawlerService {
     @Value("${crawler.batch.delay-ms:5000}")
     int batchDelayMs;
 
+    @Override
     @Transactional
-    public BaseResponse<?> crawlComic(CrawlerComicRequest request, CrawlerProgressMessage progressMessage) {
+    public BaseResponse<?> crawlComic(CrawlerComicRequest request) {
         try {
             Map<String, Object> crawlingResult = new HashMap<>();
             List<Map<String, Object>> errorResults = new ArrayList<>();
@@ -96,20 +86,7 @@ public class CrawlerServiceImpl implements CrawlerService {
             int comicProcessed = 0;
 
             for (int currentPage = request.getStartPage(); currentPage <= request.getEndPage(); currentPage++) {
-                // Kiểm tra nếu task đã bị dừng
-                if (progressMessage != null && shouldStopCrawling(progressMessage.getSessionId())) {
-                    log.info("Tiến trình crawl đã bị dừng cho session: {}", progressMessage.getSessionId());
-                    return BaseResponse.success("Tiến trình crawl đã bị dừng");
-                }
-
                 log.info("Đang crawl trang {} / {}", currentPage, request.getEndPage());
-
-                // Cập nhật tiến độ nếu có progressMessage
-                if (progressMessage != null) {
-                    progressMessage.setCurrentPage(currentPage);
-                    progressMessage.setStatus(CrawlerStatus.IN_PROGRESS);
-                    sendProgressUpdate(progressMessage);
-                }
 
                 if (currentPage > request.getStartPage()) {
                     Thread.sleep(batchDelayMs);
@@ -133,21 +110,8 @@ public class CrawlerServiceImpl implements CrawlerService {
                 }
 
                 for (OTruyenComic comicSummary : comics) {
-                    // Kiểm tra lại nếu task đã bị dừng
-                    if (progressMessage != null && shouldStopCrawling(progressMessage.getSessionId())) {
-                        log.info("Tiến trình crawl đã bị dừng cho session: {}", progressMessage.getSessionId());
-                        return BaseResponse.success("Tiến trình crawl đã bị dừng");
-                    }
-
                     try {
                         Thread.sleep(requestDelayMs);
-
-                        // Cập nhật truyện hiện tại nếu có progressMessage
-                        if (progressMessage != null) {
-                            progressMessage.setCurrentComic(comicSummary.getSlug());
-                            progressMessage.setCurrentComicChaptersProcessed(0);
-                            sendProgressUpdate(progressMessage);
-                        }
 
                         String slug = comicSummary.getSlug();
                         if (slug == null || slug.isEmpty()) {
@@ -164,18 +128,11 @@ public class CrawlerServiceImpl implements CrawlerService {
                             errorResult.put("comicSlug", slug);
                             errorResult.put("error", "Không thể lấy chi tiết cho truyện");
                             errorResults.add(errorResult);
-
-                            // Thêm lỗi vào progressMessage nếu có
-                            if (progressMessage != null) {
-                                progressMessage.addError(slug, "Không thể lấy chi tiết cho truyện");
-                                sendProgressUpdate(progressMessage);
-                            }
                             continue;
                         }
 
                         OTruyenComicDetail comicDetail = comicDetailResponse.getBody();
-                        boolean success = processComicWithChapters(comicDetail,
-                                request.isSaveDrive(), restTemplate, progressMessage);
+                        boolean success = processComicWithChapters(comicDetail, request.isSaveDrive(), restTemplate);
 
                         if (success) {
                             totalSuccessfulComics++;
@@ -183,13 +140,6 @@ public class CrawlerServiceImpl implements CrawlerService {
 
                         comicProcessed++;
                         totalComicProcessed++;
-
-                        // Cập nhật số lượng truyện đã xử lý nếu có progressMessage
-                        if (progressMessage != null) {
-                            progressMessage.setTotalComicsProcessed(totalComicProcessed);
-                            progressMessage.setTotalSuccessfulComics(totalSuccessfulComics);
-                            sendProgressUpdate(progressMessage);
-                        }
 
                         if (comicProcessed % batchSize == 0) {
                             log.info("Đã xử lý {} truyện, đang tạm nghỉ...", comicProcessed);
@@ -201,17 +151,10 @@ public class CrawlerServiceImpl implements CrawlerService {
                         errorResult.put("comicSlug", comicSummary.getSlug());
                         errorResult.put("error", e.getMessage());
                         errorResults.add(errorResult);
-
-                        // Thêm lỗi vào progressMessage nếu có
-                        if (progressMessage != null) {
-                            progressMessage.addError(comicSummary.getSlug(), e.getMessage());
-                            sendProgressUpdate(progressMessage);
-                        }
                     }
                 }
 
-                log.info("Hoàn thành crawl trang {} với {} truyện", currentPage,
-                        comics.size());
+                log.info("Hoàn thành crawl trang {} với {} truyện", currentPage, comics.size());
             }
 
             crawlingResult.put("totalProcessed", totalComicProcessed);
@@ -230,108 +173,9 @@ public class CrawlerServiceImpl implements CrawlerService {
         }
     }
 
-    @Override
-    public BaseResponse<?> startCrawlComic(CrawlerComicRequest request, String sessionId) {
-        CrawlerTask crawlerTask = new CrawlerTask(messagingTemplate, this) {
-            @Override
-            public void initialize(CrawlerComicRequest request, String sessionId) {
-                super.initialize(request, sessionId);
-            }
-
-            @Override
-            public void run() {
-                try {
-                    CrawlerProgressMessage progressMessage = CrawlerProgressMessage.builder()
-                            .sessionId(sessionId)
-                            .status(CrawlerStatus.STARTED)
-                            .totalComicsProcessed(0)
-                            .totalSuccessfulComics(0)
-                            .currentPage(request.getStartPage())
-                            .totalPages(request.getEndPage() - request.getStartPage() + 1)
-                            .errors(new ArrayList<>())
-                            .build();
-
-                    sendProgressUpdate(progressMessage);
-                    progressMessage.setStatus(CrawlerStatus.IN_PROGRESS);
-                    sendProgressUpdate(progressMessage);
-
-                    // Sử dụng crawlComicAsync với progressMessage
-                    crawlComicAsync(request, progressMessage);
-
-                    progressMessage.setStatus(CrawlerStatus.COMPLETED);
-                    sendProgressUpdate(progressMessage);
-
-                    activeTasks.remove(sessionId);
-                } catch (Exception e) {
-                    log.error("Lỗi trong quá trình crawl: {}", e.getMessage());
-                    CrawlerProgressMessage errorMessage = CrawlerProgressMessage.builder()
-                            .sessionId(sessionId)
-                            .status(CrawlerStatus.ERROR)
-                            .build();
-                    errorMessage.addError("crawler", e.getMessage());
-                    sendProgressUpdate(errorMessage);
-
-                    activeTasks.remove(sessionId);
-                }
-            }
-        };
-
-        // Thêm dòng này để khởi tạo task với request và sessionId
-        crawlerTask.initialize(request, sessionId);
-
-        activeTasks.put(sessionId, crawlerTask);
-        taskExecutor.execute(crawlerTask);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("sessionId", sessionId);
-        response.put("message", "Tiến trình crawl đã bắt đầu");
-
-        return BaseResponse.success(response);
-    }
-
-    @Override
-    public BaseResponse<?> getCrawlStatus(String sessionId) {
-        if (!activeTasks.containsKey(sessionId)) {
-            throw new BaseException(ErrorCode.CRAWLER_NOT_FOUND);
-        }
-
-        return BaseResponse.success("Tiến trình crawl đang hoạt động");
-    }
-
-    @Override
-    public BaseResponse<?> stopCrawlTask(String sessionId) {
-        if (!activeTasks.containsKey(sessionId)) {
-            throw new BaseException(ErrorCode.CRAWLER_NOT_FOUND);
-        }
-
-        // Gọi phương thức stop() trên CrawlerTask
-        CrawlerTask task = activeTasks.get(sessionId);
-        task.stop();
-
-        // Vẫn giữ dòng xóa task khỏi map
-        activeTasks.remove(sessionId);
-
-        CrawlerProgressMessage message = CrawlerProgressMessage.builder()
-                .sessionId(sessionId)
-                .status(CrawlerStatus.COMPLETED)
-                .build();
-        messagingTemplate.convertAndSend("/topic/crawler/" + sessionId, message);
-
-        return BaseResponse.success("Đã dừng tiến trình crawl");
-    }
-
-    private void sendProgressUpdate(CrawlerProgressMessage message) {
-        messagingTemplate.convertAndSend("/topic/crawler/" + message.getSessionId(), message);
-    }
-
-    @Transactional
-    public BaseResponse<?> crawlComic(CrawlerComicRequest request) {
-        return crawlComic(request, null);
-    }
-
     @Transactional
     private boolean processComicWithChapters(OTruyenComicDetail comicDetail, boolean isSaveDrive,
-            RestTemplate restTemplate, CrawlerProgressMessage progressMessage) throws InterruptedException {
+            RestTemplate restTemplate) throws InterruptedException {
         try {
             ComicItem oTruyenComic = comicDetail.getData().getItem();
 
@@ -371,7 +215,7 @@ public class CrawlerServiceImpl implements CrawlerService {
                 }
 
                 if (oTruyenComic.getCategory() != null && !oTruyenComic.getCategory().isEmpty()) {
-                    Set<Category> categories = new HashSet<>();
+                    List<Category> categories = new ArrayList<>();
 
                     for (var oTruyenCategory : oTruyenComic.getCategory()) {
                         String categorySlug = StringUtils.generateSlug(oTruyenCategory.getName());
@@ -409,9 +253,7 @@ public class CrawlerServiceImpl implements CrawlerService {
             Thread.sleep(requestDelayMs);
 
             try {
-                boolean anyChapterProcessed = processChapters(comicDetail, comic, restTemplate, isExistingComic,
-                        progressMessage);
-
+                boolean anyChapterProcessed = processChapters(comicDetail, comic, restTemplate, isExistingComic);
                 return anyChapterProcessed || !isExistingComic;
             } catch (Exception e) {
                 log.error("Lỗi khi xử lý chapters cho truyện {}: {}", comic.getName(), e.getMessage());
@@ -425,7 +267,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     @Transactional
     private boolean processChapters(OTruyenComicDetail comicDetail, Comic comic, RestTemplate restTemplate,
-            boolean isExistingComic, CrawlerProgressMessage progressMessage) throws InterruptedException {
+            boolean isExistingComic) throws InterruptedException {
         List<OTruyenChapter> chapters = new ArrayList<>();
 
         ComicItem item = comicDetail.getData().getItem();
@@ -453,12 +295,6 @@ public class CrawlerServiceImpl implements CrawlerService {
         boolean anyChapterProcessedSuccessfully = false;
 
         for (OTruyenChapter chapter : chapters) {
-            // Kiểm tra nếu task đã bị dừng
-            if (progressMessage != null && shouldStopCrawling(progressMessage.getSessionId())) {
-                log.info("Tiến trình xử lý chapter đã bị dừng cho session: {}", progressMessage.getSessionId());
-                return anyChapterProcessedSuccessfully;
-            }
-
             Thread.sleep(requestDelayMs);
 
             double chapterNumber;
@@ -474,17 +310,12 @@ public class CrawlerServiceImpl implements CrawlerService {
                 continue;
             }
 
-            boolean chapterSuccess = processChapter(chapter, comic, restTemplate, latestChapterNumber, isExistingComic,
-                    progressMessage);
+            boolean chapterSuccess = processChapter(chapter, comic, restTemplate, latestChapterNumber, isExistingComic);
             if (chapterSuccess) {
                 anyChapterProcessedSuccessfully = true;
             }
 
             chapterProcessed++;
-            if (progressMessage != null) {
-                progressMessage.setCurrentComicChaptersProcessed(chapterProcessed);
-                sendProgressUpdate(progressMessage);
-            }
 
             if (chapterProcessed % batchSize == 0) {
                 log.info("Đã xử lý {} chapter cho truyện {}, đang tạm nghỉ...",
@@ -498,8 +329,7 @@ public class CrawlerServiceImpl implements CrawlerService {
 
     @Transactional
     private boolean processChapter(OTruyenChapter chapter, Comic comic, RestTemplate restTemplate,
-            Double latestChapterNumber, boolean isExistingComic, CrawlerProgressMessage progressMessage)
-            throws InterruptedException {
+            Double latestChapterNumber, boolean isExistingComic) throws InterruptedException {
         double chapterNumber;
         try {
             chapterNumber = NumberUtils.parseStringToDouble(chapter.getChapter_name());
@@ -521,20 +351,6 @@ public class CrawlerServiceImpl implements CrawlerService {
 
         List<ChapterImage> chapterImages = chapterDetail.getData().getItem().getChapter_image();
         processChapterDetail(chapterImages, chapterNew);
-
-        // Cập nhật thông tin chapter đã crawl xong cho frontend
-        if (progressMessage != null) {
-            Map<String, Object> chapterInfo = new HashMap<>();
-            chapterInfo.put("comicName", comic.getName());
-            chapterInfo.put("comicId", comic.getId());
-            chapterInfo.put("chapterNumber", chapterNumber);
-            chapterInfo.put("chapterId", chapterNew.getId());
-            chapterInfo.put("chapterTitle", chapterNew.getTitle());
-            chapterInfo.put("imageCount", chapterImages.size());
-
-            progressMessage.setLastCompletedChapter(chapterInfo);
-            sendProgressUpdate(progressMessage);
-        }
 
         return true;
     }
@@ -611,47 +427,4 @@ public class CrawlerServiceImpl implements CrawlerService {
                 chapterNew.getChapterNumber(),
                 chapterNew.getComic().getName());
     }
-
-    /**
-     * Phiên bản bất đồng bộ của crawlComic để sử dụng với WebSocket
-     */
-    public void crawlComicAsync(CrawlerComicRequest request, CrawlerProgressMessage progressMessage) {
-        try {
-            // Gọi phương thức đồng bộ với progressMessage
-            BaseResponse<?> response = crawlComic(request, progressMessage);
-
-            // Cập nhật kết quả vào progressMessage nếu cần
-            if (response.getStatus() == 200) {
-                progressMessage.setStatus(CrawlerStatus.COMPLETED);
-            } else {
-                progressMessage.setStatus(CrawlerStatus.ERROR);
-                progressMessage.addError("crawler", "Có lỗi xảy ra trong quá trình crawl");
-            }
-        } catch (Exception e) {
-            log.error("Lỗi khi crawl comic bất đồng bộ", e);
-            progressMessage.setStatus(CrawlerStatus.ERROR);
-            progressMessage.addError("crawler", e.getMessage());
-        } finally {
-            // Đảm bảo gửi thông báo cuối cùng
-            sendProgressUpdate(progressMessage);
-        }
-    }
-
-    // Dừng tại dòng này để tránh nhầm lẫn
-    public void crawlComicWithProgress(CrawlerComicRequest request, CrawlerProgressMessage progressMessage) {
-        // Phương thức này không cần thiết nữa, sử dụng crawlComicAsync thay thế
-        try {
-            crawlComic(request, progressMessage);
-        } catch (Exception e) {
-            progressMessage.setStatus(CrawlerStatus.ERROR);
-            progressMessage.addError("crawler", e.getMessage());
-            sendProgressUpdate(progressMessage);
-        }
-    }
-
-    private boolean shouldStopCrawling(String sessionId) {
-        CrawlerTask task = activeTasks.get(sessionId);
-        return task == null || task.isStopped();
-    }
-
 }
