@@ -24,10 +24,13 @@ import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.DetailChapter;
 import com.thjvjpxx.backend_comic.model.Level;
+import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ChapterService;
 import com.thjvjpxx.backend_comic.service.StorageService;
+import com.thjvjpxx.backend_comic.utils.ChapterUtils;
+import com.thjvjpxx.backend_comic.utils.ComicUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
 import com.thjvjpxx.backend_comic.utils.ValidationUtils;
 
@@ -43,9 +46,12 @@ public class ChapterServiceImpl implements ChapterService {
     final ChapterRepository chapterRepository;
     final ComicRepository comicRepository;
     final StorageService b2StorageService;
+    final ComicUtils comicUtils;
 
     @Value("${b2.bucketName}")
     String bucketName;
+
+    final ChapterUtils chapterUtils;
 
     /**
      * Lấy danh sách chương
@@ -102,21 +108,8 @@ public class ChapterServiceImpl implements ChapterService {
                     ? chapter.getComic().getPublisher().getLevel()
                     : null;
 
-            ChapterResponse chapterResponse = ChapterResponse.builder()
-                    .id(chapter.getId())
-                    .title(chapter.getTitle())
-                    .chapterNumber(chapter.getChapterNumber())
-                    .comicName(chapter.getComic().getName())
-                    .status(chapter.getStatus())
-                    .price(chapter.getPrice())
-                    .domainCdn(chapter.getDomainCdn())
-                    .chapterPath(chapter.getChapterPath())
-                    .detailChapters(detailChapterResponses)
-                    .createdAt(chapter.getCreatedAt().toString())
-                    .updatedAt(chapter.getUpdatedAt().toString())
-                    .publisherName(publisherName)
-                    .publisherLevel(publisherLevel)
-                    .build();
+            ChapterResponse chapterResponse = chapterUtils.convertChapterToChapterResponse(chapter,
+                    detailChapterResponses, publisherName, publisherLevel);
 
             chapterResponses.add(chapterResponse);
         }
@@ -184,7 +177,12 @@ public class ChapterServiceImpl implements ChapterService {
      */
     @Override
     @Transactional
-    public BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files) {
+    public BaseResponse<?> createChapter(ChapterRequest chapterRequest, List<MultipartFile> files, User publisher) {
+
+        if (publisher != null) {
+            comicUtils.validateComicOwnershipByComicId(publisher, chapterRequest.getComicId());
+        }
+
         validateChapterRequest(chapterRequest);
         validateChapterNumber(chapterRequest);
 
@@ -339,7 +337,12 @@ public class ChapterServiceImpl implements ChapterService {
      */
     @Override
     @Transactional
-    public BaseResponse<?> updateChapter(String id, ChapterRequest chapterRequest, List<MultipartFile> files) {
+    public BaseResponse<?> updateChapter(String id, ChapterRequest chapterRequest, List<MultipartFile> files,
+            User publisher) {
+        if (publisher != null) {
+            comicUtils.validateComicOwnershipByComicId(publisher, chapterRequest.getComicId());
+        }
+
         // Validate input
         ValidationUtils.checkNullId(id);
         validateChapterRequest(chapterRequest);
@@ -465,10 +468,15 @@ public class ChapterServiceImpl implements ChapterService {
      */
     @Override
     @Transactional
-    public BaseResponse<?> deleteChapter(String id) {
+    public BaseResponse<?> deleteChapter(String id, User publisher) {
+
         ValidationUtils.checkNullId(id);
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
+
+        if (publisher != null) {
+            comicUtils.validateComicOwnershipByComicId(publisher, chapter.getComic().getId());
+        }
 
         String key = B2Constants.FOLDER_KEY_COMIC + "/" + chapter.getChapterPath() + "/";
         b2StorageService.remove(key);

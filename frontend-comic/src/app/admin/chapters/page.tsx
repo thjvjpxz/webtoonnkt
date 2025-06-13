@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Pagination from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import UserName from "@/components/ui/UserName";
 import { useChapter } from "@/hooks/useChapter";
+import { renderBadge } from "@/components/ui/comic-render";
 import { constructImageUrl, formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
@@ -330,16 +330,8 @@ export default function Chapters() {
                       </TableCell>
 
                       {/* Nhà xuất bản */}
-                      <TableCell className="text-center text-foreground">
-                        <div className="flex items-center justify-center">
-                          {chapter.publisherName !== null ? (
-                            <UserName
-                              username={chapter.publisherName || ''}
-                              level={chapter.publisherLevel}
-                              showLevel={false}
-                            />
-                          ) : "Không có"}
-                        </div>
+                      <TableCell className="text-center text-muted-foreground font-medium">
+                        {renderBadge(chapter.publisherName || null)}
                       </TableCell>
 
                       {/* Ngày tạo */}

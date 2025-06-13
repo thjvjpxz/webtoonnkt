@@ -1,6 +1,5 @@
 package com.thjvjpxx.backend_comic.controller;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,22 +47,22 @@ public class ComicController {
         return comicService.getAllChapters(page, limit, search, status, id);
     }
 
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping
     public BaseResponse<?> createComic(
             @Valid @RequestPart("data") ComicRequest comicRequest,
             @RequestPart(value = "cover", required = false) MultipartFile cover) {
-        return comicService.createComic(comicRequest, cover);
+        return comicService.createComic(comicRequest, cover, null);
     }
 
-    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(value = "/{id}")
     public BaseResponse<?> updateComic(@PathVariable String id,
             @Valid @RequestPart("data") ComicRequest comicRequest,
             @RequestPart(value = "cover", required = false) MultipartFile cover) {
-        return comicService.updateComic(id, comicRequest, cover);
+        return comicService.updateComic(id, comicRequest, cover, null);
     }
 
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteComic(@PathVariable String id) {
-        return comicService.deleteComic(id);
+        return comicService.deleteComic(id, null);
     }
 }

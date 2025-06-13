@@ -2,7 +2,6 @@ package com.thjvjpxx.backend_comic.controller;
 
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,23 +38,23 @@ public class ChapterController {
         return chapterService.getAllChapters(page, limit, search, comicId);
     }
 
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping
     public BaseResponse<?> createChapter(
             @Valid @RequestPart("data") ChapterRequest chapterRequest,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        return chapterService.createChapter(chapterRequest, files);
+        return chapterService.createChapter(chapterRequest, files, null);
     }
 
     @PutMapping("/{id}")
     public BaseResponse<?> updateChapter(@PathVariable String id,
             @Valid @RequestPart("data") ChapterRequest chapterRequest,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        return chapterService.updateChapter(id, chapterRequest, files);
+        return chapterService.updateChapter(id, chapterRequest, files, null);
     }
 
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteChapter(@PathVariable String id) {
-        return chapterService.deleteChapter(id);
+        return chapterService.deleteChapter(id, null);
     }
 
 }

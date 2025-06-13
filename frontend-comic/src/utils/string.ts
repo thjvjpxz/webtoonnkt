@@ -44,7 +44,7 @@ export const formatRole = (role: string) => {
  * @param url - URL ảnh
  * @returns URL ảnh đã được chọn
  */
-export const chooseImageUrl = (url: string) => {
+export const chooseImageUrl = (url: string | undefined) => {
   // Kiểm tra URL hợp lệ
   if (!url || typeof url !== 'string') {
     return '/images/placeholder.svg';

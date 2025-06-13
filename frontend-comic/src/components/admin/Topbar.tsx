@@ -52,23 +52,38 @@ export default function Topbar({ title }: TopbarProps) {
         {/* User Info Header */}
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
           <Image
-            src={chooseImageUrl(user?.imgUrl || "")}
+            src={chooseImageUrl(user?.imgUrl)}
             alt={user?.username || ""}
             width={48}
             height={48}
             className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
           />
 
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground truncate">
-              {user?.username || 'Admin'}
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                Quản trị viên
-              </span>
-            </div>
-          </div>
+          {
+            user?.role?.name === "ADMIN" ? (
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground truncate">
+                  {user?.username || 'Admin'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs px-2 py-1 rounded font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
+                    Quản trị viên
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground truncate">
+                  {user?.username || 'Publisher'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs px-2 py-1 rounded font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    Publisher
+                  </span>
+                </div>
+              </div>
+            )
+          }
         </div>
 
         <DropdownMenuSeparator />

@@ -118,14 +118,6 @@ public enum ErrorCode {
     COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Bình luận đã bị xóa!"),
 
     // Publisher
-    PUBLISHER_COMIC_NAME_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tên truyện không được để trống!"),
-    PUBLISHER_COMIC_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên truyện không được vượt quá 255 ký tự!"),
-    PUBLISHER_COMIC_ORIGIN_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên gốc không được vượt quá 255 ký tự!"),
-    PUBLISHER_COMIC_AUTHOR_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tác giả không được để trống!"),
-    PUBLISHER_COMIC_AUTHOR_TOO_LONG(HttpStatus.BAD_REQUEST, "Tên tác giả không được vượt quá 255 ký tự!"),
-    PUBLISHER_COMIC_DESCRIPTION_TOO_LONG(HttpStatus.BAD_REQUEST, "Mô tả không được vượt quá 1000 ký tự!"),
-    PUBLISHER_COMIC_CATEGORIES_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Danh sách thể loại không được để trống!"),
-    PUBLISHER_COMIC_CATEGORIES_MIN_ONE(HttpStatus.BAD_REQUEST, "Phải chọn ít nhất 1 thể loại!"),
     PUBLISHER_COMIC_NOT_OWNER(HttpStatus.FORBIDDEN, "Bạn không có quyền thao tác với truyện này!"),
 
     PUBLISHER_CHAPTER_TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Tiêu đề chương không được để trống!"),

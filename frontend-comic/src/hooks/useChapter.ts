@@ -1,10 +1,11 @@
 import { ChapterCreateUpdate, ChapterWithComicDetail } from "@/types/chapter";
-import { createChapter, deleteChapter, getChapters, getMyChapters, updateChapter } from "@/services/chapterService";
+import * as chapterService from "@/services/chapterService";
+import * as publisherService from "@/services/publisherService";
 import { useCallback, useEffect, useState } from "react";
-import { getComics, getMyComics } from "@/services/comicService";
 import { ComicResponse } from "@/types/comic";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
+import { getComics } from "@/services/comicService";
 
 export const useChapter = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -39,8 +40,8 @@ export const useChapter = () => {
 
     try {
       const response = isPublisher
-        ? await getMyChapters(currentPage, pageSize, searchTerm, comicFilter || undefined)
-        : await getChapters(currentPage, pageSize, searchTerm, comicFilter || undefined);
+        ? await publisherService.getChapters(currentPage - 1, pageSize, searchTerm, comicFilter || undefined)
+        : await chapterService.getChapters(currentPage - 1, pageSize, searchTerm, comicFilter || undefined);
 
       if (response.status === 200 && response.data) {
         setTotalPages(response.totalPages || 1);
@@ -68,8 +69,8 @@ export const useChapter = () => {
     setIsLoadingComics(true);
     try {
       const response = isPublisher
-        ? await getMyComics(searchTerm, page, limit)
-        : await getComics(searchTerm, page, limit);
+        ? await publisherService.getMyComics(page, limit, searchTerm)
+        : await getComics(page, limit, searchTerm);
       if (response.status === 200 && response.data) {
         if (page === 1) {
           setComicOptions(response.data);
@@ -114,9 +115,11 @@ export const useChapter = () => {
   const handleDeleteChapter = async () => {
     try {
 
-      const response = await deleteChapter(selectedChapter!.id);
-      if (response.status === 200) {
-        toast.success("Xóa chương thành công chương " + response.data?.chapterNumber + " của truyện " + response.data?.comicName);
+      const response = isPublisher
+        ? await publisherService.deleteChapter(selectedChapter!.id)
+        : await chapterService.deleteChapter(selectedChapter!.id);
+      if (response.status === 200 && response.data) {
+        toast.success("Xóa chương thành công chương " + response.data.chapterNumber + " của truyện " + response.data.comicName);
         fetchChapters();
         setIsDeleteModalOpen(false);
       } else {
@@ -141,8 +144,12 @@ export const useChapter = () => {
       const isUpdate = !!chapterRequest.id;
 
       const response = isUpdate
-        ? await updateChapter(chapterRequest.id!, chapterRequest, files)
-        : await createChapter(chapterRequest, files);
+        ? isPublisher
+          ? await publisherService.updateChapter(chapterRequest.id!, chapterRequest, files)
+          : await chapterService.updateChapter(chapterRequest.id!, chapterRequest, files)
+        : isPublisher
+          ? await publisherService.createChapter(chapterRequest, files)
+          : await chapterService.createChapter(chapterRequest, files);
 
       if (response.status === 200) {
         const successMessage = isUpdate

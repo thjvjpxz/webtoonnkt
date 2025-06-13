@@ -413,8 +413,7 @@ public class TransactionServiceImpl implements TransactionService {
             // 1. Tính tổng số giao dịch
             Long totalTransactions = transactionRepository.count();
 
-            // 2. Tính tổng doanh thu (chỉ tính giao dịch PayOS COMPLETED và amount > 0 -
-            // nạp tiền qua PayOS)
+            // 2. Tính tổng doanh thu
             Double totalAmount = transactionRepository.findAll().stream()
                     .filter(t -> t.getStatus() == TransactionStatus.COMPLETED
                             && t.getAmount() > 0

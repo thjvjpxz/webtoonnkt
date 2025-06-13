@@ -3,17 +3,18 @@ import { CategoryResponse } from "./category";
 // Interface cho tạo/cập nhật comic của publisher
 export interface PublisherComicRequest {
   name: string;
-  originName?: string;
+  slug: string;
+  description: string;
   author: string;
-  description?: string;
+  status: string;
+  originName: string;
+  categories: string[];
   thumbUrl?: string;
-  categoryIds: string[];
 
-  // Biến check để theo dõi thay đổi
-  isSlugChanged?: boolean;
-  isThumbUrlChanged?: boolean;
-  isCategoriesChanged?: boolean;
-  shouldRemoveThumbUrl?: boolean;
+  isSlugChanged: boolean;
+  isThumbUrlChanged: boolean;
+  isCategoriesChanged: boolean;
+  shouldRemoveThumbUrl: boolean;
 }
 
 // Interface cho response comic của publisher với thông tin thống kê
@@ -21,59 +22,15 @@ export interface PublisherComicResponse {
   id: string;
   name: string;
   slug: string;
-  originName?: string;
-  thumbUrl?: string;
+  originName: string;
+  thumbUrl: string;
   author: string;
-  status: "ONGOING" | "COMPLETED";
-  description?: string;
-
-  // Thống kê
+  status: string;
   followersCount: number;
   viewsCount: number;
-  chaptersCount: number;
-  totalRevenue: number;
-
-  // Metadata
+  description: string;
+  publisherUserName: string;
   categories: CategoryResponse[];
   createdAt: string;
   updatedAt: string;
-
-  // Chapter mới nhất
-  lastChapterId?: string;
-  lastChapterTitle?: string;
-  lastChapterNumber?: number;
 }
-
-// Interface cho thống kê publisher
-export interface PublisherStatsResponse {
-  totalComics: number;
-  totalChapters: number;
-  totalViews: number;
-  totalFollowers: number;
-  totalRevenue: number;
-  monthlyRevenue: number;
-  availableBalance: number;
-}
-
-// Interface cho yêu cầu rút tiền
-export interface WithdrawalRequestDto {
-  amount: number;
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-  reason?: string;
-}
-
-// Interface cho response yêu cầu rút tiền
-export interface WithdrawalRequest {
-  id: string;
-  amount: number;
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-  reason?: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  requestDate: string;
-  processedDate?: string;
-  note?: string;
-} 

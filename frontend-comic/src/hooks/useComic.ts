@@ -1,55 +1,11 @@
 import { getAllCategories } from "@/services/categoryService";
-import { createComicWithCover, deleteComic, getComics, getMyComics, updateComicWithCover } from "@/services/comicService";
+import * as comicService from "@/services/comicService";
 import * as publisherService from "@/services/publisherService";
 import { CategoryResponse } from "@/types/category";
 import { ComicCreateUpdate, ComicResponse } from "@/types/comic";
-import { PublisherComicRequest, PublisherComicResponse } from "@/types/publisher";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
-// Helper function để chuyển đổi PublisherComicResponse thành ComicResponse
-const convertPublisherComicToComic = (publisherComic: PublisherComicResponse): ComicResponse => ({
-  id: publisherComic.id,
-  name: publisherComic.name,
-  slug: publisherComic.slug,
-  originName: publisherComic.originName || "",
-  thumbUrl: publisherComic.thumbUrl || "",
-  author: publisherComic.author,
-  status: publisherComic.status,
-  followersCount: publisherComic.followersCount,
-  viewsCount: publisherComic.viewsCount,
-  description: publisherComic.description || "",
-  lastChapterId: publisherComic.lastChapterId || "",
-  categories: publisherComic.categories,
-  createdAt: publisherComic.createdAt,
-  updatedAt: publisherComic.updatedAt,
-});
-
-// Helper function để chuyển đổi ComicCreateUpdate thành PublisherComicRequest
-const convertComicCreateToPublisherRequest = (comicData: ComicCreateUpdate, isUpdate: boolean = false): PublisherComicRequest => {
-  const baseRequest = {
-    name: comicData.name,
-    originName: comicData.originName,
-    author: comicData.author,
-    description: comicData.description,
-    thumbUrl: comicData.thumbUrl,
-    categoryIds: comicData.categories,
-  };
-
-  // Chỉ thêm các biến check khi đang cập nhật
-  if (isUpdate) {
-    return {
-      ...baseRequest,
-      isSlugChanged: comicData.isSlugChanged,
-      isThumbUrlChanged: comicData.isThumbUrlChanged,
-      isCategoriesChanged: comicData.isCategoriesChanged,
-      shouldRemoveThumbUrl: comicData.shouldRemoveThumbUrl,
-    };
-  }
-
-  return baseRequest;
-};
 
 export const useComic = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -104,25 +60,22 @@ export const useComic = () => {
     try {
       const response = isPublisher
         ? await publisherService.getMyComics(
-          searchTerm,
-          statusFilter,
-          categoryFilter,
-          currentPage,
-          pageSize
-        )
-        : await getComics(
-          searchTerm,
           currentPage,
           pageSize,
-          statusFilter || "",
-          categoryFilter || ""
+          searchTerm,
+          statusFilter,
+          categoryFilter
+        )
+        : await comicService.getComics(
+          currentPage,
+          pageSize,
+          searchTerm,
+          statusFilter,
+          categoryFilter
         );
 
       if (response.status === 200 && response.data) {
-        const convertedComics = isPublisher
-          ? (response.data as PublisherComicResponse[]).map(convertPublisherComicToComic)
-          : response.data as ComicResponse[];
-        setComics(convertedComics);
+        setComics(response.data);
         setTotalPages(response.totalPages || 1);
       } else {
         setComics([]);
@@ -157,8 +110,8 @@ export const useComic = () => {
   const handleAddComic = async (comicData: ComicCreateUpdate, file?: File) => {
     try {
       const response = isPublisher
-        ? await publisherService.createComicWithCover(convertComicCreateToPublisherRequest(comicData, false), file)
-        : await createComicWithCover(comicData, file);
+        ? await publisherService.createComic(comicData, file)
+        : await comicService.createComic(comicData, file);
 
       if (response.status === 200) {
         toast.success("Thêm truyện thành công");
@@ -185,12 +138,12 @@ export const useComic = () => {
 
     try {
       const response = isPublisher
-        ? await publisherService.updateComicWithCover(
+        ? await publisherService.updateComic(
           currentComic.id,
-          convertComicCreateToPublisherRequest(comicData, true),
+          comicData,
           file
         )
-        : await updateComicWithCover(
+        : await comicService.updateComic(
           currentComic.id,
           comicData,
           file
@@ -219,7 +172,7 @@ export const useComic = () => {
     try {
       const response = isPublisher
         ? await publisherService.deleteComic(currentComic.id)
-        : await deleteComic(currentComic.id);
+        : await comicService.deleteComic(currentComic.id);
 
       if (response.status === 200) {
         toast.success("Xóa truyện thành công");
