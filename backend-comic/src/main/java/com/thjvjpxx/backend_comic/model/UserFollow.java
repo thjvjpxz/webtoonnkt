@@ -1,5 +1,9 @@
 package com.thjvjpxx.backend_comic.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +23,8 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(name = "user_follows", indexes = {
         @Index(name = "idx_user_id", columnList = "user_id"),
-        @Index(name = "idx_comic_id", columnList = "comic_id")
+        @Index(name = "idx_comic_id", columnList = "comic_id"),
+        @Index(name = "idx_created_at", columnList = "created_at")
 })
 @Data
 @NoArgsConstructor
@@ -39,4 +44,8 @@ public class UserFollow {
     @ManyToOne
     @JoinColumn(name = "comic_id", nullable = false)
     Comic comic;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    LocalDateTime createdAt;
 }

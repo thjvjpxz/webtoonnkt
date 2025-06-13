@@ -80,6 +80,7 @@ public class SecurityConfig {
 
 						// Các API cần xác thực với vai trò PUBLISHER
 						.requestMatchers("/publisher/**").hasAnyRole("PUBLISHER", "ADMIN")
+						.requestMatchers("/publisher/stats/personal/**").hasAnyRole("PUBLISHER", "ADMIN")
 
 						// Các API khác cần xác thực
 						.anyRequest().authenticated())

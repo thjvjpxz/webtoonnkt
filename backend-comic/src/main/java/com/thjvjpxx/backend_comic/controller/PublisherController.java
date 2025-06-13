@@ -1,7 +1,9 @@
 package com.thjvjpxx.backend_comic.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thjvjpxx.backend_comic.dto.request.ChapterRequest;
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.PublisherPersonalStatsResponse;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.ChapterService;
 import com.thjvjpxx.backend_comic.service.ComicService;
+import com.thjvjpxx.backend_comic.service.PublisherPersonalStatsService;
 import com.thjvjpxx.backend_comic.service.PublisherService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
 
@@ -39,6 +43,27 @@ public class PublisherController {
     SecurityUtils securityUtils;
     ComicService comicService;
     ChapterService chapterService;
+    PublisherPersonalStatsService publisherPersonalStatsService;
+
+    // ==================== PERSONAL STATISTICS ====================
+    @GetMapping("/stats/personal")
+    public BaseResponse<PublisherPersonalStatsResponse> getPersonalStats() {
+        User currentUser = securityUtils.getCurrentUser();
+        PublisherPersonalStatsResponse stats = publisherPersonalStatsService.getPersonalStats(currentUser);
+
+        return BaseResponse.success(stats, "Lấy thống kê cá nhân thành công");
+    }
+
+    @GetMapping("/stats/personal/range")
+    public BaseResponse<PublisherPersonalStatsResponse> getPersonalStatsInRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+        User currentUser = securityUtils.getCurrentUser();
+        PublisherPersonalStatsResponse stats = publisherPersonalStatsService.getPersonalStatsInDateRange(currentUser,
+                startDate, endDate);
+
+        return BaseResponse.success(stats, "Lấy thống kê cá nhân theo khoảng thời gian thành công");
+    }
 
     // ==================== COMIC MANAGEMENT ====================
     @GetMapping("/comics")

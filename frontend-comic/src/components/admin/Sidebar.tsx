@@ -43,6 +43,12 @@ export default function Sidebar({
       label: "Tổng quan",
     },
     {
+      path: "/publisher/dashboard",
+      icon: <FiHome size={20} />,
+      label: "Tổng quan",
+      show: isPublisher
+    },
+    {
       path: "/admin/categories",
       icon: <FiTag size={20} />,
       label: "Quản lý thể loại",

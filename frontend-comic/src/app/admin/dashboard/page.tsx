@@ -1,10 +1,10 @@
 "use client";
 
 import DashboardLayout from "@/components/admin/DashboardLayout";
-import StatisticsCards from "@/components/admin/StatisticsCards";
-import StatisticsCharts from "@/components/admin/StatisticsCharts";
-import QuickMetrics from "@/components/admin/QuickMetrics";
-import TransactionStats from "@/components/admin/TransactionStats";
+import StatisticsCards from "@/components/admin/stats/StatisticsCards";
+import StatisticsCharts from "@/components/admin/stats/StatisticsCharts";
+import QuickMetrics from "@/components/admin/stats/QuickMetrics";
+import TransactionStats from "@/components/admin/stats/TransactionStats";
 import { useAdminStatistics } from "@/hooks/useAdminStatistics";
 import { Button } from "@/components/ui/button";
 import { FiRefreshCw } from "react-icons/fi";

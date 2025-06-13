@@ -4,10 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.thjvjpxx.backend_comic.model.ComicViewsHistory;
+import com.thjvjpxx.backend_comic.model.User;
 
 public interface ComicViewsHistoryRepository extends JpaRepository<ComicViewsHistory, String> {
     Optional<ComicViewsHistory> findByComicIdAndViewDate(String comicId, LocalDateTime viewDate);
@@ -62,4 +65,46 @@ public interface ComicViewsHistoryRepository extends JpaRepository<ComicViewsHis
             LIMIT 10
             """, nativeQuery = true)
     List<Object[]> getTopComicsByViews();
+
+    // === PUBLISHER STATS QUERIES ===
+
+    // Tổng lượt xem của publisher
+    @Query("SELECT COALESCE(SUM(cvh.viewCount), 0) FROM comic_views_history cvh WHERE cvh.comic.publisher = :publisher")
+    Long getTotalViewsByPublisher(@Param("publisher") User publisher);
+
+    // Lượt xem của publisher trong khoảng thời gian
+    @Query("SELECT COALESCE(SUM(cvh.viewCount), 0) FROM comic_views_history cvh WHERE cvh.comic.publisher = :publisher AND cvh.viewDate >= :startDate AND cvh.viewDate < :endDate")
+    Long getViewsByPublisherBetweenDates(@Param("publisher") User publisher,
+            @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    // Thống kê views theo tháng cho publisher
+    @Query(value = """
+            SELECT
+                DATE_FORMAT(cvh.view_date, '%Y-%m') as month,
+                COALESCE(SUM(cvh.view_count), 0) as total_views
+            FROM comic_views_history cvh
+            INNER JOIN comics c ON cvh.comic_id = c.id
+            WHERE c.publisher_id = :publisherId
+                AND cvh.view_date >= :startDate
+                AND cvh.view_date < :endDate
+            GROUP BY DATE_FORMAT(cvh.view_date, '%Y-%m')
+            ORDER BY month DESC
+            """, nativeQuery = true)
+    List<Object[]> getMonthlyViewsByPublisher(@Param("publisherId") String publisherId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
+    // Top comics theo views của publisher
+    @Query("""
+            SELECT cvh.comic, SUM(cvh.viewCount) as totalViews
+            FROM comic_views_history cvh
+            WHERE cvh.comic.publisher = :publisher
+            GROUP BY cvh.comic
+            ORDER BY totalViews DESC
+            """)
+    List<Object[]> getTopComicsByViewsForPublisher(@Param("publisher") User publisher, Pageable pageable);
+
+    // Đếm unique viewers (dựa trên comic views - ước tính)
+    @Query("SELECT COUNT(DISTINCT cvh.comic.id) FROM comic_views_history cvh WHERE cvh.comic.publisher = :publisher")
+    Long getUniqueComicViewsByPublisher(@Param("publisher") User publisher);
 }
