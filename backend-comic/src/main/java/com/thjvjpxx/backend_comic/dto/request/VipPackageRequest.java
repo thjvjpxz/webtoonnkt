@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa gói VIP
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VipPackageRequest {

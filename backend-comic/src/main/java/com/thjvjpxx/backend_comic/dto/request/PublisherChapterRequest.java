@@ -12,6 +12,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa chapter của publisher
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PublisherChapterRequest {

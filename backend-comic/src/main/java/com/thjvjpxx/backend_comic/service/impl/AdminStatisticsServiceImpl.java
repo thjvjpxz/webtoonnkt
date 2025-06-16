@@ -30,25 +30,24 @@ import com.thjvjpxx.backend_comic.repository.TransactionRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.AdminStatisticsService;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.experimental.FieldDefaults;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 
-    private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
-    private final ComicViewsHistoryRepository comicViewsHistoryRepository;
-    private final PublisherRequestRepository publisherRequestRepository;
-    private final ComicRepository comicRepository;
-    private final ChapterRepository chapterRepository;
+    TransactionRepository transactionRepository;
+    UserRepository userRepository;
+    ComicViewsHistoryRepository comicViewsHistoryRepository;
+    PublisherRequestRepository publisherRequestRepository;
+    ComicRepository comicRepository;
+    ChapterRepository chapterRepository;
 
     @Override
     public AdminStatisticsResponse getAllStatistics() {
-        log.info("Bắt đầu lấy tất cả thống kê cho Admin");
-
         return AdminStatisticsResponse.builder()
                 .revenueStats(getRevenueStatistics())
                 .userGrowthStats(getUserGrowthStatistics())
@@ -58,11 +57,15 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .build();
     }
 
-    @Override
-    public RevenueStatsResponse getRevenueStatistics() {
-        log.info("Lấy thống kê doanh thu");
+    // ================ HELPER METHODS ================
 
-        // Lấy doanh thu theo năm để tính YoY
+    /**
+     * Lấy thống kê doanh thu
+     * 
+     * @return thống kê doanh thu
+     */
+    private RevenueStatsResponse getRevenueStatistics() {
+        // Lấy doanh thu theo năm để tính tăng trưởng
         List<Object[]> yearlyRevenues = transactionRepository.getYearlyRevenueStats();
         Double currentYearRevenue = 0.0;
         Double previousYearRevenue = 0.0;
@@ -134,9 +137,12 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .build();
     }
 
-    @Override
-    public UserGrowthStatsResponse getUserGrowthStatistics() {
-        log.info("Lấy thống kê tăng trưởng người dùng");
+    /**
+     * Lấy thống kê tăng trưởng người dùng
+     * 
+     * @return thống kê tăng trưởng người dùng
+     */
+    private UserGrowthStatsResponse getUserGrowthStatistics() {
 
         Long totalUsers = userRepository.countTotalUsers();
         Long totalVipUsers = userRepository.countVipUsers();
@@ -152,10 +158,8 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
         }
 
         // Tính tỉ lệ active user (giả định: user có lượt xem chapter trong tháng)
-        // Đây là một ước tính đơn giản, có thể cần logic phức tạp hơn
         Double activeUserRate = 0.0;
         if (totalUsers > 0 && totalChapterViews > 0) {
-            // Giả định mỗi user active xem trung bình 10 chapter/tháng
             Long estimatedActiveUsers = Math.min(totalChapterViews / 10, totalUsers);
             activeUserRate = (estimatedActiveUsers.doubleValue() / totalUsers.doubleValue()) * 100;
         }
@@ -195,9 +199,12 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .build();
     }
 
-    @Override
-    public ContentPerformanceStatsResponse getContentPerformanceStatistics() {
-        log.info("Lấy thống kê hiệu suất nội dung");
+    /**
+     * Lấy thống kê hiệu suất nội dung
+     * 
+     * @return thống kê hiệu suất nội dung
+     */
+    private ContentPerformanceStatsResponse getContentPerformanceStatistics() {
 
         Long totalViews = comicViewsHistoryRepository.getTotalViews();
         Long currentMonthViews = comicViewsHistoryRepository.getCurrentMonthViews();
@@ -268,9 +275,12 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .build();
     }
 
-    @Override
-    public TransactionStatusStatsResponse getTransactionStatusStatistics() {
-        log.info("Lấy thống kê tình trạng giao dịch");
+    /**
+     * Lấy thống kê tình trạng giao dịch
+     * 
+     * @return thống kê tình trạng giao dịch
+     */
+    private TransactionStatusStatsResponse getTransactionStatusStatistics() {
 
         Long totalTransactions = transactionRepository.count();
         Long completedTransactions = transactionRepository.countByStatus(TransactionStatus.COMPLETED);
@@ -342,9 +352,12 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .build();
     }
 
-    @Override
-    public PublisherActivityStatsResponse getPublisherActivityStatistics() {
-        log.info("Lấy thống kê hoạt động publisher");
+    /**
+     * Lấy thống kê hoạt động publisher
+     * 
+     * @return thống kê hoạt động publisher
+     */
+    private PublisherActivityStatsResponse getPublisherActivityStatistics() {
 
         Long totalPublishers = userRepository.countTotalPublishers();
         Long pendingRequests = publisherRequestRepository.countByStatus(PublisherRequestStatus.PENDING);

@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho tất cả response
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder

@@ -15,21 +15,55 @@ import com.thjvjpxx.backend_comic.model.User;
 
 @Repository
 public interface PublisherRequestRepository extends JpaRepository<PublisherRequest, String> {
+    /**
+     * Tìm yêu cầu publisher theo người dùng
+     * @param user người dùng cần tìm yêu cầu
+     * @return Optional chứa yêu cầu publisher nếu tìm thấy
+     */
     Optional<PublisherRequest> findByUser(User user);
 
+    /**
+     * Tìm yêu cầu publisher theo trạng thái với phân trang
+     * @param status trạng thái yêu cầu
+     * @param pageable thông tin phân trang
+     * @return danh sách yêu cầu publisher theo trạng thái với phân trang
+     */
     Page<PublisherRequest> findByStatus(PublisherRequestStatus status, Pageable pageable);
 
+    /**
+     * Tìm yêu cầu publisher theo trạng thái và tên người dùng chứa keyword với phân trang
+     * @param status trạng thái yêu cầu
+     * @param username tên người dùng cần tìm kiếm
+     * @param pageable thông tin phân trang
+     * @return danh sách yêu cầu publisher phù hợp với phân trang
+     */
     Page<PublisherRequest> findByStatusAndUserUsernameContaining(PublisherRequestStatus status, String username,
             Pageable pageable);
 
+    /**
+     * Tìm yêu cầu publisher theo tên người dùng chứa keyword với phân trang
+     * @param username tên người dùng cần tìm kiếm
+     * @param pageable thông tin phân trang
+     * @return danh sách yêu cầu publisher có tên người dùng chứa keyword với phân trang
+     */
     Page<PublisherRequest> findByUserUsernameContaining(String username, Pageable pageable);
 
     // === QUERIES CHO ADMIN STATISTICS ===
 
-    // Đếm số yêu cầu theo trạng thái
+    /**
+     * Đếm số yêu cầu publisher theo trạng thái
+     * @param status trạng thái yêu cầu cần đếm
+     * @return tổng số yêu cầu theo trạng thái
+     */
     Long countByStatus(PublisherRequestStatus status);
 
-    // Thống kê yêu cầu theo trạng thái
+    /**
+     * Thống kê phân bố yêu cầu publisher theo trạng thái
+     * @return danh sách Object[] chứa thông tin [status, count, percentage] 
+     *         - status: trạng thái yêu cầu
+     *         - count: số lượng yêu cầu
+     *         - percentage: tỷ lệ phần trăm
+     */
     @Query(value = """
             SELECT
                 pr.status,
@@ -40,7 +74,14 @@ public interface PublisherRequestRepository extends JpaRepository<PublisherReque
             """, nativeQuery = true)
     List<Object[]> getRequestStatusDistribution();
 
-    // Thống kê hoạt động publisher theo tháng (12 tháng gần nhất)
+    /**
+     * Thống kê hoạt động yêu cầu publisher theo tháng (12 tháng gần nhất)
+     * @return danh sách Object[] chứa thông tin [month, new_requests, approved_requests, rejected_requests]
+     *         - month: tháng (định dạng YYYY-MM)
+     *         - new_requests: số yêu cầu mới
+     *         - approved_requests: số yêu cầu được duyệt
+     *         - rejected_requests: số yêu cầu bị từ chối
+     */
     @Query(value = """
             SELECT
                 DATE_FORMAT(pr.created_at, '%Y-%m') as month,
@@ -54,7 +95,10 @@ public interface PublisherRequestRepository extends JpaRepository<PublisherReque
             """, nativeQuery = true)
     List<Object[]> getMonthlyPublisherActivity();
 
-    // Đếm yêu cầu được duyệt trong tháng hiện tại
+    /**
+     * Đếm số yêu cầu publisher được duyệt trong tháng hiện tại
+     * @return tổng số yêu cầu được duyệt trong tháng hiện tại
+     */
     @Query(value = """
             SELECT COUNT(*)
             FROM publisher_requests pr
@@ -64,7 +108,10 @@ public interface PublisherRequestRepository extends JpaRepository<PublisherReque
             """, nativeQuery = true)
     Long countApprovedThisMonth();
 
-    // Đếm yêu cầu bị từ chối trong tháng hiện tại
+    /**
+     * Đếm số yêu cầu publisher bị từ chối trong tháng hiện tại
+     * @return tổng số yêu cầu bị từ chối trong tháng hiện tại
+     */
     @Query(value = """
             SELECT COUNT(*)
             FROM publisher_requests pr

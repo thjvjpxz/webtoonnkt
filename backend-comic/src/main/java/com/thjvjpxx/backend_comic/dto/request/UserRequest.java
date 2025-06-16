@@ -6,6 +6,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa user
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequest {

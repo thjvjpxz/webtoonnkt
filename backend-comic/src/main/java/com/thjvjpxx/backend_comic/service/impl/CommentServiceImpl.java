@@ -88,25 +88,6 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public BaseResponse<List<CommentResponse>> getCommentsByUser(String userId, int page, int limit) {
-		ValidationUtils.checkNullId(userId);
-		Pageable pageable = PaginationUtils.createPageable(page, limit);
-		Page<Comment> comments = commentRepository.findByUserIdAndStatus(userId, CommentStatus.ACTIVE,
-				pageable);
-
-		List<CommentResponse> commentResponses = comments.getContent().stream()
-				.map(this::convertToResponse)
-				.collect(Collectors.toList());
-
-		return BaseResponse.success(
-				commentResponses,
-				page,
-				(int) comments.getTotalElements(),
-				limit,
-				comments.getTotalPages());
-	}
-
-	@Override
 	public BaseResponse<List<CommentResponse>> getParentCommentsByComic(String comicId, int page, int limit) {
 		ValidationUtils.checkNullId(comicId);
 		Pageable pageable = PaginationUtils.createPageable(page, limit);

@@ -28,6 +28,7 @@ public class PublisherRequestController {
 
     /**
      * Lấy danh sách yêu cầu trở thành publisher
+     * GET /publisher-requests
      * 
      * @param page   Trang hiện tại
      * @param size   Số lượng yêu cầu trên mỗi trang
@@ -46,6 +47,7 @@ public class PublisherRequestController {
 
     /**
      * Cập nhật trạng thái yêu cầu trở thành publisher
+     * PUT /publisher-requests/{id}
      * 
      * @param id      ID yêu cầu
      * @param request Request body chứa trạng thái yêu cầu

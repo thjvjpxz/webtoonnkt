@@ -11,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa chapter
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChapterRequest {
@@ -32,5 +35,5 @@ public class ChapterRequest {
     List<DetailChapterRequest> detailChapters;
 
     Boolean isFileUploaded;
-    
+
 }

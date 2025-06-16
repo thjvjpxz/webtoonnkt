@@ -10,6 +10,9 @@ import org.springframework.core.env.MapPropertySource;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+/**
+ * Xử lý đọc ENV
+ */
 public class EnvPostProcessor implements EnvironmentPostProcessor {
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment env, SpringApplication application) {

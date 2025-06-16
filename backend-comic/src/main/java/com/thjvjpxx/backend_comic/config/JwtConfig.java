@@ -13,6 +13,9 @@ import io.jsonwebtoken.Jwts;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Cấu hình JWT
+ */
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtConfig {

@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO cho request thêm/sửa/xóa category
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryRequest {

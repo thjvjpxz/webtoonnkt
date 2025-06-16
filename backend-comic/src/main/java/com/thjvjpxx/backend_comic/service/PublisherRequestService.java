@@ -4,6 +4,9 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.PublisherRequestStatus;
 import com.thjvjpxx.backend_comic.model.User;
 
+/**
+ * Service xử lý logic liên quan đến yêu cầu trở thành publisher
+ */
 public interface PublisherRequestService {
     /**
      * Gửi yêu cầu trở thành publisher (chỉ dành cho user)

@@ -5,7 +5,7 @@ import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 
 public interface CrawlerService {
     /**
-     * Crawl truyện từ nguồn bên ngoài
+     * Crawl truyện từ nguồn otruyen
      * 
      * @param request Thông tin request
      * @return Kết quả crawl

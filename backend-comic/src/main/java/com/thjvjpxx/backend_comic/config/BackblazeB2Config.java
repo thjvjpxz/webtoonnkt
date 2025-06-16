@@ -15,6 +15,9 @@ import software.amazon.awssdk.core.checksums.ResponseChecksumValidation;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/**
+ * Cấu hình Backblaze B2
+ */
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BackblazeB2Config {
@@ -30,6 +33,11 @@ public class BackblazeB2Config {
     @Value("${b2.region}")
     String region;
 
+    /**
+     * Tạo S3Client cho Backblaze B2
+     * 
+     * @return S3Client cho Backblaze B2
+     */
     @Bean
     public S3Client s3Client() {
         URI uri = URI.create(endpoint);

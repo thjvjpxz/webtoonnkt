@@ -38,9 +38,10 @@ export default function Sidebar({
 
   const navItems = [
     {
-      path: "/admin/dashboard",
+      path: isPublisher ? "/publisher/dashboard" : "/admin/dashboard",
       icon: <FiHome size={20} />,
       label: "Tổng quan",
+      show: isPublisher
     },
     {
       path: "/admin/categories",

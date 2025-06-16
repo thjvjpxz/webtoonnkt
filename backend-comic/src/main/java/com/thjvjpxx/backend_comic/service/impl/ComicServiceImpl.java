@@ -12,16 +12,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
-import com.thjvjpxx.backend_comic.dto.response.ChapterResponse;
 import com.thjvjpxx.backend_comic.dto.response.ComicResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
-import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.User;
-import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.service.ComicService;
 import com.thjvjpxx.backend_comic.utils.ComicUtils;
@@ -38,7 +35,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComicServiceImpl implements ComicService {
     ComicRepository comicRepository;
-    ChapterRepository chapterRepository;
 
     // Utility classes
     ComicUtils comicUtils;
@@ -154,39 +150,6 @@ public class ComicServiceImpl implements ComicService {
         }
 
         return BaseResponse.success(comic);
-    }
-
-    @Override
-    public BaseResponse<List<ChapterResponse>> getAllChapters(int page, int limit, String search, String status,
-            String comicId) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
-        int originalPage = page;
-        Page<Chapter> chapters = null;
-        if (search != null && !search.isEmpty()) {
-            chapters = chapterRepository.findByComicIdAndTitleContaining(comicId, search, pageable);
-        } else if (status != null && !status.isEmpty()) {
-            chapters = chapterRepository.findByComicIdAndStatus(comicId, status, pageable);
-        } else {
-            chapters = chapterRepository.findByComicId(comicId, pageable);
-        }
-
-        List<ChapterResponse> chapterResponses = chapters.getContent().stream()
-                .map(chapter -> ChapterResponse.builder()
-                        .id(chapter.getId())
-                        .title(chapter.getTitle())
-                        .chapterNumber(chapter.getChapterNumber())
-                        .status(chapter.getStatus())
-                        .createdAt(chapter.getCreatedAt().toString())
-                        .updatedAt(chapter.getUpdatedAt().toString())
-                        .build())
-                .collect(Collectors.toList());
-
-        return BaseResponse.success(
-                chapterResponses,
-                originalPage,
-                (int) chapters.getTotalElements(),
-                limit,
-                chapters.getTotalPages());
     }
 
     // ====================== HELPER METHODS ======================

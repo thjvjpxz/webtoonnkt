@@ -13,17 +13,45 @@ import com.thjvjpxx.backend_comic.model.Category;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, String> {
+    /**
+     * Tìm tất cả category
+     * 
+     * @param pageable Pageable
+     * @return Page<Category>
+     */
     Page<Category> findAll(Pageable pageable);
 
+    /**
+     * Tìm category theo name hoặc slug
+     * 
+     * @param name     Name
+     * @param slug     Slug
+     * @param pageable Pageable
+     * @return Page<Category>
+     */
     Page<Category> findByNameContainingOrSlugContaining(String name, String slug, Pageable pageable);
 
+    /**
+     * Tìm category theo slug
+     * 
+     * @param slug Slug
+     * @return Category
+     */
     Optional<Category> findBySlug(String slug);
 
+    /**
+     * Tìm category theo name
+     * 
+     * @param name Name
+     * @return Category
+     */
     Optional<Category> findByName(String name);
 
-    List<Category> findAllBySlugIn(List<String> slugs);
-
-    // Truy vấn lấy ra 10 categories có nhiều truyện nhất
+    /**
+     * Truy vấn lấy ra 10 categories có nhiều truyện nhất
+     * 
+     * @return List<Category>
+     */
     @Query(value = """
             SELECT c.*
             FROM categories c JOIN comic_categories cc ON c.id = cc.category_id

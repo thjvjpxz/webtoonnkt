@@ -63,17 +63,13 @@ export default function Header() {
           variant="default"
           className="relative h-10 w-10 rounded-full transition-all duration-200 select-none"
         >
-          {user?.imgUrl ? (
-            <Image
-              src={chooseImageUrl(user.imgUrl)}
-              alt={user.username}
-              fill
-              sizes="36px"
-              className="rounded-full object-cover border-2 border-primary/20"
-            />
-          ) : (
-            <FiUser className="w-6 h-6 text-primary-foreground" />
-          )}
+          <Image
+            src={chooseImageUrl(user?.imgUrl || "")}
+            alt={user?.username || ""}
+            fill
+            sizes="36px"
+            className="rounded-full object-cover border-2 border-primary/20"
+          />
           {user?.vip && (
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
               <span className="text-xs font-bold text-white">★</span>
@@ -88,22 +84,16 @@ export default function Header() {
       >
         {/* User Info Header */}
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
-          {user?.imgUrl ? (
-            <Image
-              src={chooseImageUrl(user.imgUrl)}
-              alt={user.username}
-              width={48}
-              height={48}
-              className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <FiUser className="w-6 h-6 text-primary-foreground" />
-            </div>
-          )}
+          <Image
+            src={chooseImageUrl(user?.imgUrl || "")}
+            alt={user?.username || ""}
+            width={48}
+            height={48}
+            className="rounded-full object-cover border-2 border-primary/20 h-[48px] w-[48px]"
+          />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-foreground truncate">
-              {user?.username || 'Admin'}
+              {user?.username || ''}
             </p>
             {isAdmin() && (
               <div className="flex items-center gap-2">
@@ -167,7 +157,7 @@ export default function Header() {
         )}
         {isPublisher() && (
           <DropdownMenuItem asChild>
-            <Link href="/admin/comics" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+            <Link href="/publisher/dashboard" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
               <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                 <FiSettings className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               </div>

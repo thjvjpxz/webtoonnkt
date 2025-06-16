@@ -197,6 +197,12 @@ public class HomeController {
         return purchaseService.getMyPurchasedVipPackage(securityUtils.getCurrentUser());
     }
 
+    /**
+     * Gửi yêu cầu trở thành publisher
+     * POST /publisher-request
+     * 
+     * @return Response chứa thông báo thành công
+     */
     @PostMapping("publisher-request")
     public BaseResponse<?> sendPublisherRequest() {
         return publisherRequestService.sendPublisherRequest(securityUtils.getCurrentUser());

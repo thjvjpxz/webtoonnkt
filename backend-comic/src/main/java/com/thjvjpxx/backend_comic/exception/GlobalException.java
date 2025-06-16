@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 
+/**
+ * Xử lý exception cho tất cả exception
+ */
 @RestControllerAdvice
 public class GlobalException {
     @ExceptionHandler(BaseException.class)

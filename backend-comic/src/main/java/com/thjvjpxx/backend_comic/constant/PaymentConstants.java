@@ -1,5 +1,8 @@
 package com.thjvjpxx.backend_comic.constant;
 
+/**
+ * Constants cho thanh toán
+ */
 public class PaymentConstants {
 
     // Tỷ giá quy đổi: 1 linh thạch = 1000 VND

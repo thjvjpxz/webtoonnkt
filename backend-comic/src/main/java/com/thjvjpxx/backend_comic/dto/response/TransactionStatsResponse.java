@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho thống kê transaction
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionStatsResponse {

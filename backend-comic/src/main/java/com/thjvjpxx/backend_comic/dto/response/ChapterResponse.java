@@ -12,6 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * DTO response cho chapter
+ */
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder

@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO response cho request của publisher
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

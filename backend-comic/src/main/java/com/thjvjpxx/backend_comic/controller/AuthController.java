@@ -27,28 +27,50 @@ public class AuthController {
 
     AuthService authService;
 
+    /**
+     * API đăng nhập
+     * POST /auth/login
+     * 
+     * @param loginRequest DTO chứa username và password
+     * @return Response chứa access token và refresh token
+     */
     @PostMapping("/login")
     public BaseResponse<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
+    /**
+     * API làm mới token
+     * POST /auth/refresh
+     * 
+     * @param payload DTO chứa refresh token
+     * @return Response chứa access token mới
+     */
     @PostMapping("/refresh")
     public BaseResponse<?> refreshToken(@RequestBody Map<String, String> payload) {
         String refreshToken = payload.get("refreshToken");
         return authService.refreshToken(refreshToken);
     }
 
-    @PostMapping("/validate-token")
-    public BaseResponse<?> validateToken(@RequestBody Map<String, String> payload) {
-        String token = payload.get("token");
-        return authService.validateToken(token);
-    }
-
+    /**
+     * API đăng ký
+     * POST /auth/register
+     * 
+     * @param registerRequest DTO chứa thông tin đăng ký
+     * @return Response chứa kết quả đăng ký
+     */
     @PostMapping("/register")
     public BaseResponse<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }
 
+    /**
+     * API xác thực email
+     * GET /auth/verify
+     * 
+     * @param token token cần xác thực
+     * @return Response chứa kết quả xác thực
+     */
     @GetMapping("/verify")
     public BaseResponse<?> verify(@RequestParam String token) {
         return authService.verify(token);

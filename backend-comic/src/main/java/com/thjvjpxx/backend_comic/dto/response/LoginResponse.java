@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO response cho đăng nhập
+ */
 @Data
 @Builder
 @NoArgsConstructor

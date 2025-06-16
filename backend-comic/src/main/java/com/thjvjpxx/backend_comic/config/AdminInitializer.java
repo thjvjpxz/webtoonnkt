@@ -21,6 +21,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Khởi tạo dữ liệu mặc định cho hệ thống
+ */
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,6 +48,12 @@ public class AdminInitializer implements CommandLineRunner {
 
     }
 
+    /**
+     * Tạo level type mới
+     * 
+     * @param name Tên level type
+     * @return Level type đã tạo
+     */
     private LevelType createLevelType(String name) {
         return levelTypeRepository.findByName(name).orElseGet(() -> {
             LevelType levelType = new LevelType();
@@ -53,6 +62,9 @@ public class AdminInitializer implements CommandLineRunner {
         });
     }
 
+    /**
+     * Tạo tất cả level
+     */
     private void createFullLevel() {
         List<String> colors = Arrays.asList(
                 "#f18121",
@@ -125,6 +137,17 @@ public class AdminInitializer implements CommandLineRunner {
         createLevel("Ma Vương", urlGifs.get(8), colors.get(8), 2209000, 9, maVuong);
     }
 
+    /**
+     * Tạo level mới
+     * 
+     * @param name        Tên level
+     * @param urlGif      URL gif
+     * @param color       Màu
+     * @param expRequired Số exp cần để lên level
+     * @param levelNumber Cấp độ
+     * @param levelType   Level type
+     * @return Level đã tạo
+     */
     private Level createLevel(String name, String urlGif, String color, int expRequired, int levelNumber,
             LevelType levelType) {
         return levelRepository.findByName(name).orElseGet(() -> {
@@ -140,6 +163,16 @@ public class AdminInitializer implements CommandLineRunner {
 
     }
 
+    /**
+     * Tạo user mới
+     * 
+     * @param username Username
+     * @param email    Email
+     * @param password Password
+     * @param role     Role
+     * @param level    Level
+     * @return User đã tạo
+     */
     private User createUser(String username, String email, String password, Role role, Level level) {
         return userRepository.findByUsername(username).orElseGet(() -> {
             return userRepository.findByEmail(email).orElseGet(() -> {
@@ -155,6 +188,9 @@ public class AdminInitializer implements CommandLineRunner {
         });
     }
 
+    /**
+     * Tạo tất cả role
+     */
     private void createFullRole() {
         createRole("ADMIN", "Quản trị viên");
         createRole("PUBLISHER", "Dịch giả");

@@ -104,13 +104,3 @@ export const getParentCommentsByComic = async (
 export const getRepliesByParentId = async (parentId: string) => {
   return await fetchApi<CommentResponse[]>(`${endpoint}/${parentId}/replies`);
 };
-
-// Lấy comment của user hiện tại
-export const getMyComments = async (
-  page: number = 1,
-  limit: number = 10
-) => {
-  return await fetchApi<CommentResponse[]>(
-    `${endpoint}/my-comments?page=${page - 1}&limit=${limit}`
-  );
-};

@@ -52,7 +52,7 @@ export default function Topbar({ title }: TopbarProps) {
         {/* User Info Header */}
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 mb-2">
           <Image
-            src={chooseImageUrl(user?.imgUrl)}
+            src={chooseImageUrl(user?.imgUrl || "")}
             alt={user?.username || ""}
             width={48}
             height={48}
