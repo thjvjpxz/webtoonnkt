@@ -44,9 +44,9 @@ public interface DetailComicService {
      * Lấy chi tiết chapter
      * 
      * @param chapterId     ID chapter
-     * @param currentUserId ID user
+     * @param user          User
      * @return Response chứa chapter
      */
-    BaseResponse<?> getChapterDetail(String chapterId, String currentUserId);
+    BaseResponse<?> getChapterDetail(String chapterId, User user);
 
 }

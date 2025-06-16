@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { useState } from "react";
-import { checkFollowComic, followComic, unfollowComic } from "@/services/comicDetailService";
+import { checkFollowComic, followComic, unfollowComic } from "@/services/detailComicService";
 import { buyChapter } from "@/services/homeService";
 import toast from "react-hot-toast";
 import { ComicDetailResponse } from "@/types/comic";

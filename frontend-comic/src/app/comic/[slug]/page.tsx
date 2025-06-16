@@ -3,7 +3,7 @@ import ComicDetailContent from "@/components/comic/ComicDetailContent";
 import Main from '../../../components/layout/Main';
 import { use, useEffect, useState } from "react";
 import { ComicDetailResponse } from "@/types/comic";
-import { getComicBySlug } from "@/services/comicDetailService";
+import { getComicBySlug } from "@/services/detailComicService";
 import { notFound } from "next/navigation";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 

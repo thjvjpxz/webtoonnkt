@@ -45,6 +45,7 @@ public class SecurityConfig {
 						// .requestMatchers("/**").permitAll()
 						// Các API công khai
 						.requestMatchers(
+								"/ocr-tts/**",
 								"/test/**",
 								"/public/**",
 								"/auth/login",

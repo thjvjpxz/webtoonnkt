@@ -49,6 +49,8 @@ app:
   verification-token-expiration: 1800000 # 30p
   forgot-password-token-expiration: 1800000 # 30p
   backend-url: https://cd67-171-241-8-122.ngrok-free.app
+  audio:
+    output-directory: ./audio-output
 
 crawler:
   otruyen:
@@ -79,3 +81,7 @@ payos:
   checksum-key: ${PAYOS_CHECKSUM_KEY}
   return-url: ${app.frontend-url}/payment/success
   cancel-url: ${app.frontend-url}/payment/failure
+
+google:
+  genai:
+    api-key: ${GOOGLE_GENAI_API_KEY}

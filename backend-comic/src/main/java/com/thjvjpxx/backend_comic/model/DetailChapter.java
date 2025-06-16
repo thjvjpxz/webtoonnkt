@@ -46,4 +46,13 @@ public class DetailChapter {
     @JoinColumn(name = "chapter_id", nullable = false)
     @JsonIgnore
     Chapter chapter;
+
+    @Column(name = "tts_url")
+    String ttsUrl;
+
+    @Column(name = "ocr_content", columnDefinition = "JSON")
+    String ocrContent;
+
+    @Column(name = "has_bubble")
+    Boolean hasBubble;
 }

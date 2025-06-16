@@ -1,7 +1,7 @@
 'use client'
 import Main from "@/components/layout/Main";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { getChaptersByComicId, getComicBySlug } from "@/services/comicDetailService";
+import { getChaptersByComicId, getComicBySlug } from "@/services/detailComicService";
 import { Chapter } from "@/types/chapter";
 import { notFound } from "next/navigation";
 import { use, useEffect, useState } from "react";

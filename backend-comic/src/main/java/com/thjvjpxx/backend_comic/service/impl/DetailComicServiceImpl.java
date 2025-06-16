@@ -174,21 +174,22 @@ public class DetailComicServiceImpl implements DetailComicService {
     }
 
     @Override
-    public BaseResponse<?> getChapterDetail(String chapterId, String currentUserId) {
+    public BaseResponse<?> getChapterDetail(String chapterId, User user) {
         Chapter chapter = chapterRepo.findById(chapterId)
                 .orElseThrow(() -> new BaseException(ErrorCode.CHAPTER_NOT_FOUND));
 
         // Kiểm tra quyền truy cập chapter có phí
-        if (!chapter.isFree() && currentUserId != null) {
+        if (!chapter.isFree() && user != null) {
             // User đã đăng nhập, kiểm tra đã mua chapter chưa
-            User currentUser = userRepo.findById(currentUserId)
-                    .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+            User currentUser = user;
 
             boolean hasPurchased = purchasedChapterRepo.existsByUserAndChapter(currentUser, chapter);
-            if (!hasPurchased && !currentUser.getVip()) {
+            boolean isAdmin = currentUser.getRole().getName().equals("ADMIN");
+
+            if (!hasPurchased && !currentUser.getVip() && !isAdmin) {
                 throw new BaseException(ErrorCode.CHAPTER_NOT_PURCHASED);
             }
-        } else if (!chapter.isFree() && currentUserId == null) {
+        } else if (!chapter.isFree() && user == null) {
             // User chưa đăng nhập và chapter có phí
             throw new BaseException(ErrorCode.CHAPTER_REQUIRES_LOGIN);
         }
