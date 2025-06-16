@@ -52,17 +52,6 @@ app:
   audio:
     output-directory: ./audio-output
 
-crawler:
-  otruyen:
-    api-url: https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=
-    api-comic-detail: https://otruyenapi.com/v1/api/truyen-tranh/
-    image-cdn: https://img.otruyenapi.com
-  request:
-    delay-ms: 0
-  batch:
-    size: 5
-    delay-ms: 0
-
 jwt:
   expiration: 3600000 # 1 giờ
   refresh-expiration: 604800000 # 7 ngày

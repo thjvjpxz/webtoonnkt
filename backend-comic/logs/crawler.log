@@ -1,0 +1,92 @@
+2025-06-16 08:56:24 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - Starting CrawlerApplication using Java 21.0.6 with PID 17692 (D:\do-an\backend-comic\target\classes started by thjvjpxz in D:\do-an\backend-comic)
+2025-06-16 08:56:24 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - The following 1 profile is active: "crawler"
+2025-06-16 08:56:26 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-06-16 08:56:26 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@470edd38
+2025-06-16 08:56:26 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-06-16 08:56:29 [restartedMain] WARN  o.s.c.a.AnnotationConfigApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'storageUtils' defined in file [D:\do-an\backend-comic\target\classes\com\thjvjpxx\backend_comic\utils\StorageUtils.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'com.thjvjpxx.backend_comic.service.StorageService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2025-06-16 08:56:29 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-06-16 08:56:29 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-06-16 08:56:29 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.thjvjpxx.backend_comic.utils.StorageUtils required a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' in your configuration.
+
+2025-06-16 08:57:08 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - Starting CrawlerApplication using Java 21.0.6 with PID 8020 (D:\do-an\backend-comic\target\classes started by thjvjpxz in D:\do-an\backend-comic)
+2025-06-16 08:57:08 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - The following 1 profile is active: "crawler"
+2025-06-16 08:57:10 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-06-16 08:57:10 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4e8acad
+2025-06-16 08:57:10 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-06-16 08:57:14 [restartedMain] WARN  o.s.c.a.AnnotationConfigApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'storageUtils' defined in file [D:\do-an\backend-comic\target\classes\com\thjvjpxx\backend_comic\utils\StorageUtils.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'com.thjvjpxx.backend_comic.service.StorageService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2025-06-16 08:57:14 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-06-16 08:57:14 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-06-16 08:57:14 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.thjvjpxx.backend_comic.utils.StorageUtils required a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' in your configuration.
+
+2025-06-16 08:57:48 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - Starting CrawlerApplication using Java 21.0.6 with PID 8764 (D:\do-an\backend-comic\target\classes started by thjvjpxz in D:\do-an\backend-comic)
+2025-06-16 08:57:48 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - The following 1 profile is active: "crawler"
+2025-06-16 08:57:49 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-06-16 08:57:49 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@421385c0
+2025-06-16 08:57:49 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-06-16 08:57:51 [restartedMain] WARN  o.s.c.a.AnnotationConfigApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'storageUtils' defined in file [D:\do-an\backend-comic\target\classes\com\thjvjpxx\backend_comic\utils\StorageUtils.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'com.thjvjpxx.backend_comic.service.StorageService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2025-06-16 08:57:51 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-06-16 08:57:51 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-06-16 08:57:51 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.thjvjpxx.backend_comic.utils.StorageUtils required a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' in your configuration.
+
+2025-06-16 08:58:54 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - Starting CrawlerApplication using Java 21.0.6 with PID 16292 (D:\do-an\backend-comic\target\classes started by thjvjpxz in D:\do-an\backend-comic)
+2025-06-16 08:58:54 [restartedMain] INFO  c.t.backend_comic.CrawlerApplication - The following 1 profile is active: "crawler"
+2025-06-16 08:58:55 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-06-16 08:58:55 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6a6a5c89
+2025-06-16 08:58:55 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-06-16 08:58:59 [restartedMain] WARN  o.s.c.a.AnnotationConfigApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'storageUtils' defined in file [D:\do-an\backend-comic\target\classes\com\thjvjpxx\backend_comic\utils\StorageUtils.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'com.thjvjpxx.backend_comic.service.StorageService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2025-06-16 08:58:59 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-06-16 08:58:59 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-06-16 08:58:59 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in com.thjvjpxx.backend_comic.utils.StorageUtils required a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.thjvjpxx.backend_comic.service.StorageService' in your configuration.
+
