@@ -39,4 +39,30 @@ public interface AuthService {
      * @return Response chứa kết quả xác thực
      */
     BaseResponse<?> verify(String token);
+
+    /**
+     * Quên mật khẩu
+     * 
+     * @param email Email người dùng
+     * @return Response chứa kết quả quên mật khẩu
+     */
+    BaseResponse<?> forgotPassword(String email);
+
+    /**
+     * Đặt lại mật khẩu
+     * 
+     * @param token           Token cần đặt lại mật khẩu
+     * @param password        Mật khẩu mới
+     * @param confirmPassword Xác nhận mật khẩu mới
+     * @return Response chứa kết quả đặt lại mật khẩu
+     */
+    BaseResponse<?> resetPassword(String token, String password, String confirmPassword);
+
+    /**
+     * Kiểm tra token đặt lại mật khẩu có hết hạn không
+     * 
+     * @param token Token cần kiểm tra
+     * @return Response chứa kết quả kiểm tra
+     */
+    BaseResponse<?> checkResetPasswordTokenExpired(String token);
 }

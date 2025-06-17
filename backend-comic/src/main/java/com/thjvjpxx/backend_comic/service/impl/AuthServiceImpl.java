@@ -24,6 +24,7 @@ import com.thjvjpxx.backend_comic.service.EmailService;
 import com.thjvjpxx.backend_comic.service.LevelService;
 import com.thjvjpxx.backend_comic.utils.StringUtils;
 
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -171,9 +172,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userOpt.get();
 
-        long veriSeconds = verificationTokenExpiration / 1000;
-
-        if (user.getCreatedAt().plusSeconds(veriSeconds).isBefore(LocalDateTime.now())) {
+        if (checkTokenExpired(user.getCreatedAt())) {
             throw new BaseException(ErrorCode.VERIFICATION_TOKEN_EXPIRED);
         }
 
@@ -182,5 +181,63 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         return BaseResponse.success(user);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse<?> forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+        String resetPasswordToken = StringUtils.generateVerificationToken();
+        String resetPasswordUrl = frontendUrl + "/reset-password?token=" + resetPasswordToken;
+
+        emailService.sendResetPasswordEmail(email, resetPasswordUrl);
+
+        user.setResetPasswordToken(resetPasswordToken);
+        userRepository.save(user);
+
+        return BaseResponse.success("Vui lòng kiểm tra email để đặt lại mật khẩu!");
+    }
+
+    @Override
+    public BaseResponse<?> resetPassword(String token, String password, String confirmPassword) {
+        if (token == null || token.isEmpty()) {
+            throw new BaseException(ErrorCode.TOKEN_REQUIRED);
+        }
+        if (!password.equals(confirmPassword)) {
+            throw new BaseException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        try {
+            User user = userRepository.findByResetPasswordToken(token)
+                    .orElseThrow(() -> new BaseException(ErrorCode.RESET_PASSWORD_TOKEN_INVALID));
+
+            if (checkTokenExpired(user.getUpdatedAt())) {
+                throw new BaseException(ErrorCode.RESET_PASSWORD_TOKEN_EXPIRED);
+            }
+
+            user.setPassword(passwordEncoder.encode(password));
+            user.setResetPasswordToken(null);
+            userRepository.save(user);
+
+            return BaseResponse.success("Đặt lại mật khẩu thành công!");
+
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.RESET_PASSWORD_TOKEN_INVALID);
+        }
+    }
+
+    @Override
+    public BaseResponse<?> checkResetPasswordTokenExpired(String token) {
+        User user = userRepository.findByResetPasswordToken(token)
+                .orElseThrow(() -> new BaseException(ErrorCode.RESET_PASSWORD_TOKEN_INVALID));
+
+        return BaseResponse.success(checkTokenExpired(user.getUpdatedAt()));
+    }
+
+    // ======================== HELPER METHODS ========================
+    private boolean checkTokenExpired(LocalDateTime time) {
+        long veriSeconds = verificationTokenExpiration / 1000;
+        return time.plusSeconds(veriSeconds).isBefore(LocalDateTime.now());
     }
 }

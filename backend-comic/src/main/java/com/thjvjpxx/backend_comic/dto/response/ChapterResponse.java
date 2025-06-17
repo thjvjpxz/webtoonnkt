@@ -34,6 +34,7 @@ public class ChapterResponse {
     List<ChapterResponseSummary> chapterSummaries;
     String createdAt;
     String updatedAt;
+    Boolean hasAudio;
     String publisherName;
     Level publisherLevel;
 
@@ -46,6 +47,8 @@ public class ChapterResponse {
         String id;
         String imgUrl;
         int orderNumber;
+        String ttsUrl;
+        Boolean hasBubble;
     }
 
     @Data

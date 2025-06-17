@@ -49,7 +49,7 @@ const navItems: NavItem[] = [
 export default function Nav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showPublisherModal, setShowPublisherModal] = useState(false);
-  const { isAuthenticated, isAdmin, isPublisher } = useAuthState();
+  const { isAuthenticated, isReader } = useAuthState();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -83,7 +83,7 @@ export default function Nav() {
           </ul>
 
           {/* Publisher Request Button */}
-          {isAuthenticated && !isAdmin && !isPublisher && (
+          {isAuthenticated && isReader() && (
             <Button
               variant="outline"
               size="sm"
@@ -159,7 +159,7 @@ export default function Nav() {
               ))}
 
               {/* Publisher Request Button for Mobile */}
-              {isAuthenticated && !isAdmin && !isPublisher && (
+              {isAuthenticated && isReader() && (
                 <li className="pt-2 border-t border-primary-foreground/10">
                   <button
                     onClick={() => {

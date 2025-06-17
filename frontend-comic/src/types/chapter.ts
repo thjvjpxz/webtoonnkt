@@ -75,6 +75,8 @@ export interface DetailChapter {
   id: string;
   imgUrl: string;
   orderNumber: number;
+  ttsUrl: string;
+  hasBubble: boolean;
 }
 
 

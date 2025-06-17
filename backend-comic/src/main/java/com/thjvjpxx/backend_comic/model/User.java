@@ -59,6 +59,9 @@ public class User {
     @Column(name = "verification_token")
     String verificationToken;
 
+    @Column(name = "reset_password_token")
+    String resetPasswordToken;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     Role role;

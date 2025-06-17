@@ -230,6 +230,8 @@ public class DetailComicServiceImpl implements DetailComicService {
                         .id(detailChapter.getId())
                         .imgUrl(detailChapter.getImgUrl())
                         .orderNumber(detailChapter.getOrderNumber())
+                        .ttsUrl(detailChapter.getTtsUrl())
+                        .hasBubble(detailChapter.getHasBubble())
                         .build())
                 .sorted((a, b) -> Integer.compare(a.getOrderNumber(), b.getOrderNumber()))
                 .collect(Collectors.toList());
@@ -252,6 +254,7 @@ public class DetailComicServiceImpl implements DetailComicService {
                 .chapterPath(chapter.getChapterPath())
                 .status(chapter.getStatus())
                 .price(chapter.getPrice())
+                .hasAudio(chapter.getHasAudio())
                 .domainCdn(chapter.getDomainCdn())
                 .chapterPath(chapter.getChapterPath())
                 .detailChapters(detailChapterResponses)
@@ -301,7 +304,7 @@ public class DetailComicServiceImpl implements DetailComicService {
     }
 
     /**
-     * Tính toán số exp reward phù hợp dựa trên level hiện tại của user
+     * Tính toán số exp phù hợp dựa trên level hiện tại của user
      * 
      * @param user User cần tính toán exp reward
      * @return Số exp reward phù hợp

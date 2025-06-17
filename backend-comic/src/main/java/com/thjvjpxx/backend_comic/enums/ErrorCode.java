@@ -103,6 +103,8 @@ public enum ErrorCode {
     EMAIL_INVALID_RECIPIENT(HttpStatus.BAD_REQUEST, "Địa chỉ email người nhận không hợp lệ!"),
     EMAIL_TEMPLATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi xử lý template email!"),
     VERIFICATION_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Token xác thực đã hết hạn!"),
+    RESET_PASSWORD_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Token đặt lại mật khẩu đã hết hạn!"),
+    RESET_PASSWORD_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "Token đặt lại mật khẩu không hợp lệ!"),
 
     // User Follow
     USER_FOLLOW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Người dùng đã theo dõi truyện này!"),
