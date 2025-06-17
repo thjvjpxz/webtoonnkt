@@ -90,11 +90,29 @@ public class DetailComicController {
      */
     @GetMapping("/{slug}/{chapterId}")
     public BaseResponse<?> getChapterDetail(@PathVariable String slug, @PathVariable String chapterId) {
-        String currentUserId = null;
+        User user = null;
         try {
-            currentUserId = securityUtils.getCurrentUserId();
+            user = securityUtils.getCurrentUser();
         } catch (Exception e) {
         }
-        return detailComicService.getChapterDetail(chapterId, currentUserId);
+        return detailComicService.getChapterDetail(chapterId, user);
+    }
+
+    /**
+     * Cộng exp cho user hiện tại (test purpose)
+     * POST /users/me/gain-exp
+     * 
+     * @param expAmount Số exp cần cộng
+     * @param reason    Lý do cộng exp
+     * @return Response chứa thông tin level progress
+     */
+    @PostMapping("/gain-exp")
+    public BaseResponse<?> gainExp() {
+        User currentUser = null;
+        try {
+            currentUser = securityUtils.getCurrentUser();
+        } catch (Exception e) {
+        }
+        return detailComicService.gainExp(currentUser);
     }
 }

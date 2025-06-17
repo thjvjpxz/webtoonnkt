@@ -17,6 +17,7 @@ import com.thjvjpxx.backend_comic.constant.PaymentConstants;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
+import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.enums.TransactionStatus;
 import com.thjvjpxx.backend_comic.exception.BaseException;
@@ -404,4 +405,43 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    @Override
+    public BaseResponse<TransactionStatsResponse> getTransactionStats() {
+        try {
+            log.info("Lấy thống kê giao dịch");
+
+            // 1. Tính tổng số giao dịch
+            Long totalTransactions = transactionRepository.count();
+
+            // 2. Tính tổng doanh thu (chỉ tính giao dịch PayOS COMPLETED và amount > 0 -
+            // nạp tiền qua PayOS)
+            Double totalAmount = transactionRepository.findAll().stream()
+                    .filter(t -> t.getStatus() == TransactionStatus.COMPLETED
+                            && t.getAmount() > 0
+                            && "PayOS".equals(t.getPaymentMethod()))
+                    .mapToDouble(Transaction::getAmount)
+                    .sum();
+
+            // 3. Đếm số giao dịch đã thanh toán (COMPLETED)
+            Long paidCount = transactionRepository.countByStatus(TransactionStatus.COMPLETED);
+
+            // 4. Đếm số giao dịch đang chờ (PENDING)
+            Long pendingCount = transactionRepository.countByStatus(TransactionStatus.PENDING);
+
+            // Tạo response
+            TransactionStatsResponse stats = new TransactionStatsResponse();
+            stats.setTotalTransactions(totalTransactions);
+            stats.setTotalAmount(totalAmount);
+            stats.setPaidCount(paidCount);
+            stats.setPendingCount(pendingCount);
+
+            log.info("Thống kê giao dịch: {} tổng, {} Linh Thạch doanh thu (PayOS), {} đã thanh toán, {} đang chờ",
+                    totalTransactions, totalAmount, paidCount, pendingCount);
+            return BaseResponse.success(stats, "Lấy thống kê giao dịch thành công!");
+
+        } catch (Exception e) {
+            log.error("Lỗi khi lấy thống kê giao dịch: {}", e.getMessage(), e);
+            throw new BaseException(ErrorCode.HAS_ERROR);
+        }
+    }
 }

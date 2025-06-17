@@ -15,8 +15,18 @@ import com.thjvjpxx.backend_comic.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
+
+	/**
+	 * Tìm người dùng theo mã token đặt lại mật khẩu
+	 * 
+	 * @param token mã token đặt lại mật khẩu cần tìm kiếm
+	 * @return Optional chứa User nếu tìm thấy
+	 */
+	Optional<User> findByResetPasswordToken(String token);
+
 	/**
 	 * Tìm người dùng theo tên đăng nhập
+	 * 
 	 * @param username tên đăng nhập cần tìm kiếm
 	 * @return Optional chứa User nếu tìm thấy
 	 */
@@ -24,6 +34,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo địa chỉ email
+	 * 
 	 * @param email địa chỉ email cần tìm kiếm
 	 * @return Optional chứa User nếu tìm thấy
 	 */
@@ -31,6 +42,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo mã token xác thực
+	 * 
 	 * @param token mã token xác thực cần tìm kiếm
 	 * @return Optional chứa User nếu tìm thấy
 	 */
@@ -38,6 +50,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm tất cả người dùng chưa bị xóa với phân trang
+	 * 
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng chưa bị xóa với phân trang
 	 */
@@ -45,8 +58,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo tên đăng nhập hoặc email và chưa bị xóa với phân trang
+	 * 
 	 * @param username tên đăng nhập cần tìm kiếm
-	 * @param email địa chỉ email cần tìm kiếm
+	 * @param email    địa chỉ email cần tìm kiếm
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng khớp điều kiện với phân trang
 	 */
@@ -55,17 +69,20 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo vai trò và chưa bị xóa với phân trang
-	 * @param role vai trò của người dùng
+	 * 
+	 * @param role     vai trò của người dùng
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng theo vai trò và chưa bị xóa với phân trang
 	 */
 	Page<User> findByDeletedFalseAndRole(Role role, Pageable pageable);
 
 	/**
-	 * Tìm người dùng theo vai trò và tìm kiếm theo tên đăng nhập hoặc email, chưa bị xóa với phân trang
-	 * @param role vai trò của người dùng
+	 * Tìm người dùng theo vai trò và tìm kiếm theo tên đăng nhập hoặc email, chưa
+	 * bị xóa với phân trang
+	 * 
+	 * @param role       vai trò của người dùng
 	 * @param searchTerm từ khóa tìm kiếm (tên đăng nhập hoặc email)
-	 * @param pageable thông tin phân trang và sắp xếp
+	 * @param pageable   thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng khớp điều kiện với phân trang
 	 */
 	@Query("SELECT u FROM users u WHERE u.deleted = false AND u.role = :role AND (u.username LIKE %:searchTerm% OR u.email LIKE %:searchTerm%)")
@@ -74,6 +91,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm tất cả người dùng đã bị xóa với phân trang
+	 * 
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng đã bị xóa với phân trang
 	 */
@@ -81,8 +99,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo tên đăng nhập hoặc email và đã bị xóa với phân trang
+	 * 
 	 * @param username tên đăng nhập cần tìm kiếm
-	 * @param email địa chỉ email cần tìm kiếm
+	 * @param email    địa chỉ email cần tìm kiếm
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng khớp điều kiện với phân trang
 	 */
@@ -91,17 +110,20 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Tìm người dùng theo vai trò và đã bị xóa với phân trang
-	 * @param role vai trò của người dùng
+	 * 
+	 * @param role     vai trò của người dùng
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng theo vai trò và đã bị xóa với phân trang
 	 */
 	Page<User> findByDeletedTrueAndRole(Role role, Pageable pageable);
 
 	/**
-	 * Tìm người dùng theo vai trò và tìm kiếm theo tên đăng nhập hoặc email, đã bị xóa với phân trang
-	 * @param role vai trò của người dùng
+	 * Tìm người dùng theo vai trò và tìm kiếm theo tên đăng nhập hoặc email, đã bị
+	 * xóa với phân trang
+	 * 
+	 * @param role       vai trò của người dùng
 	 * @param searchTerm từ khóa tìm kiếm (tên đăng nhập hoặc email)
-	 * @param pageable thông tin phân trang và sắp xếp
+	 * @param pageable   thông tin phân trang và sắp xếp
 	 * @return danh sách người dùng khớp điều kiện với phân trang
 	 */
 	@Query("SELECT u FROM users u WHERE u.deleted = true AND u.role = :role AND (u.username LIKE %:searchTerm% OR u.email LIKE %:searchTerm%)")
@@ -112,6 +134,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Đếm tổng số người dùng chưa bị xóa (dành cho admin)
+	 * 
 	 * @return tổng số người dùng hoạt động trong hệ thống
 	 */
 	@Query("SELECT COUNT(u) FROM users u WHERE u.deleted = false")
@@ -119,13 +142,16 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Đếm số người dùng VIP chưa bị xóa (dành cho admin)
+	 * 
 	 * @return tổng số người dùng VIP trong hệ thống
 	 */
 	@Query("SELECT COUNT(u) FROM users u WHERE u.deleted = false AND u.vip = true")
 	Long countVipUsers();
 
 	/**
-	 * Thống kê số người dùng đăng ký theo tháng trong 12 tháng gần nhất (dành cho admin)
+	 * Thống kê số người dùng đăng ký theo tháng trong 12 tháng gần nhất (dành cho
+	 * admin)
+	 * 
 	 * @return danh sách Object[] chứa thông tin [month, new_users]
 	 *         - month: tháng (định dạng YYYY-MM)
 	 *         - new_users: số người dùng mới đăng ký trong tháng
@@ -144,6 +170,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Đếm số người dùng mới đăng ký trong tháng hiện tại (dành cho admin)
+	 * 
 	 * @return số lượng người dùng mới trong tháng hiện tại
 	 */
 	@Query(value = """
@@ -157,6 +184,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Đếm số người dùng mới đăng ký trong tháng trước (dành cho admin)
+	 * 
 	 * @return số lượng người dùng mới trong tháng trước
 	 */
 	@Query(value = """
@@ -170,6 +198,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	/**
 	 * Đếm tổng số nhà xuất bản trong hệ thống (dành cho admin)
+	 * 
 	 * @return tổng số người dùng có vai trò PUBLISHER chưa bị xóa
 	 */
 	@Query(value = """

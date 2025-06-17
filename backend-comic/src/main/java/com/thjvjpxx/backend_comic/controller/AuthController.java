@@ -75,4 +75,44 @@ public class AuthController {
     public BaseResponse<?> verify(@RequestParam String token) {
         return authService.verify(token);
     }
+
+    /**
+     * API quên mật khẩu
+     * POST /auth/forgot-password
+     * 
+     * @param email Email người dùng
+     * @return Response chứa kết quả quên mật khẩu
+     */
+    @PostMapping("/forgot-password")
+    public BaseResponse<?> forgotPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        return authService.forgotPassword(email);
+    }
+
+    /**
+     * API đặt lại mật khẩu
+     * POST /auth/reset-password
+     * 
+     * @param payload DTO chứa token, mật khẩu mới và xác nhận mật khẩu mới
+     * @return Response chứa kết quả đặt lại mật khẩu
+     */
+    @PostMapping("/reset-password")
+    public BaseResponse<?> resetPassword(@RequestBody Map<String, String> payload) {
+        String token = payload.get("token");
+        String password = payload.get("password");
+        String confirmPassword = payload.get("confirmPassword");
+        return authService.resetPassword(token, password, confirmPassword);
+    }
+
+    /**
+     * API kiểm tra token đặt lại mật khẩu có hết hạn không
+     * GET /auth/check-reset-password-token-expired
+     * 
+     * @param token Token cần kiểm tra
+     * @return Response chứa kết quả kiểm tra
+     */
+    @GetMapping("/check-reset-password-token-expired")
+    public BaseResponse<?> checkResetPasswordTokenExpired(@RequestParam String token) {
+        return authService.checkResetPasswordTokenExpired(token);
+    }
 }

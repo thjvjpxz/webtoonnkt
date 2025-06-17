@@ -18,7 +18,8 @@ import com.thjvjpxx.backend_comic.model.User;
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
 	/**
 	 * Tìm giao dịch theo người dùng với phân trang
-	 * @param user người dùng cần tìm giao dịch
+	 * 
+	 * @param user     người dùng cần tìm giao dịch
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách giao dịch của người dùng với phân trang
 	 */
@@ -26,6 +27,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Tìm giao dịch theo mã đơn hàng PayOS
+	 * 
 	 * @param payosOrderCode mã đơn hàng PayOS cần tìm kiếm
 	 * @return Optional chứa giao dịch nếu tìm thấy
 	 */
@@ -33,6 +35,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Tìm tất cả giao dịch theo trạng thái
+	 * 
 	 * @param status trạng thái giao dịch cần tìm kiếm
 	 * @return danh sách tất cả giao dịch theo trạng thái
 	 */
@@ -40,7 +43,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Tìm giao dịch theo trạng thái với phân trang
-	 * @param status trạng thái giao dịch cần tìm kiếm
+	 * 
+	 * @param status   trạng thái giao dịch cần tìm kiếm
 	 * @param pageable thông tin phân trang và sắp xếp
 	 * @return danh sách giao dịch theo trạng thái với phân trang
 	 */
@@ -50,6 +54,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Đếm tổng số giao dịch theo trạng thái (dành cho admin)
+	 * 
 	 * @param status trạng thái giao dịch cần đếm
 	 * @return tổng số giao dịch theo trạng thái
 	 */
@@ -57,14 +62,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Tính tổng số tiền VND theo trạng thái giao dịch (dành cho admin)
+	 * 
 	 * @param status trạng thái giao dịch cần tính tổng
-	 * @return tổng số tiền VND của các giao dịch theo trạng thái, trả về 0 nếu không có
+	 * @return tổng số tiền VND của các giao dịch theo trạng thái, trả về 0 nếu
+	 *         không có
 	 */
 	@Query("SELECT COALESCE(SUM(t.payosAmountVnd), 0) FROM transactions t WHERE t.status = :status AND t.payosAmountVnd IS NOT NULL")
 	Double sumVndAmountByStatus(@Param("status") TransactionStatus status);
 
 	/**
 	 * Thống kê số lượng giao dịch theo phương thức thanh toán
+	 * 
 	 * @return danh sách Object[] chứa thông tin [paymentMethod, count]
 	 *         - paymentMethod: phương thức thanh toán
 	 *         - count: số lượng giao dịch sử dụng phương thức đó
@@ -75,7 +83,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 	// === QUERIES CHO ADMIN STATISTICS ===
 
 	/**
-	 * Thống kê doanh thu theo tháng trong 12 tháng gần nhất (chỉ giao dịch hoàn thành)
+	 * Thống kê doanh thu theo tháng trong 12 tháng gần nhất (chỉ giao dịch hoàn
+	 * thành)
+	 * 
 	 * @return danh sách Object[] chứa thông tin [month, revenue, transaction_count]
 	 *         - month: tháng (định dạng YYYY-MM)
 	 *         - revenue: tổng doanh thu VND trong tháng
@@ -97,6 +107,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Thống kê doanh thu theo năm (2 năm gần nhất, chỉ giao dịch hoàn thành)
+	 * 
 	 * @return danh sách Object[] chứa thông tin [year, revenue]
 	 *         - year: năm
 	 *         - revenue: tổng doanh thu VND trong năm
@@ -116,7 +127,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
 	/**
 	 * Thống kê phân bố giao dịch theo trạng thái với tỷ lệ phần trăm và tổng tiền
-	 * @return danh sách Object[] chứa thông tin [status, count, percentage, total_amount]
+	 * 
+	 * @return danh sách Object[] chứa thông tin [status, count, percentage,
+	 *         total_amount]
 	 *         - status: trạng thái giao dịch
 	 *         - count: số lượng giao dịch theo trạng thái
 	 *         - percentage: tỷ lệ phần trăm giao dịch theo trạng thái

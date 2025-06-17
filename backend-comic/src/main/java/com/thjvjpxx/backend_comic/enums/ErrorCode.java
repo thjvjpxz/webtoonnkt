@@ -11,6 +11,7 @@ public enum ErrorCode {
     // Common
     ID_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Id không được trống!"),
     HAS_ERROR(HttpStatus.BAD_REQUEST, "Có lỗi xảy ra vui lòng thử lại sau!"),
+    REQUEST_BODY_INVALID(HttpStatus.BAD_REQUEST, "Body yêu cầu không hợp lệ!"),
 
     // Category
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Thể loại không tồn tại!"),
@@ -102,6 +103,8 @@ public enum ErrorCode {
     EMAIL_INVALID_RECIPIENT(HttpStatus.BAD_REQUEST, "Địa chỉ email người nhận không hợp lệ!"),
     EMAIL_TEMPLATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi xử lý template email!"),
     VERIFICATION_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Token xác thực đã hết hạn!"),
+    RESET_PASSWORD_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Token đặt lại mật khẩu đã hết hạn!"),
+    RESET_PASSWORD_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "Token đặt lại mật khẩu không hợp lệ!"),
 
     // User Follow
     USER_FOLLOW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Người dùng đã theo dõi truyện này!"),

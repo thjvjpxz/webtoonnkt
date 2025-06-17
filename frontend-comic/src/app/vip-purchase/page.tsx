@@ -432,7 +432,7 @@ export default function VipPurchasePage() {
         {!isAuthenticated && (
           <div className="mt-8 text-center">
             <Card className="bg-muted/50">
-              <CardContent className="pt-6">
+              <CardContent>
                 <p className="text-muted-foreground">
                   Bạn cần <span className="font-semibold text-primary">đăng nhập</span> để có thể mua gói VIP
                 </p>

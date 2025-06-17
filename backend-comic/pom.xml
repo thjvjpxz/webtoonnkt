@@ -30,11 +30,11 @@
 		<java.version>21</java.version>
 		<lombok.version>1.18.24</lombok.version>
 		<google-auth.version>1.33.1</google-auth.version>
-		<google-api-services-drive.version>v3-rev197-1.25.0</google-api-services-drive.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<aws-sdk.version>2.31.37</aws-sdk.version>
 		<payos.version>1.0.3</payos.version>
 		<java-dotenv.version>5.2.2</java-dotenv.version>
+		<google-genai.version>1.4.1</google-genai.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -86,11 +86,6 @@
 			<version>${google-auth.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.apis</groupId>
-			<artifactId>google-api-services-drive</artifactId>
-			<version>${google-api-services-drive.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.auth</groupId>
 			<artifactId>google-auth-library-credentials</artifactId>
 			<version>${google-auth.version}</version>
@@ -128,6 +123,12 @@
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>java-dotenv</artifactId>
 			<version>${java-dotenv.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.genai</groupId>
+			<artifactId>google-genai</artifactId>
+			<version>${google-genai.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -16,12 +16,14 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToRegister: () => void;
+  onSwitchToForgotPassword: () => void;
 }
 
 export default function LoginModal({
   isOpen,
   onClose,
   onSwitchToRegister,
+  onSwitchToForgotPassword,
 }: LoginModalProps) {
 
   const {
@@ -118,7 +120,8 @@ export default function LoginModal({
           <div className="text-right">
             <button
               type="button"
-              className="text-sm text-primary hover:underline"
+              onClick={onSwitchToForgotPassword}
+              className="text-sm text-primary hover:underline cursor-pointer"
               disabled={isLoading}
             >
               Quên mật khẩu?

@@ -49,17 +49,8 @@ app:
   verification-token-expiration: 1800000 # 30p
   forgot-password-token-expiration: 1800000 # 30p
   backend-url: https://cd67-171-241-8-122.ngrok-free.app
-
-crawler:
-  otruyen:
-    api-url: https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=
-    api-comic-detail: https://otruyenapi.com/v1/api/truyen-tranh/
-    image-cdn: https://img.otruyenapi.com
-  request:
-    delay-ms: 0
-  batch:
-    size: 5
-    delay-ms: 0
+  audio:
+    output-directory: ./audio-output
 
 jwt:
   expiration: 3600000 # 1 giờ
@@ -79,3 +70,7 @@ payos:
   checksum-key: ${PAYOS_CHECKSUM_KEY}
   return-url: ${app.frontend-url}/payment/success
   cancel-url: ${app.frontend-url}/payment/failure
+
+google:
+  genai:
+    api-key: ${GOOGLE_GENAI_API_KEY}

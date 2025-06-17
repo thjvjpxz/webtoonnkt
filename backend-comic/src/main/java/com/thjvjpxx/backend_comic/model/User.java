@@ -1,5 +1,13 @@
 package com.thjvjpxx.backend_comic.model;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,14 +21,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity(name = "users")
 @Table(indexes = {
@@ -59,6 +59,9 @@ public class User {
     @Column(name = "verification_token")
     String verificationToken;
 
+    @Column(name = "reset_password_token")
+    String resetPasswordToken;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
@@ -66,15 +69,12 @@ public class User {
     @Column(name = "balance", nullable = false)
     Double balance = 0.0; // Số linh thạch hiện có (1 linh thạch = 1000 VND)
 
-    @Column(name = "last_topup")
-    Timestamp lastTopup;
-
     @ManyToOne
     @JoinColumn(name = "level_id")
     Level level;
 
     @Column(name = "current_exp", nullable = false)
-    Integer currentExp = 1000;
+    Integer currentExp = 0;
 
     @Column(name = "created_at")
     @CreationTimestamp

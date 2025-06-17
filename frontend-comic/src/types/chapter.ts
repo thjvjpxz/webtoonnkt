@@ -14,6 +14,8 @@ export interface Chapter {
   createdAt: string;
   updatedAt: string;
   hasPurchased: boolean;
+  hasAudio: boolean;
+  isRead: boolean;
   chapterSummaries?: ChapterSummary[];
   publisherName?: string;
   publisherLevel?: LevelResponse;
@@ -73,6 +75,8 @@ export interface DetailChapter {
   id: string;
   imgUrl: string;
   orderNumber: number;
+  ttsUrl: string;
+  hasBubble: boolean;
 }
 
 

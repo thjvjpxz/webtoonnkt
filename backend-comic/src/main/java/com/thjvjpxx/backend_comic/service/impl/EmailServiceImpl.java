@@ -28,6 +28,14 @@ public class EmailServiceImpl implements EmailService {
 	@Value("${spring.mail.default-encoding}")
 	String encoding;
 
+	/**
+	 * Gửi email với nội dung HTML
+	 * 
+	 * @param to      Địa chỉ email người nhận
+	 * @param subject Tiêu đề email
+	 * @param html    Nội dung email dạng HTML
+	 * @throws MessagingException
+	 */
 	private void sendHtmlEmail(String to, String subject, String html) throws MessagingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, true, encoding);
@@ -60,6 +68,10 @@ public class EmailServiceImpl implements EmailService {
 
 	/**
 	 * Tạo template HTML cho email xác thực
+	 * 
+	 * @param username        Tên người dùng
+	 * @param verificationUrl URL xác thực
+	 * @return Template HTML
 	 */
 	private String buildVerificationEmailTemplate(String username, String verificationUrl) {
 		return """
@@ -157,6 +169,10 @@ public class EmailServiceImpl implements EmailService {
 
 	/**
 	 * Tạo template HTML cho email đặt lại mật khẩu
+	 * 
+	 * @param username Tên người dùng
+	 * @param resetUrl URL đặt lại mật khẩu
+	 * @return Template HTML
 	 */
 	private String buildPasswordResetEmailTemplate(String username, String resetUrl) {
 		return """

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thjvjpxx.backend_comic.dto.request.TopupRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.TransactionResponse;
+import com.thjvjpxx.backend_comic.dto.response.TransactionStatsResponse;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.TransactionService;
 import com.thjvjpxx.backend_comic.utils.SecurityUtils;
@@ -109,4 +110,14 @@ public class TransactionController {
         return transactionService.getAllTransactionsWithFilter(page, limit, search, status, paymentMethod);
     }
 
+    /**
+     * Lấy thống kê giao dịch (dành cho admin)
+     * GET /transactions/stats
+     * 
+     * @return Response chứa thống kê giao dịch
+     */
+    @GetMapping("/stats")
+    public BaseResponse<TransactionStatsResponse> getTransactionStats() {
+        return transactionService.getTransactionStats();
+    }
 }

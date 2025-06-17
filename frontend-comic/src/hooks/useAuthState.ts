@@ -87,6 +87,10 @@ export function useAuthState() {
     return hasRole(["PUBLISHER"]);
   }, [hasRole]);
 
+  const isReader = useCallback((): boolean => {
+    return hasRole(["READER"]);
+  }, [hasRole]);
+
   // Kiểm tra user có phải VIP không
   const isVIP = useCallback((): boolean => {
     return user?.vip || false;
@@ -110,5 +114,6 @@ export function useAuthState() {
     isAdmin,
     isVIP,
     isPublisher,
+    isReader,
   };
 } 

@@ -16,6 +16,7 @@ import {
   FiPackage,
   FiCreditCard,
   FiUserCheck,
+  FiVolume2,
 } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 
@@ -59,6 +60,11 @@ export default function Sidebar({
       icon: <FiFileText size={20} />,
       label: "Quản lý chương",
       show: isPublisher
+    },
+    {
+      path: "/admin/text-extraction",
+      icon: <FiVolume2 size={20} />,
+      label: "Trích xuất văn bản & TTS",
     },
     {
       path: "/admin/vip-packages",

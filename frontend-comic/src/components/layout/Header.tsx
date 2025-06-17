@@ -25,6 +25,7 @@ import {
 import { useState } from "react";
 import LoginModal from "../auth/LoginModal";
 import RegisterModal from "../auth/RegisterModal";
+import ForgotPasswordModal from "../auth/ForgotPasswordModal";
 import { useAuthModals } from "@/hooks/useAuthModals";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useRouter } from "next/navigation";
@@ -42,11 +43,14 @@ export default function Header() {
   const {
     isLoginOpen,
     isRegisterOpen,
+    isForgotPasswordOpen,
     openLogin,
     openRegister,
     closeAll,
     switchToRegister,
     switchToLogin,
+    switchToForgotPassword,
+    switchBackToLogin,
   } = useAuthModals();
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -312,11 +316,17 @@ export default function Header() {
         isOpen={isLoginOpen}
         onClose={closeAll}
         onSwitchToRegister={switchToRegister}
+        onSwitchToForgotPassword={switchToForgotPassword}
       />
       <RegisterModal
         isOpen={isRegisterOpen}
         onClose={closeAll}
         onSwitchToLogin={switchToLogin}
+      />
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={closeAll}
+        onBackToLogin={switchBackToLogin}
       />
     </>
   );

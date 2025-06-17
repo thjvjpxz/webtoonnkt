@@ -45,14 +45,11 @@ public class SecurityConfig {
 						// .requestMatchers("/**").permitAll()
 						// Các API công khai
 						.requestMatchers(
+								"/ocr-tts/**",
 								"/test/**",
 								"/public/**",
-								"/auth/login",
-								"/auth/register",
-								"/auth/refresh-token",
-								"/auth/verify",
-								"/comic/*",
-								"/comic/*/*",
+								"/auth/**",
+								"/comic/**",
 								"/",
 								"/category",
 								"/search",
@@ -66,7 +63,8 @@ public class SecurityConfig {
 								"/comments/*/replies",
 								"/topup/callback",
 								"/transactions/webhook/**",
-								"/webhook/payos/**")
+								"/webhook/payos/**",
+								"/crawler/**")
 						.permitAll()
 
 						// Các API cần xác thực với vai trò ADMIN
@@ -80,6 +78,7 @@ public class SecurityConfig {
 						.requestMatchers("/comments?*").hasRole("ADMIN")
 						.requestMatchers("/vip-packages/**").hasRole("ADMIN")
 						.requestMatchers("/admin/statistics/**").hasRole("ADMIN")
+						.requestMatchers("/transactions/stats").hasRole("ADMIN")
 
 						// Các API cần xác thực với vai trò PUBLISHER
 						.requestMatchers("/publisher/**").hasAnyRole("PUBLISHER", "ADMIN")

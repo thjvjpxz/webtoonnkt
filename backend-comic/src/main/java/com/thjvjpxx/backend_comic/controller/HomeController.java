@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
+import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.service.HomeService;
 import com.thjvjpxx.backend_comic.service.PublisherRequestService;
 import com.thjvjpxx.backend_comic.service.PurchaseService;
@@ -100,8 +103,8 @@ public class HomeController {
     @GetMapping("favorites")
     public BaseResponse<?> getFavorites(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        String currentUserId = securityUtils.getCurrentUserId();
-        return homeService.getFavorites(currentUserId, page, size);
+        User user = securityUtils.getCurrentUser();
+        return homeService.getFavorites(user, page, size);
     }
 
     /**
@@ -112,8 +115,8 @@ public class HomeController {
      */
     @GetMapping("profile")
     public BaseResponse<?> getProfile() {
-        String currentUserId = securityUtils.getCurrentUserId();
-        return homeService.getProfile(currentUserId);
+        User user = securityUtils.getCurrentUser();
+        return homeService.getProfile(user);
     }
 
     /**
@@ -125,9 +128,9 @@ public class HomeController {
      */
     @PutMapping("profile")
     public BaseResponse<?> updateProfile(@RequestBody Map<String, String> request) {
-        String currentUserId = securityUtils.getCurrentUserId();
+        User user = securityUtils.getCurrentUser();
         String levelTypeId = request.get("levelTypeId");
-        return homeService.updateProfile(currentUserId, levelTypeId);
+        return homeService.updateProfile(user, levelTypeId);
     }
 
     /**
@@ -139,8 +142,21 @@ public class HomeController {
      */
     @PostMapping("change-password")
     public BaseResponse<?> changePassword(@RequestBody ChangePassRequest request) {
-        String currentUserId = securityUtils.getCurrentUserId();
-        return homeService.changePassword(currentUserId, request);
+        User user = securityUtils.getCurrentUser();
+        return homeService.changePassword(user, request);
+    }
+
+    /**
+     * API thay đổi avatar
+     * PUT /change-avatar
+     * 
+     * @param file File ảnh
+     * @return Response thông báo thành công
+     */
+    @PutMapping("change-avatar")
+    public BaseResponse<?> changeAvatar(@RequestPart("avatar") MultipartFile avatar) {
+        User user = securityUtils.getCurrentUser();
+        return homeService.changeAvatar(user, avatar);
     }
 
     /**

@@ -18,5 +18,5 @@ public class CrawlerComicRequest {
     @NotNull
     int endPage;
     @NotNull
-    boolean isSaveDrive;
+    boolean saveDrive;
 }
