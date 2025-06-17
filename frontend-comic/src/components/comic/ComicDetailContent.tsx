@@ -32,7 +32,8 @@ import {
   FiStar,
   FiTag,
   FiUser,
-  FiX
+  FiX,
+  FiCheck
 } from "react-icons/fi";
 import { chooseImageUrl } from "@/utils/string";
 
@@ -257,20 +258,64 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
 
                 {/* Nút hành động */}
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-4">
-                  {comicDetailResponse.chapters.length > 0 && (
-                    <Link href={`/comic/${comicDetailResponse.slug}/${comicDetailResponse.chapters[0].id}`}>
-                      <Button>
-                        <FiPlay />
-                        Đọc từ đầu
-                      </Button>
-                    </Link>
-                  )}
+                  {(() => {
+                    // Kiểm tra xem có chapter nào đã đọc không
+                    const hasReadChapters = comicDetailResponse.chapters.some(chapter => chapter.isRead);
+
+                    if (hasReadChapters) {
+                      // Sắp xếp tất cả chapters theo thứ tự chapterNumber
+                      const sortedAllChapters = comicDetailResponse.chapters
+                        .sort((a, b) => a.chapterNumber - b.chapterNumber);
+
+                      // Tìm chapter cuối cùng đã đọc (theo thứ tự chapterNumber)
+                      const readChapters = sortedAllChapters.filter(chapter => chapter.isRead);
+                      const lastReadChapter = readChapters[readChapters.length - 1];
+
+                      // Tìm chapter tiếp theo
+                      const nextChapter = sortedAllChapters
+                        .find(chapter => chapter.chapterNumber > lastReadChapter.chapterNumber);
+
+                      // Nếu không có chapter tiếp theo, tiếp tục đọc chapter cuối cùng đã đọc
+                      const continueChapter = nextChapter || lastReadChapter;
+
+                      return (
+                        <>
+                          {hasReadChapters ? (
+
+                            <Link href={`/comic/${comicDetailResponse.slug}/${continueChapter.id}`}>
+                              <Button>
+                                <FiPlay />
+                                Tiếp tục đọc
+                              </Button>
+                            </Link>) : (
+
+                            < Link href={`/comic/${comicDetailResponse.slug}/${comicDetailResponse.chapters[0].id}`}>
+                              <Button>
+                                <FiPlay />
+                                Đọc từ đầu
+                              </Button>
+                            </Link>
+                          )}
+                        </>
+                      );
+                    } else {
+                      // Nếu chưa đọc chapter nào, hiển thị nút đọc từ đầu như cũ
+                      return comicDetailResponse.chapters.length > 0 && (
+                        <Link href={`/comic/${comicDetailResponse.slug}/${comicDetailResponse.chapters[0].id}`}>
+                          <Button>
+                            <FiPlay />
+                            Đọc từ đầu
+                          </Button>
+                        </Link>
+                      );
+                    }
+                  })()}
 
                   {sortedChapters.length > 0 && (
                     <Link href={`/comic/${comicDetailResponse.slug}/${sortedChapters[0].id}`}>
                       <Button variant="outline">
                         <FiBookOpen />
-                        Chapter mới nhất
+                        Chương mới nhất
                       </Button>
                     </Link>
                   )}
@@ -392,18 +437,32 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                   <Link
                     key={chapter.id}
                     href={`/comic/${comicDetailResponse.slug}/${chapter.id}`}
-                    className="group block p-3 sm:p-4 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-primary/50 transition-all duration-200"
+                    className={`group block p-3 sm:p-4 rounded border transition-all duration-200 ${chapter.isRead
+                      ? "border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 hover:bg-green-100/70 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-700"
+                      : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-primary/50"
+                      }`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-primary transition-colors duration-200 text-sm sm:text-base line-clamp-2 sm:line-clamp-1">
-                          Chapter {chapter.chapterNumber}: {chapter.title}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className={`font-medium group-hover:text-primary transition-colors duration-200 text-sm sm:text-base line-clamp-2 sm:line-clamp-1 ${chapter.isRead
+                            ? "text-green-700 dark:text-green-300"
+                            : "text-gray-900 dark:text-white"
+                            }`}>
+                            Chapter {chapter.chapterNumber}: {chapter.title}
+                          </h3>
+                        </div>
                         <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                           <div className="flex items-center gap-1">
                             <FiCalendar className="text-xs flex-shrink-0" />
                             <span className="truncate">{formatDate(chapter.createdAt)}</span>
                           </div>
+                          {chapter.isRead && (
+                            <div className="hidden sm:flex items-center gap-1 text-green-600 dark:text-green-400">
+                              <FiCheck className="text-xs" />
+                              <span className="text-xs font-medium">Đã đọc</span>
+                            </div>
+                          )}
 
                           {/* Price badge on mobile */}
                           <div className="flex sm:hidden items-center w-full justify-end">
@@ -457,6 +516,6 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
           title="Bình luận truyện"
         />
       </div>
-    </div>
+    </div >
   );
 }

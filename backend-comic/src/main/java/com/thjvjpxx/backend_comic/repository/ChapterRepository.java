@@ -131,7 +131,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, String> {
 			WHERE
 				c.comic_id = :comicId
 			ORDER BY
-				c.updated_at DESC, c.chapter_number DESC
+				c.chapter_number DESC
 			LIMIT 4
 			""", nativeQuery = true)
 	List<ChapterHome> findTop4LatestChapter(@Param("comicId") String comicId);

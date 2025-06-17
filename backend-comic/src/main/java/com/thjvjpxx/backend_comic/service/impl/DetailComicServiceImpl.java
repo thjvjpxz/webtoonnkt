@@ -24,6 +24,7 @@ import com.thjvjpxx.backend_comic.model.ComicViewsHistory;
 import com.thjvjpxx.backend_comic.model.DetailChapter;
 import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.PurchasedChapter;
+import com.thjvjpxx.backend_comic.model.ReadingHistory;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.model.UserFollow;
 import com.thjvjpxx.backend_comic.repository.ChapterRepository;
@@ -32,6 +33,7 @@ import com.thjvjpxx.backend_comic.repository.ComicViewsHistoryRepository;
 import com.thjvjpxx.backend_comic.repository.DetailChapterRepository;
 import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.PurchasedChapterRepository;
+import com.thjvjpxx.backend_comic.repository.ReadingHistoryRepository;
 import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.DetailComicService;
@@ -53,6 +55,7 @@ public class DetailComicServiceImpl implements DetailComicService {
     ComicViewsHistoryRepository comicViewsHistoryRepo;
     PurchasedChapterRepository purchasedChapterRepo;
     LevelRepository levelRepo;
+    ReadingHistoryRepository readingHistoryRepo;
 
     @Override
     public BaseResponse<?> getComicDetail(String slug, User user) {
@@ -64,6 +67,8 @@ public class DetailComicServiceImpl implements DetailComicService {
 
         List<Chapter> chapters = chapterRepo.findByComicId(comic.getId());
 
+        List<ReadingHistory> readingHistories = readingHistoryRepo.findByComicId(comic.getId());
+
         // Tạo Map chứa thông tin chapter đã mua nếu user đăng nhập
         Map<String, Boolean> purchasedChaptersMap = new HashMap<>();
         if (user != null) {
@@ -73,7 +78,7 @@ public class DetailComicServiceImpl implements DetailComicService {
                             pc -> pc.getChapter().getId(),
                             pc -> true));
         }
-        final Map<String, Boolean> finalPurchasedChaptersMap = purchasedChaptersMap;
+        Map<String, Boolean> finalPurchasedChaptersMap = purchasedChaptersMap;
 
         List<ChapterSummary> chapterSummaries = chapters.stream()
                 .map(chapter -> ChapterSummary.builder()
@@ -88,6 +93,8 @@ public class DetailComicServiceImpl implements DetailComicService {
                                 user != null ? finalPurchasedChaptersMap.getOrDefault(chapter.getId(), chapter.isFree())
                                         : null)
                         .hasAudio(chapter.getHasAudio())
+                        .isRead(readingHistories.stream()
+                                .anyMatch(rh -> rh.getChapter().getId().equals(chapter.getId())))
                         .createdAt(chapter.getCreatedAt())
                         .updatedAt(chapter.getUpdatedAt())
                         .build())
@@ -193,6 +200,7 @@ public class DetailComicServiceImpl implements DetailComicService {
             if (!hasPurchased && !currentUser.getVip() && !isAdmin) {
                 throw new BaseException(ErrorCode.CHAPTER_NOT_PURCHASED);
             }
+
         } else if (!chapter.isFree() && user == null) {
             // User chưa đăng nhập và chapter có phí
             throw new BaseException(ErrorCode.CHAPTER_REQUIRES_LOGIN);
@@ -211,6 +219,7 @@ public class DetailComicServiceImpl implements DetailComicService {
         // Tăng exp cho user khi đọc chapter (nếu đã đăng nhập)
         if (user != null) {
             gainExp(user);
+            addReadingHistory(user, chapter);
         }
 
         String comicId = chapter.getComic().getId();
@@ -276,6 +285,20 @@ public class DetailComicServiceImpl implements DetailComicService {
     }
 
     // ===================== HELPER METHODS =====================
+
+    private void addReadingHistory(User user, Chapter chapter) {
+        // check if reading history exists
+        Optional<ReadingHistory> readingHistoryOpt = readingHistoryRepo.findByUserAndChapter(user, chapter);
+        if (readingHistoryOpt.isPresent()) {
+            return;
+        }
+
+        ReadingHistory readingHistory = ReadingHistory.builder()
+                .user(user)
+                .chapter(chapter)
+                .build();
+        readingHistoryRepo.save(readingHistory);
+    }
 
     /**
      * Tính toán số exp reward phù hợp dựa trên level hiện tại của user
