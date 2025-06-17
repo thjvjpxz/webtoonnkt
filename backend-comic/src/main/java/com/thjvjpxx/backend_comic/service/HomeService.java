@@ -1,7 +1,10 @@
 package com.thjvjpxx.backend_comic.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.model.User;
 
 /**
  * Service xử lý API trang chủ
@@ -49,7 +52,7 @@ public interface HomeService {
      * @param size          Số lượng trong 1 trang
      * @return Response chứa danh sách comic yêu thích
      */
-    public BaseResponse<?> getFavorites(String currentUserId, int page, int size);
+    public BaseResponse<?> getFavorites(User user, int page, int size);
 
     /**
      * Lấy thông tin user
@@ -57,7 +60,7 @@ public interface HomeService {
      * @param currentUserId ID user
      * @return Response chứa thông tin user
      */
-    public BaseResponse<?> getProfile(String currentUserId);
+    public BaseResponse<?> getProfile(User user);
 
     /**
      * Cập nhật thông tin user
@@ -66,7 +69,7 @@ public interface HomeService {
      * @param levelTypeId   ID level type
      * @return Response chứa thông tin user đã cập nhật
      */
-    public BaseResponse<?> updateProfile(String currentUserId, String levelTypeId);
+    public BaseResponse<?> updateProfile(User user, String levelTypeId);
 
     /**
      * Thay đổi mật khẩu
@@ -75,5 +78,14 @@ public interface HomeService {
      * @param request       DTO chứa thông tin mật khẩu mới
      * @return Response chứa thông tin user đã thay đổi mật khẩu
      */
-    public BaseResponse<?> changePassword(String currentUserId, ChangePassRequest request);
+    public BaseResponse<?> changePassword(User user, ChangePassRequest request);
+
+    /**
+     * Thay đổi avatar
+     * 
+     * @param user User
+     * @param file File ảnh
+     * @return Response chứa thông tin user đã thay đổi avatar
+     */
+    public BaseResponse<?> changeAvatar(User user, MultipartFile file);
 }

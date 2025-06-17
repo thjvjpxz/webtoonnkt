@@ -51,6 +51,7 @@ public class DetailComicResponse {
         Double price;
         String status;
         Boolean hasPurchased;
+        Boolean hasAudio;
         LocalDateTime createdAt;
         LocalDateTime updatedAt;
     }

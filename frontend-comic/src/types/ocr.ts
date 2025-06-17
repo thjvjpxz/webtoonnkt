@@ -25,9 +25,14 @@ export interface OcrItem {
 export interface OcrResponse {
   id: string
   items: OcrItem[]
+  path_audio: string
+  has_bubble: boolean
 }
 
+// Request cho API Java Spring Boot
 export interface OcrAndTtsRequest {
   id: string
-  ocr_items: string
+  ocrItems: string
+  pathAudio: string
+  hasBubble: boolean
 }

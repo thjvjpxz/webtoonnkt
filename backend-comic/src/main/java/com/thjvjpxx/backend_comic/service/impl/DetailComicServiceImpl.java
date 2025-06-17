@@ -22,6 +22,7 @@ import com.thjvjpxx.backend_comic.model.Chapter;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.ComicViewsHistory;
 import com.thjvjpxx.backend_comic.model.DetailChapter;
+import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.PurchasedChapter;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.model.UserFollow;
@@ -29,6 +30,7 @@ import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.repository.ComicViewsHistoryRepository;
 import com.thjvjpxx.backend_comic.repository.DetailChapterRepository;
+import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.PurchasedChapterRepository;
 import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
@@ -50,6 +52,7 @@ public class DetailComicServiceImpl implements DetailComicService {
     DetailChapterRepository detailChapterRepo;
     ComicViewsHistoryRepository comicViewsHistoryRepo;
     PurchasedChapterRepository purchasedChapterRepo;
+    LevelRepository levelRepo;
 
     @Override
     public BaseResponse<?> getComicDetail(String slug, User user) {
@@ -84,6 +87,7 @@ public class DetailComicServiceImpl implements DetailComicService {
                         .hasPurchased(
                                 user != null ? finalPurchasedChaptersMap.getOrDefault(chapter.getId(), chapter.isFree())
                                         : null)
+                        .hasAudio(chapter.getHasAudio())
                         .createdAt(chapter.getCreatedAt())
                         .updatedAt(chapter.getUpdatedAt())
                         .build())
@@ -204,6 +208,11 @@ public class DetailComicServiceImpl implements DetailComicService {
         incrementViewsCount(comic);
         incrementComicViewsHistory(comic);
 
+        // Tăng exp cho user khi đọc chapter (nếu đã đăng nhập)
+        if (user != null) {
+            gainExp(user);
+        }
+
         String comicId = chapter.getComic().getId();
         List<Chapter> chapters = chapterRepo.findByComicId(comicId);
 
@@ -243,18 +252,123 @@ public class DetailComicServiceImpl implements DetailComicService {
         return BaseResponse.success(chapterResponse);
     }
 
+    @Override
+    public BaseResponse<?> gainExp(User user) {
+        if (user == null) {
+            return BaseResponse.success("Thành công");
+        }
+
+        // Tính toán exp amount phù hợp dựa trên level hiện tại
+        int expAmount = calculateExpReward(user);
+
+        int newCurrentExp = user.getCurrentExp() + expAmount;
+        user.setCurrentExp(newCurrentExp);
+
+        Level currentLevel = user.getLevel();
+        if (currentLevel != null) {
+            checkAndUpgradeLevel(user, currentLevel);
+        }
+
+        // Lưu user với thông tin mới
+        userRepo.save(user);
+
+        return BaseResponse.success("Thành công");
+    }
+
+    // ===================== HELPER METHODS =====================
+
+    /**
+     * Tính toán số exp reward phù hợp dựa trên level hiện tại của user
+     * 
+     * @param user User cần tính toán exp reward
+     * @return Số exp reward phù hợp
+     */
+    private int calculateExpReward(User user) {
+
+        Level currentLevel = user.getLevel();
+        int currentLevelNumber = currentLevel.getLevelNumber();
+
+        Optional<Level> nextLevelOpt = levelRepo.findByLevelNumberAndLevelType(
+                currentLevelNumber + 1, currentLevel.getLevelType());
+
+        if (nextLevelOpt.isPresent()) {
+            Level nextLevel = nextLevelOpt.get();
+            int expRequiredForNextLevel = nextLevel.getExpRequired();
+
+            int targetActions = calculateTargetActionsForLevel(currentLevelNumber);
+
+            return Math.max(expRequiredForNextLevel / targetActions, 10);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Tính toán số lần thực hiện hành động mục tiêu để lên level tiếp theo
+     * 
+     * @param currentLevelNumber Level hiện tại
+     * @return Số lần thực hiện mong muốn
+     */
+    private int calculateTargetActionsForLevel(int currentLevelNumber) {
+        if (currentLevelNumber <= 3) {
+            return 100 + (currentLevelNumber - 1) * 100; // 100, 200, 300
+        } else if (currentLevelNumber <= 6) {
+            return 1000 + (currentLevelNumber - 4) * 1000; // 1000, 2000, 3000
+        } else {
+            return 10000 + (currentLevelNumber - 7) * 1000; // 10000, 11000, 12000
+        }
+    }
+
+    /**
+     * Kiểm tra và nâng cấp level cho user nếu đủ exp
+     * 
+     * @param user         User cần kiểm tra
+     * @param currentLevel Level hiện tại của user
+     */
+    private void checkAndUpgradeLevel(User user, Level currentLevel) {
+        int userCurrentExp = user.getCurrentExp();
+        int currentLevelNumber = currentLevel.getLevelNumber();
+
+        // Tìm level tiếp theo trong cùng level type
+        Optional<Level> nextLevelOpt = levelRepo.findByLevelNumberAndLevelType(
+                currentLevelNumber + 1, currentLevel.getLevelType());
+
+        // Nếu có level tiếp theo và user đủ exp để lên level
+        if (nextLevelOpt.isPresent()) {
+            Level nextLevel = nextLevelOpt.get();
+            if (userCurrentExp >= nextLevel.getExpRequired()) {
+                user.setLevel(nextLevel);
+                // Có thể trừ exp đã dùng để lên level hoặc giữ nguyên tùy theo logic game
+                // user.setCurrentExp(userCurrentExp - nextLevel.getExpRequired());
+
+                // Đệ quy kiểm tra có thể lên level tiếp theo nữa không
+                checkAndUpgradeLevel(user, nextLevel);
+            }
+        }
+    }
+
+    /**
+     * Tăng số lượt xem truyện
+     * 
+     * @param comic Comic cần tăng số lượt xem
+     */
     private void incrementViewsCount(Comic comic) {
-        comic.setViewsCount(comic.getViewsCount() + 1);
+        comic.setViewsCount(comic.getViewsCount() + 0);
         comicRepo.save(comic);
     }
 
+    /**
+     * Tăng số lượt xem truyện vào bảng comic_views_history
+     * 
+     * @param comic Comic cần tăng số lượt xem
+     */
     private void incrementComicViewsHistory(Comic comic) {
         LocalDateTime date = LocalDate.now().atStartOfDay();
         Optional<ComicViewsHistory> comicViewsHistoryOpt = comicViewsHistoryRepo
                 .findByComicIdAndViewDate(comic.getId(), date);
         if (comicViewsHistoryOpt.isPresent()) {
             ComicViewsHistory comicViewsHistory = comicViewsHistoryOpt.get();
-            comicViewsHistory.setViewCount(comicViewsHistory.getViewCount() + 1);
+            comicViewsHistory.setViewCount(comicViewsHistory.getViewCount() + 0);
             comicViewsHistoryRepo.save(comicViewsHistory);
         } else {
             ComicViewsHistory comicViewsHistory = ComicViewsHistory.builder()

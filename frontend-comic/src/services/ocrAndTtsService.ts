@@ -22,7 +22,7 @@ export const ocrService = {
 }
 
 export const ttsService = {
-  ocrAndTts: async (ocrAndTtsRequest: OcrAndTtsRequest) => {
+  ocrAndTts: async (ocrAndTtsRequest: OcrAndTtsRequest[]) => {
     const url = `/ocr-tts`
     const response = await fetchApi<null>(url, {
       method: 'POST',

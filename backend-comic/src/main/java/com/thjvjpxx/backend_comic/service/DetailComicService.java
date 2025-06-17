@@ -43,10 +43,17 @@ public interface DetailComicService {
     /**
      * Lấy chi tiết chapter
      * 
-     * @param chapterId     ID chapter
-     * @param user          User
+     * @param chapterId ID chapter
+     * @param user      User
      * @return Response chứa chapter
      */
     BaseResponse<?> getChapterDetail(String chapterId, User user);
 
+    /**
+     * Cộng exp cho user
+     * 
+     * @param user User cần cộng exp
+     * @return Response chứa thông tin level progress
+     */
+    BaseResponse<?> gainExp(User user);
 }

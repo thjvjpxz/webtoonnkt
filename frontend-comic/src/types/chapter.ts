@@ -14,6 +14,7 @@ export interface Chapter {
   createdAt: string;
   updatedAt: string;
   hasPurchased: boolean;
+  hasAudio: boolean;
   chapterSummaries?: ChapterSummary[];
   publisherName?: string;
   publisherLevel?: LevelResponse;

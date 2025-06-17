@@ -14,7 +14,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import json
 
 
 class OcrRequest(BaseModel):
@@ -45,6 +44,7 @@ class OcrResponse(BaseModel):
     id: str
     items: list[OcrItem]
     path_audio: str = ""
+    has_bubble: bool = False
 
 
 app = FastAPI()
@@ -202,6 +202,7 @@ def process_single_image_safe(image_url: str, id: str) -> OcrResponse:
                 os.makedirs("public/tts", exist_ok=True)
                 prompt = create_tts_prompt(result.items)
                 path_audio = f"public/tts/{result.id}"
+                result.has_bubble = True
                 if GEMINI_API_KEY:
                     text_to_speech(prompt, GEMINI_API_KEY, path_audio)
                     result.path_audio = f"{path_audio}.wav"
@@ -314,18 +315,9 @@ def create_tts_prompt(ocr_items: List[OcrItem]) -> str:
             if current_panel is not None:
                 formatted_content += "\n\n"
 
-        # Format theo type
+        # Chỉ lấy nội dung text thuần túy, không thêm prefix
         text = item.text.strip()
-        if item.type == TypeBubble.DIALOGUE:
-            formatted_content += f"Đối thoại: {text}\n"
-        elif item.type == TypeBubble.THOUGHT:
-            formatted_content += f"Suy nghĩ: {text}\n"
-        elif item.type == TypeBubble.NARRATION:
-            formatted_content += f"Tự sự: {text}\n"
-        elif item.type == TypeBubble.SOUND_EFFECT:
-            formatted_content += f"Âm thanh: {text}\n"
-        elif item.type == TypeBubble.BACKGROUND:
-            formatted_content += f"Chữ nền: {text}\n"
+        formatted_content += f"{text}\n"
 
     # Tạo prompt cuối cùng
     prompt = tts_prompt_template.format(

@@ -27,9 +27,9 @@ def text_to_speech(prompt: str, api_key: str, file_name: str):
         ),
     ]
     generate_content_config = types.GenerateContentConfig(
-        temperature=1,
-        top_p=0.95,
-        max_output_tokens=64,
+        temperature=0.7,
+        top_p=0.85,
+
         response_modalities=[
             "audio",
         ],
@@ -38,7 +38,8 @@ def text_to_speech(prompt: str, api_key: str, file_name: str):
                 prebuilt_voice_config=types.PrebuiltVoiceConfig(
                     voice_name="orus"
                 )
-            )
+            ),
+            speaking_rate=1.3
         ),
     )
 

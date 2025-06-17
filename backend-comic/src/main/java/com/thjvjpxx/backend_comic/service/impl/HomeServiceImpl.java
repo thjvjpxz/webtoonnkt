@@ -6,15 +6,19 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.thjvjpxx.backend_comic.constant.B2Constants;
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ChapterHome;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicLastUpdate;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.PopulerToday;
+import com.thjvjpxx.backend_comic.dto.response.UserProfileResponse;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
@@ -31,7 +35,10 @@ import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
 import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.HomeService;
+import com.thjvjpxx.backend_comic.service.StorageService;
+import com.thjvjpxx.backend_comic.utils.FileUtils;
 import com.thjvjpxx.backend_comic.utils.PaginationUtils;
+import com.thjvjpxx.backend_comic.utils.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +57,7 @@ public class HomeServiceImpl implements HomeService {
     PasswordEncoder passwordEncoder;
     LevelRepository levelRepo;
     LevelTypeRepository levelTypeRepo;
+    StorageService storageService;
 
     @Override
     public BaseResponse<?> getHomeComic() {
@@ -109,9 +117,9 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public BaseResponse<?> getFavorites(String currentUserId, int page, int size) {
+    public BaseResponse<?> getFavorites(User user, int page, int size) {
         Pageable pageable = PaginationUtils.createPageable(page, size);
-        Page<UserFollow> favorites = userFollowRepo.findByUserId(currentUserId, pageable);
+        Page<UserFollow> favorites = userFollowRepo.findByUserId(user.getId(), pageable);
 
         List<PopulerToday> populerToday = new ArrayList<>();
 
@@ -132,17 +140,34 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public BaseResponse<?> getProfile(String currentUserId) {
-        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
-        return BaseResponse.success(user);
+    public BaseResponse<?> getProfile(User user) {
+        Level nextLevel = levelRepo.findByLevelNumberAndLevelType(user.getLevel().getLevelNumber() + 1,
+                user.getLevel().getLevelType()).get();
+        UserProfileResponse userProfileResponse = UserProfileResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .imgUrl(user.getImgUrl())
+                .vip(user.getVip())
+                .active(user.getActive())
+                .blocked(user.getBlocked())
+                .deleted(user.getDeleted())
+                .role(user.getRole())
+                .balance(user.getBalance())
+                .level(user.getLevel())
+                .currentExp(user.getCurrentExp())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .nextLevelExpRequired(nextLevel != null ? nextLevel.getExpRequired() : null)
+                .build();
+        return BaseResponse.success(userProfileResponse);
     }
 
     @Override
-    public BaseResponse<?> changePassword(String currentUserId, ChangePassRequest request) {
+    public BaseResponse<?> changePassword(User user, ChangePassRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new BaseException(ErrorCode.PASSWORD_AND_CONFIRM_NOT_MATCH);
         }
-        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BaseException(ErrorCode.INVALID_OLD_PASSWORD);
         }
@@ -152,10 +177,9 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public BaseResponse<?> updateProfile(String currentUserId, String levelTypeId) {
-        User user = userRepo.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
+    public BaseResponse<?> updateProfile(User user, String levelTypeId) {
         LevelType levelType = levelTypeRepo.findById(levelTypeId)
-                .orElseThrow(() -> new RuntimeException("Level type not found"));
+                .orElseThrow(() -> new BaseException(ErrorCode.LEVEL_TYPE_NOT_FOUND));
         Level level = user.getLevel();
         int levelNumber = level.getLevelNumber();
 
@@ -166,6 +190,39 @@ public class HomeServiceImpl implements HomeService {
         userRepo.save(user);
         return BaseResponse.success("Cập nhật thông tin thành công");
     }
+
+    @Override
+    public BaseResponse<?> changeAvatar(User user, MultipartFile file) {
+        // Kiểm tra file có tồn tại không
+        if (file == null || file.isEmpty()) {
+            throw new BaseException(ErrorCode.FILE_NOT_FOUND);
+        }
+
+        // Lưu URL avatar cũ để xóa sau khi upload thành công
+        String oldImgUrl = user.getImgUrl();
+
+        // Xóa avatar cũ nếu có
+        if (oldImgUrl != null && !oldImgUrl.isEmpty()) {
+            FileUtils.deleteFileFromB2(oldImgUrl, storageService);
+        }
+
+        // Upload avatar mới
+        String fileName = user.getUsername() + "." + StringUtils.getExtension(file.getOriginalFilename());
+        var response = storageService.uploadFile(file, B2Constants.FOLDER_KEY_AVATAR, fileName);
+
+        if (response.getStatus() != HttpStatus.OK.value()) {
+            throw new BaseException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+
+        // Cập nhật URL avatar mới cho user
+        String newImgUrl = response.getMessage();
+        user.setImgUrl(newImgUrl);
+        userRepo.save(user);
+
+        return BaseResponse.success("Thay đổi avatar thành công");
+    }
+
+    // ======================= HELPER METHODS =======================
 
     private List<Category> getPopulerCategories() {
         return categoryRepo.findTop10CategoriesWithMostComics();

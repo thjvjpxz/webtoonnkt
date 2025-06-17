@@ -2,18 +2,19 @@
 
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal";
 import EditProfileModal from "@/components/profile/EditProfileModal";
+import ChangeAvatarModal from "@/components/profile/ChangeAvatarModal";
 import Main from "@/components/layout/Main";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useAuthState } from "@/hooks/useAuthState";
 import { getProfile } from "@/services/homeService";
-import { UserResponse } from "@/types/user";
+import { UserResponse, UserWithNextLevel } from "@/types/user";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { FiCalendar, FiDollarSign, FiEdit3, FiHome, FiKey, FiMail, FiShield, FiStar, FiTrendingUp, FiUser, FiEdit } from "react-icons/fi";
+import { FiCalendar, FiDollarSign, FiEdit3, FiHome, FiKey, FiMail, FiShield, FiStar, FiTrendingUp, FiUser, FiEdit, FiCamera } from "react-icons/fi";
 import { chooseImageUrl } from "@/utils/string";
 import PublisherRequestModal from "@/components/profile/PublisherRequestModal";
 
@@ -21,12 +22,13 @@ export default function ProfilePage() {
   const { isAuthenticated } = useAuthState();
   const router = useRouter();
 
-  const [userProfile, setUserProfile] = useState<UserResponse | null>(null);
+  const [userProfile, setUserProfile] = useState<UserWithNextLevel | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showPublisherModal, setShowPublisherModal] = useState(false);
+  const [showChangeAvatarModal, setShowChangeAvatarModal] = useState(false);
 
   // Redirect nếu chưa đăng nhập
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function ProfilePage() {
   // Tính phần trăm EXP
   const getExpPercentage = () => {
     if (!userProfile?.level || !userProfile?.currentExp) return 0;
-    return Math.min((userProfile.currentExp / userProfile.level.expRequired) * 100, 100);
+    return Math.min((userProfile.currentExp / userProfile.nextLevelExpRequired) * 100, 100);
   };
 
   return (
@@ -157,7 +159,7 @@ export default function ProfilePage() {
                   <div className="p-6">
                     <div className="flex flex-col sm:flex-row items-center gap-6">
                       {/* Avatar */}
-                      <div className="relative">
+                      <div className="relative group">
                         <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-primary/20">
                           {userProfile.imgUrl ? (
                             <Image
@@ -173,6 +175,16 @@ export default function ProfilePage() {
                             </div>
                           )}
                         </div>
+
+                        {/* Button đổi ảnh đại diện */}
+                        <button
+                          onClick={() => setShowChangeAvatarModal(true)}
+                          className="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          title="Đổi ảnh đại diện"
+                        >
+                          <FiCamera className="w-6 h-6 text-white" />
+                        </button>
+
                         {userProfile.vip && (
                           <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800">
                             <FiStar className="w-4 h-4 text-white" />
@@ -271,7 +283,7 @@ export default function ProfilePage() {
                                 Cấp độ: {userProfile.level.name}
                               </span>
                               <span className="text-sm text-gray-500 dark:text-gray-400">
-                                {userProfile.currentExp}/{userProfile.level.expRequired} EXP
+                                {userProfile.currentExp}/{userProfile.nextLevelExpRequired} EXP
                               </span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -347,15 +359,6 @@ export default function ProfilePage() {
                           <p className="font-medium text-gray-900 dark:text-gray-100">{userProfile.currentExp || 0} EXP</p>
                         </div>
                       </div>
-                      {userProfile.lastTopup && (
-                        <div className="flex items-center gap-3">
-                          <FiCalendar className="w-5 h-5 text-green-500" />
-                          <div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Nạp tiền gần nhất</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{formatDate(userProfile.lastTopup.toString())}</p>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -431,6 +434,14 @@ export default function ProfilePage() {
       <PublisherRequestModal
         isOpen={showPublisherModal}
         onClose={() => setShowPublisherModal(false)}
+      />
+
+      {/* Change Avatar Modal */}
+      <ChangeAvatarModal
+        isOpen={showChangeAvatarModal}
+        onClose={() => setShowChangeAvatarModal(false)}
+        currentAvatar={userProfile?.imgUrl}
+        onAvatarUpdated={handleProfileUpdated}
       />
     </Main>
   )

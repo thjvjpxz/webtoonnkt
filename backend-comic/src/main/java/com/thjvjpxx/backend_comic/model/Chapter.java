@@ -80,6 +80,9 @@ public class Chapter {
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
     List<DetailChapter> detailChapters;
 
+    @Column(name = "has_audio")
+    Boolean hasAudio;
+
     @Column(name = "created_at")
     @CreationTimestamp
     LocalDateTime createdAt;

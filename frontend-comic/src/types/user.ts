@@ -29,12 +29,14 @@ export interface UserResponse {
   deleted: boolean;
   role: Role;
   balance: number;
-  lastTopup: Date;
   level: LevelResponse;
   currentExp: number;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface UserWithNextLevel extends UserResponse {
+  nextLevelExpRequired: number;
+}
 
 

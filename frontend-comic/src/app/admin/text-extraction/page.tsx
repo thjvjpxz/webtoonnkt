@@ -19,7 +19,7 @@ import { getComicBySlug, getChaptersByComicId } from '@/services/detailComicServ
 import { ocrService, ttsService } from '@/services/ocrAndTtsService'
 import { ComicResponse } from '@/types/comic'
 import { Chapter } from '@/types/chapter'
-import { OcrRequest, OcrResponse } from '@/types/ocr'
+import { OcrRequest, OcrResponse, OcrAndTtsRequest } from '@/types/ocr'
 import DashboardLayout from '@/components/admin/DashboardLayout'
 import { constructImageUrl } from '@/utils/helpers'
 import { chooseImageUrl } from '@/utils/string'
@@ -31,7 +31,6 @@ interface ProcessingStatus {
   currentStep: 'idle' | 'ocr' | 'tts' | 'completed' | 'error'
   progress: number
   currentChapter?: string
-  ocrResults?: OcrResponse[]
   error?: string
 }
 
@@ -116,18 +115,29 @@ export default function TextExtractionPage() {
   // Xử lý chọn/bỏ chọn chương
   const handleChapterSelect = (chapterId: string, checked: boolean) => {
     if (checked) {
-      setSelectedChapters(prev => [...prev, chapterId])
+      setSelectedChapters(prev => {
+        const newSelected = [...prev, chapterId]
+        // Kiểm tra xem có phải tất cả chapters chưa xử lý đã được chọn không
+        const unprocessedChapters = chapters.filter(chapter => chapter.hasAudio === null)
+        const allUnprocessedSelected = unprocessedChapters.every(chapter =>
+          newSelected.includes(chapter.id)
+        )
+        setSelectAll(allUnprocessedSelected)
+        return newSelected
+      })
     } else {
       setSelectedChapters(prev => prev.filter(id => id !== chapterId))
       setSelectAll(false)
     }
   }
 
-  // Xử lý chọn/bỏ chọn tất cả
+  // Xử lý chọn/bỏ chọn tất cả (chỉ chọn chapters chưa được xử lý OCR/TTS)
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked)
     if (checked) {
-      setSelectedChapters(chapters.map(chapter => chapter.id))
+      // Chỉ chọn những chapters có hasAudio = null (chưa được xử lý)
+      const unprocessedChapters = chapters.filter(chapter => chapter.hasAudio === null)
+      setSelectedChapters(unprocessedChapters.map(chapter => chapter.id))
     } else {
       setSelectedChapters([])
     }
@@ -204,7 +214,6 @@ export default function TextExtractionPage() {
 
       // Xử lý OCR theo batch 8 phần tử
       const batchSize = 8
-      const allOcrResults: OcrResponse[] = []
       const totalBatches = Math.ceil(ocrRequests.length / batchSize)
 
       for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
@@ -213,7 +222,7 @@ export default function TextExtractionPage() {
         const batch = ocrRequests.slice(startIndex, endIndex)
 
         // Cập nhật tiến trình OCR
-        const ocrProgress = 25 + (batchIndex / totalBatches) * 40 // OCR từ 25% đến 65%
+        const ocrProgress = 25 + (batchIndex / totalBatches) * 50 // OCR từ 25% đến 75%
         setProcessingStatus(prev => prev ? {
           ...prev,
           currentStep: 'ocr',
@@ -223,28 +232,37 @@ export default function TextExtractionPage() {
 
         try {
           const batchResults = await ocrService.multiImageOcr(batch)
-          allOcrResults.push(...batchResults)
+
+          // Nếu có kết quả OCR hợp lệ, gọi luôn API TTS
+          if (batchResults && batchResults.length > 0) {
+            // Cập nhật tiến trình TTS cho batch này
+            setProcessingStatus(prev => prev ? {
+              ...prev,
+              currentStep: 'tts',
+              currentChapter: `Đang xử lý TTS cho batch ${batchIndex + 1}/${totalBatches}...`
+            } : null)
+
+            // Chuẩn bị batch request cho TTS
+            const ttsRequests: OcrAndTtsRequest[] = batchResults.map(result => ({
+              id: result.id,
+              ocrItems: JSON.stringify(result.items),
+              pathAudio: result.path_audio,
+              hasBubble: result.has_bubble
+            }))
+
+            // Gọi TTS service cho batch này
+            await ttsService.ocrAndTts(ttsRequests)
+          }
+
         } catch (error) {
-          console.error(`Error processing OCR batch ${batchIndex + 1}:`, error)
+          setProcessingStatus(prev => prev ? {
+            ...prev,
+            currentStep: 'error',
+            error: `Lỗi xử lý batch ${batchIndex + 1}: ${error}`
+          } : null)
+          console.error(`Error processing batch ${batchIndex + 1}:`, error)
           break;
         }
-      }
-
-      // Cập nhật tiến trình
-      setProcessingStatus(prev => prev ? {
-        ...prev,
-        currentStep: 'tts',
-        progress: 75,
-        currentChapter: 'Đang xử lý TTS...',
-        ocrResults: allOcrResults
-      } : null)
-
-      // Gọi TTS service cho từng kết quả OCR
-      for (const result of allOcrResults) {
-        await ttsService.ocrAndTts({
-          id: result.id,
-          ocr_items: JSON.stringify(result.items)
-        })
       }
 
       // Hoàn thành
@@ -307,7 +325,7 @@ export default function TextExtractionPage() {
                 Cấu hình xử lý
               </CardTitle>
               <CardDescription>
-                Chọn truyện và các chương cần xử lý OCR và TTS
+                Chọn truyện và các chương cần xử lý OCR và TTS. Chỉ có thể chọn những chương chưa được xử lý.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -341,7 +359,7 @@ export default function TextExtractionPage() {
                         disabled={isProcessing || chapters.length === 0}
                       />
                       <label htmlFor="select-all" className="text-sm">
-                        Chọn tất cả ({chapters.length})
+                        Chọn tất cả chưa xử lý ({chapters.filter(c => c.hasAudio === null).length}/{chapters.length})
                       </label>
                     </div>
                   </div>
@@ -357,19 +375,32 @@ export default function TextExtractionPage() {
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        {chapters.map((chapter) => (
-                          <div key={chapter.id} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={chapter.id}
-                              checked={selectedChapters.includes(chapter.id)}
-                              onCheckedChange={(checked) => handleChapterSelect(chapter.id, checked as boolean)}
-                              disabled={isProcessing}
-                            />
-                            <label htmlFor={chapter.id} className="text-sm flex-1 cursor-pointer">
-                              Chương {chapter.chapterNumber}: {chapter.title}
-                            </label>
-                          </div>
-                        ))}
+                        {chapters.map((chapter) => {
+                          const isProcessed = chapter.hasAudio !== null
+                          const hasAudio = chapter.hasAudio === true
+
+                          return (
+                            <div key={chapter.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={chapter.id}
+                                checked={selectedChapters.includes(chapter.id)}
+                                onCheckedChange={(checked) => handleChapterSelect(chapter.id, checked as boolean)}
+                                disabled={isProcessing}
+                              />
+                              <label
+                                htmlFor={chapter.id}
+                                className="text-sm flex-1 cursor-pointer"
+                              >
+                                Chương {chapter.chapterNumber}: {chapter.title}
+                              </label>
+                              {isProcessed && (
+                                <Badge variant={hasAudio ? "default" : "secondary"} className="text-xs">
+                                  {hasAudio ? "Có audio" : "Không có audio"}
+                                </Badge>
+                              )}
+                            </div>
+                          )
+                        })}
                       </div>
                     )}
                   </ScrollArea>
@@ -484,20 +515,13 @@ export default function TextExtractionPage() {
                     </Alert>
                   )}
 
-                  {/* Kết quả OCR */}
-                  {processingStatus.ocrResults && processingStatus.ocrResults.length > 0 && (
+                  {/* Hiển thị tiến trình chi tiết */}
+                  {processingStatus.currentStep !== 'idle' && processingStatus.currentStep !== 'error' && (
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Kết quả OCR:</h4>
-                      <ScrollArea className="h-32 border rounded p-2">
-                        <div className="space-y-1 text-xs">
-                          {processingStatus.ocrResults.map((result, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <CheckCircle2 className="h-3 w-3 text-green-500" />
-                              <span>Trang {result.id}: {result.items.length} văn bản được trích xuất</span>
-                            </div>
-                          ))}
-                        </div>
-                      </ScrollArea>
+                      <h4 className="text-sm font-medium">Chi tiết xử lý:</h4>
+                      <div className="text-xs text-muted-foreground">
+                        Đang xử lý theo batch để tối ưu hiệu suất...
+                      </div>
                     </div>
                   )}
                 </div>

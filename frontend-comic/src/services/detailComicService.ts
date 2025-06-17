@@ -1,21 +1,35 @@
 import { fetchApi } from "./api";
 import { ComicDetailResponse } from "@/types/comic";
 import { Chapter } from "@/types/chapter";
+import { UserResponse } from "@/types/user";
 
-// Lấy chi tiết một truyện theo slug cho page chi tiết truyện
+/**
+ * Lấy thông tin truyện theo slug
+ * @param slug - Slug của truyện
+ * @returns Thông tin truyện
+ */
 export const getComicBySlug = async (
   slug: string
 ) => {
   return await fetchApi<ComicDetailResponse>(`/comic/${slug}`);
 };
 
+/**
+ * Kiểm tra truyện có được theo dõi hay không
+ * @param comicId - ID của truyện
+ * @returns true nếu được theo dõi, false nếu không
+ */
 export const checkFollowComic = async (
   comicId: string,
 ) => {
   return await fetchApi<boolean>(`/comic/${comicId}/check-follow`);
 };
 
-// Theo dõi truyện
+/**
+ * Theo dõi truyện
+ * @param comicId - ID của truyện
+ * @returns true nếu thành công, false nếu không
+ */
 export const followComic = async (
   comicId: string,
 ) => {
@@ -28,7 +42,11 @@ export const followComic = async (
   );
 };
 
-// Bỏ theo dõi truyện
+/**
+ * Bỏ theo dõi truyện
+ * @param comicId - ID của truyện
+ * @returns true nếu thành công, false nếu không
+ */
 export const unfollowComic = async (
   comicId: string,
 ) => {
@@ -41,7 +59,12 @@ export const unfollowComic = async (
   );
 }
 
-// Lấy danh sách chapter của truyện
+/**
+ * Lấy danh sách ảnh của chapter
+ * @param slug - Slug của truyện
+ * @param chapterId - ID của chapter
+ * @returns Danh sách ảnh của chapter
+ */
 export const getChaptersByComicId = async (
   slug: string,
   chapterId: string
@@ -49,3 +72,12 @@ export const getChaptersByComicId = async (
   return await fetchApi<Chapter>(`/comic/${slug}/${chapterId}`);
 };
 
+/**
+ * Nhận exp khi đọc truyện
+ * @returns Thông tin user sau khi nhận exp
+ */
+export const gainExp = async () => {
+  return await fetchApi<null>(`/comic/gain-exp`, {
+    method: "POST"
+  })
+}
