@@ -33,7 +33,9 @@ import {
   FiHome,
   FiMenu,
   FiPause,
-  FiPlay
+  FiPlay,
+  FiVolume2,
+  FiVolumeX
 } from 'react-icons/fi';
 import { chooseImageUrl } from '@/utils/string';
 
@@ -44,6 +46,7 @@ interface ReadComicProps {
 }
 
 type ReadingMode = 'horizontal' | 'vertical';
+type AutoMode = 'none' | 'scroll' | 'audio'; // none: không tự động, scroll: tự động lướt, audio: tự động đọc
 
 export default function ReadComic({
   chapter,
@@ -53,19 +56,34 @@ export default function ReadComic({
   const { user } = useAuth();
   const router = useRouter();
   const [readingMode, setReadingMode] = useState<ReadingMode>('vertical');
-  const [autoRead, setAutoRead] = useState(false);
+  const [autoMode, setAutoMode] = useState<AutoMode>('none');
   const [currentPage, setCurrentPage] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
-  const autoReadIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const detailChapters = chapter.detailChapters;
   const chapterSummaries = chapter.chapterSummaries || [];
+  const urlAudio = process.env.NEXT_PUBLIC_OCR_BASE_URL + '/';
 
-  // Xử lý tự động đọc
+  // Kiểm tra chapter có hỗ trợ audio không
+  const hasAudioSupport = chapter.hasAudio;
+
+  // Thời gian delay cho ảnh không có bubble (ms)
+  const NO_BUBBLE_DELAY = 2000; // 2 giây
+  const AUDIO_END_DELAY = 1000; // 1 giây sau khi audio kết thúc
+
+  // Xử lý tự động lướt khi không có audio
   useEffect(() => {
-    if (autoRead && isAutoPlaying && readingMode === 'horizontal') {
-      autoReadIntervalRef.current = setInterval(() => {
+    if (autoMode === 'scroll' && isAutoPlaying && readingMode === 'horizontal') {
+      const currentImage = detailChapters[currentPage];
+      const delay = currentImage?.hasBubble ? 4000 : NO_BUBBLE_DELAY; // 4s cho có bubble, 2s cho không có bubble
+
+      autoScrollIntervalRef.current = setTimeout(() => {
         setCurrentPage(prev => {
           if (prev >= detailChapters.length - 1) {
             setIsAutoPlaying(false);
@@ -73,20 +91,101 @@ export default function ReadComic({
           }
           return prev + 1;
         });
-      }, 3000); // 3 giây mỗi trang
+      }, delay);
     } else {
-      if (autoReadIntervalRef.current) {
-        clearInterval(autoReadIntervalRef.current);
-        autoReadIntervalRef.current = null;
+      if (autoScrollIntervalRef.current) {
+        clearTimeout(autoScrollIntervalRef.current);
+        autoScrollIntervalRef.current = null;
       }
     }
 
     return () => {
-      if (autoReadIntervalRef.current) {
-        clearInterval(autoReadIntervalRef.current);
+      if (autoScrollIntervalRef.current) {
+        clearTimeout(autoScrollIntervalRef.current);
       }
     };
-  }, [autoRead, isAutoPlaying, readingMode, detailChapters.length]);
+  }, [autoMode, isAutoPlaying, readingMode, currentPage, detailChapters]);
+
+  // Xử lý tự động đọc audio
+  useEffect(() => {
+    if (autoMode === 'audio' && isAutoPlaying && readingMode === 'horizontal') {
+      const currentImage = detailChapters[currentPage];
+
+      if (currentImage?.ttsUrl) {
+        setIsAudioLoading(true);
+        setAudioError(false);
+
+        // Tạo audio element mới
+        const audio = new Audio(urlAudio + currentImage.ttsUrl);
+        audioRef.current = audio;
+
+        audio.onloadeddata = () => {
+          setIsAudioLoading(false);
+          audio.play().catch(() => {
+            setAudioError(true);
+            setIsAudioLoading(false);
+          });
+        };
+
+        audio.onended = () => {
+          // Sau khi audio kết thúc, delay 1s rồi chuyển trang
+          setTimeout(() => {
+            setCurrentPage(prev => {
+              if (prev >= detailChapters.length - 1) {
+                setIsAutoPlaying(false);
+                return prev;
+              }
+              return prev + 1;
+            });
+          }, AUDIO_END_DELAY);
+        };
+
+        audio.onerror = () => {
+          setAudioError(true);
+          setIsAudioLoading(false);
+          // Nếu audio lỗi, tự động chuyển sang chế độ scroll
+          setTimeout(() => {
+            setCurrentPage(prev => {
+              if (prev >= detailChapters.length - 1) {
+                setIsAutoPlaying(false);
+                return prev;
+              }
+              return prev + 1;
+            });
+          }, NO_BUBBLE_DELAY);
+        };
+      } else {
+        // Nếu không có audio, dùng delay như chế độ scroll
+        const delay = currentImage?.hasBubble ? 4000 : NO_BUBBLE_DELAY;
+        autoScrollIntervalRef.current = setTimeout(() => {
+          setCurrentPage(prev => {
+            if (prev >= detailChapters.length - 1) {
+              setIsAutoPlaying(false);
+              return prev;
+            }
+            return prev + 1;
+          });
+        }, delay);
+      }
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [autoMode, isAutoPlaying, readingMode, currentPage, detailChapters]);
+
+  // Dừng audio khi chuyển trang thủ công
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsAudioLoading(false);
+    setAudioError(false);
+  }, [currentPage]);
 
   // Xử lý phím tắt
   useEffect(() => {
@@ -100,7 +199,7 @@ export default function ReadComic({
       }
       if (e.key === ' ') {
         e.preventDefault();
-        if (autoRead) {
+        if (autoMode !== 'none') {
           setIsAutoPlaying(prev => !prev);
         }
       }
@@ -108,7 +207,7 @@ export default function ReadComic({
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [readingMode, autoRead, detailChapters.length]);
+  }, [readingMode, autoMode, detailChapters.length]);
 
   const handlePrevPage = () => {
     setCurrentPage(prev => Math.max(0, prev - 1));
@@ -120,6 +219,11 @@ export default function ReadComic({
 
   const toggleAutoPlay = () => {
     setIsAutoPlaying(prev => !prev);
+  };
+
+  const handleAutoModeChange = (mode: AutoMode) => {
+    setAutoMode(mode);
+    setIsAutoPlaying(false);
   };
 
   const handleChapterChange = (chapterId: string) => {
@@ -171,6 +275,12 @@ export default function ReadComic({
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white text-wrap">
                 Chapter {chapter.chapterNumber}: {chapter.title}
               </h1>
+              {hasAudioSupport && (
+                <div className="flex items-center gap-2 mt-2">
+                  <FiVolume2 className="w-4 h-4 text-blue-500" />
+                  <span className="text-sm text-blue-500 font-medium">Hỗ trợ âm thanh</span>
+                </div>
+              )}
             </div>
 
             {/* Menu toggle cho mobile */}
@@ -199,33 +309,6 @@ export default function ReadComic({
                   Chế độ ngang
                 </Button>
               </div>
-
-              {/* Tự động đọc */}
-              {readingMode === 'horizontal' && (
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="auto-read"
-                    checked={autoRead}
-                    onCheckedChange={setAutoRead}
-                  />
-                  <Label htmlFor="auto-read" className="text-sm font-medium whitespace-nowrap">
-                    Tự động đọc
-                  </Label>
-                </div>
-              )}
-
-              {/* Điều khiển tự động đọc cho chế độ dọc */}
-              {autoRead && readingMode === 'horizontal' && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleAutoPlay}
-                  className="flex items-center gap-2"
-                >
-                  {isAutoPlaying ? <FiPause className="w-4 h-4" /> : <FiPlay className="w-4 h-4" />}
-                  {isAutoPlaying ? 'Tạm dừng' : 'Phát'}
-                </Button>
-              )}
 
               {/* Chọn chapter */}
               {chapterSummaries.length > 0 && (
@@ -305,23 +388,37 @@ export default function ReadComic({
                   </Select>
                 )}
 
-                {/* Tự động đọc cho chế độ ngang */}
+                {/* Chế độ tự động */}
                 <div className="flex items-center gap-2">
-                  <Switch
-                    checked={autoRead}
-                    onCheckedChange={setAutoRead}
-                  />
-                  <Label className="text-sm text-gray-900 dark:text-white">Auto</Label>
+                  <Select value={autoMode} onValueChange={(value) => handleAutoModeChange(value as AutoMode)}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Thủ công</SelectItem>
+                      <SelectItem value="scroll">Tự động lướt</SelectItem>
+                      {hasAudioSupport && (
+                        <SelectItem value="audio">Tự động đọc</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Điều khiển tự động đọc */}
-                {autoRead && (
+                {/* Điều khiển phát/dừng */}
+                {autoMode !== 'none' && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={toggleAutoPlay}
+                    className="flex items-center gap-1"
                   >
                     {isAutoPlaying ? <FiPause className="w-4 h-4" /> : <FiPlay className="w-4 h-4" />}
+                    {autoMode === 'audio' && isAudioLoading && (
+                      <div className="w-3 h-3 border border-gray-300 border-t-transparent rounded-full animate-spin" />
+                    )}
+                    {autoMode === 'audio' && audioError && (
+                      <FiVolumeX className="w-4 h-4 text-red-500" />
+                    )}
                   </Button>
                 )}
               </div>
@@ -337,6 +434,26 @@ export default function ReadComic({
                 priority
                 sizes="100vw"
               />
+
+              {/* Indicator cho ảnh có/không có bubble */}
+              <div className="absolute top-4 left-4 z-10">
+                <div className={`px-2 py-1 rounded text-xs font-medium ${detailChapters[currentPage]?.hasBubble
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-500 text-white'
+                  }`}>
+                  {detailChapters[currentPage]?.hasBubble ? 'Có hội thoại' : 'Không có hội thoại'}
+                </div>
+              </div>
+
+              {/* Indicator cho audio */}
+              {autoMode === 'audio' && detailChapters[currentPage]?.ttsUrl && (
+                <div className="absolute top-4 right-4 z-10">
+                  <div className="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white flex items-center gap-1">
+                    <FiVolume2 className="w-3 h-3" />
+                    Có âm thanh
+                  </div>
+                </div>
+              )}
 
               {/* Nút điều khiển bên trái */}
               <div className="absolute left-0 inset-y-0 flex items-center z-10">
