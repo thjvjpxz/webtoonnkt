@@ -1,35 +1,44 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+
   images: {
-    domains: [
-      "localhost",
-      "lh3.googleusercontent.com",
-      "sv1.otruyencdn.com",
-      "img.otruyen.xyz",
-      "img.otruyenapi.com",
-      "cdn.kimthi1708.id.vn",
-      "example.com",
-      "images.unsplash.com"
-    ],
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "placehold.co",
-        pathname: "**",
+        protocol: 'https',
+        hostname: '**',
       },
       {
-        protocol: "http",
-        hostname: "example.com",
-        pathname: "**",
-      },
-      {
-        protocol: "https",
-        hostname: "sv1.otruyencdn.com",
-        pathname: "**",
-      },
+        protocol: 'http',
+        hostname: '**',
+      }
     ],
-    dangerouslyAllowSVG: true,
+    unoptimized: true,
+    dangerouslyAllowSVG: true
+  },
+
+  productionBrowserSourceMaps: false,
+
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack'],
+    });
+
+    return config;
+  },
+
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+
+  async redirects() {
+    return [];
+  },
+
+  async rewrites() {
+    return [];
   },
 };
 

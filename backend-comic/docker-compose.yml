@@ -1,0 +1,46 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: backend-comic-mysql
+    restart: no
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345Webtoon
+      MYSQL_DATABASE: webtoon
+      MYSQL_USER: webtoon
+      MYSQL_PASSWORD: 12345Webtoon
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - proxy_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+
+  # Spring Boot Application
+  backend-comic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-comic-app
+    restart: no
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - proxy_net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  proxy_net:
+    external: true

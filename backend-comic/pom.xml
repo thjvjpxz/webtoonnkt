@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<lombok.version>1.18.24</lombok.version>
+		<lombok.version>1.18.38</lombok.version>
 		<google-auth.version>1.33.1</google-auth.version>
 		<jjwt.version>0.12.6</jjwt.version>
 		<aws-sdk.version>2.31.37</aws-sdk.version>
@@ -165,3 +165,4 @@
 
 
 </project>
+
