@@ -1,9 +1,12 @@
 package com.thjvjpxx.backend_comic.service;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicHistory;
 import com.thjvjpxx.backend_comic.model.User;
 
 /**
@@ -88,4 +91,14 @@ public interface HomeService {
      * @return Response chứa thông tin user đã thay đổi avatar
      */
     public BaseResponse<?> changeAvatar(User user, MultipartFile file);
+
+    /**
+     * Lấy lịch sử đọc của user
+     * 
+     * @param user User
+     * @param page Số trang
+     * @param size Số lượng trong 1 trang
+     * @return Response chứa danh sách comic đã đọc
+     */
+    public BaseResponse<List<ComicHistory>> getHistory(User user, int page, int size);
 }

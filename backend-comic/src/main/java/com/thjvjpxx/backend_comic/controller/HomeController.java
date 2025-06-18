@@ -1,5 +1,6 @@
 package com.thjvjpxx.backend_comic.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
+import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicHistory;
 import com.thjvjpxx.backend_comic.enums.ErrorCode;
 import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.User;
@@ -105,6 +107,20 @@ public class HomeController {
             @RequestParam(defaultValue = "10") int size) {
         User user = securityUtils.getCurrentUser();
         return homeService.getFavorites(user, page, size);
+    }
+
+    /**
+     * API lấy lịch sử đọc
+     * GET /history
+     * 
+     * @param page Số trang
+     * @param size Số lượng
+     */
+    @GetMapping("history")
+    public BaseResponse<List<ComicHistory>> getHistory(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        User user = securityUtils.getCurrentUser();
+        return homeService.getHistory(user, page, size);
     }
 
     /**

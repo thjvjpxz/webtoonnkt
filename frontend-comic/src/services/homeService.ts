@@ -48,6 +48,17 @@ export const getFavoritesComic = async (page: number, limit: number) => {
 }
 
 /**
+ * Lấy danh sách truyện đã xem của user
+ * @param page - Trang hiện tại
+ * @param limit - Số lượng truyện trên mỗi trang
+ * @returns Danh sách truyện đã xem của user
+ */
+export const getHistoryComic = async (page: number, limit: number) => {
+  const response = await fetchApi<PopulerToday[]>(`/history?page=${page}&limit=${limit}`);
+  return response;
+}
+
+/**
  * Lấy thông tin profile của user
  * @returns Thông tin profile của user
  */

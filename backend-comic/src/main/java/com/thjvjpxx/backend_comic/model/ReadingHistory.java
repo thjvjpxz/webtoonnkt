@@ -28,7 +28,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(indexes = {
-        @Index(columnList = "user_id, chapter_id", unique = true)
+        @Index(columnList = "user_id, chapter_id", unique = true),
+        @Index(columnList = "user_id")
 })
 public class ReadingHistory {
 

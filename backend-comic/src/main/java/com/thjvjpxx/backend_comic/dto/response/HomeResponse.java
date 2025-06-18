@@ -48,6 +48,7 @@ public class HomeResponse {
             this.name = name;
             this.viewCount = viewCount;
         }
+
     }
 
     @Data
@@ -73,4 +74,11 @@ public class HomeResponse {
         List<ChapterHome> chapters;
     }
 
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @SuperBuilder
+    public static class ComicHistory extends PopulerToday {
+        Double alreadyRead;
+    }
 }

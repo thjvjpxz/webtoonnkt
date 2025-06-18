@@ -16,6 +16,7 @@ import com.thjvjpxx.backend_comic.dto.request.ChangePassRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ChapterHome;
+import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicHistory;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.ComicLastUpdate;
 import com.thjvjpxx.backend_comic.dto.response.HomeResponse.PopulerToday;
 import com.thjvjpxx.backend_comic.dto.response.UserProfileResponse;
@@ -25,6 +26,7 @@ import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.Level;
 import com.thjvjpxx.backend_comic.model.LevelType;
+import com.thjvjpxx.backend_comic.model.ReadingHistory;
 import com.thjvjpxx.backend_comic.model.User;
 import com.thjvjpxx.backend_comic.model.UserFollow;
 import com.thjvjpxx.backend_comic.repository.CategoryRepository;
@@ -32,6 +34,7 @@ import com.thjvjpxx.backend_comic.repository.ChapterRepository;
 import com.thjvjpxx.backend_comic.repository.ComicRepository;
 import com.thjvjpxx.backend_comic.repository.LevelRepository;
 import com.thjvjpxx.backend_comic.repository.LevelTypeRepository;
+import com.thjvjpxx.backend_comic.repository.ReadingHistoryRepository;
 import com.thjvjpxx.backend_comic.repository.UserFollowRepository;
 import com.thjvjpxx.backend_comic.repository.UserRepository;
 import com.thjvjpxx.backend_comic.service.HomeService;
@@ -58,6 +61,7 @@ public class HomeServiceImpl implements HomeService {
     LevelRepository levelRepo;
     LevelTypeRepository levelTypeRepo;
     StorageService storageService;
+    ReadingHistoryRepository readingHistoryRepo;
 
     @Override
     public BaseResponse<?> getHomeComic() {
@@ -220,6 +224,43 @@ public class HomeServiceImpl implements HomeService {
         userRepo.save(user);
 
         return BaseResponse.success("Thay đổi avatar thành công");
+    }
+
+    @Override
+    public BaseResponse<List<ComicHistory>> getHistory(User user, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageable(page, size);
+
+        int originalPage = page;
+
+        // Lấy danh sách comic distinct từ lịch sử đọc của user với phân trang
+        Page<ReadingHistory> historyPage = readingHistoryRepo.findDistinctComicsByUserId(user.getId(), pageable);
+
+        List<ComicHistory> historyComics = new ArrayList<>();
+
+        for (ReadingHistory history : historyPage.getContent()) {
+            Comic comic = history.getChapter().getComic();
+            Double latestChapter = chapterRepo.findMaxChapterNumberByComicId(comic.getId());
+            Double alreadyRead = readingHistoryRepo.findMaxChapterNumberReadByUserAndComic(user.getId(), comic.getId());
+
+            ComicHistory comicHistory = ComicHistory.builder()
+                    .id(comic.getId())
+                    .thumbUrl(comic.getThumbUrl())
+                    .slug(comic.getSlug())
+                    .name(comic.getName())
+                    .viewCount((long) comic.getViewsCount())
+                    .latestChapter(latestChapter)
+                    .alreadyRead(alreadyRead)
+                    .build();
+
+            historyComics.add(comicHistory);
+        }
+
+        return BaseResponse.success(
+                historyComics,
+                originalPage,
+                (int) historyPage.getTotalElements(),
+                size,
+                historyPage.getTotalPages());
     }
 
     // ======================= HELPER METHODS =======================

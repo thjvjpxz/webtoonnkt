@@ -8,6 +8,7 @@ export interface PopulerToday {
   thumbUrl: string;
   viewCount: number;
   latestChapter: number;
+  alreadyRead: number;
 }
 
 export interface ComicHome {
