@@ -38,8 +38,7 @@ def text_to_speech(prompt: str, api_key: str, file_name: str):
                 prebuilt_voice_config=types.PrebuiltVoiceConfig(
                     voice_name="orus"
                 )
-            ),
-            speaking_rate=1.3
+            )
         ),
     )
 

@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from src.ocr.config import MAX_WORKERS
 from src.ocr import extract, get_image_size
 from src.tts.prompts import tts_prompt_template

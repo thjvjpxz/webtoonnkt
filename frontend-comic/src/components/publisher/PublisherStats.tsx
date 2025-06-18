@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, RefreshCw, DollarSign, Eye, Users, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
+import { chooseImageUrl } from '@/utils/string';
 
 export function PublisherStats() {
   const { stats, isLoading, error, refetch, fetchStatsInRange } = usePublisherStats();
@@ -180,10 +182,12 @@ export function PublisherStats() {
           <div className="space-y-4">
             {stats.topComics.map((comic) => (
               <div key={comic.comicId} className="flex items-center gap-4 p-4 border rounded-lg">
-                <img
-                  src={comic.thumbUrl}
+                <Image
+                  src={chooseImageUrl(comic.thumbUrl)}
                   alt={comic.comicName}
                   className="w-16 h-20 object-cover rounded"
+                  width={64}
+                  height={80}
                 />
                 <div className="flex-1">
                   <h3 className="font-semibold">{comic.comicName}</h3>

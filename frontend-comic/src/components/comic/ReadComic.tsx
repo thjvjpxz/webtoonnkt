@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Chapter } from '@/types/chapter';
 import { constructImageUrl } from '@/utils/helpers';
 import { useAuth } from '@/contexts/AuthContext';
@@ -175,7 +174,7 @@ export default function ReadComic({
         audioRef.current = null;
       }
     };
-  }, [autoMode, isAutoPlaying, readingMode, currentPage, detailChapters]);
+  }, [autoMode, isAutoPlaying, readingMode, currentPage, detailChapters, urlAudio]);
 
   // Dừng audio khi chuyển trang thủ công
   useEffect(() => {

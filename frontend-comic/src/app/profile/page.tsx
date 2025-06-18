@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useAuthState } from "@/hooks/useAuthState";
 import { getProfile } from "@/services/homeService";
-import { UserResponse, UserWithNextLevel } from "@/types/user";
+import { UserWithNextLevel } from "@/types/user";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

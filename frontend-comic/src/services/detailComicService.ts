@@ -1,7 +1,6 @@
 import { fetchApi } from "./api";
 import { ComicDetailResponse } from "@/types/comic";
 import { Chapter } from "@/types/chapter";
-import { UserResponse } from "@/types/user";
 
 /**
  * Lấy thông tin truyện theo slug
