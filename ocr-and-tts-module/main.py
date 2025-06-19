@@ -1,28 +1,28 @@
-from dotenv import load_dotenv
-load_dotenv()
-
-from src.ocr.config import MAX_WORKERS
-from src.ocr import extract, get_image_size
-from src.tts.prompts import tts_prompt_template
-from src.tts import text_to_speech
-from src.utils.rate_limiter import rate_limiter
-from fastapi.security import APIKeyHeader
-from fastapi.staticfiles import StaticFiles
-from typing import List
-import requests
-from enum import Enum
-from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException, Depends, Security
-import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from functools import partial
-from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
+from functools import partial
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import os
+from fastapi import FastAPI, HTTPException, Depends, Security
+from pydantic import BaseModel
+from enum import Enum
+import requests
+from typing import List
+from fastapi.staticfiles import StaticFiles
+from fastapi.security import APIKeyHeader
+from src.utils.rate_limiter import rate_limiter
+from src.tts import text_to_speech, text_to_speech_v2
+from src.tts.prompts import tts_prompt_template
+from src.ocr import extract, get_image_size
+from src.config import MAX_WORKERS, GOOGLE_APPLICATION_CREDENTIALS
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
 
 
 class OcrRequest(BaseModel):
     image_url: str
     id: str
+    use_ai: bool = False
 
 
 class TypeBubble(Enum):
@@ -116,25 +116,6 @@ def has_valid_text(ocr_items: List[OcrItem]) -> bool:
     return False
 
 
-@app.post("/ocr", response_model=OcrResponse, dependencies=[Depends(get_api_key)])
-async def ocr(request: OcrRequest):
-    """
-    API trích xuất văn bản từ ảnh comic
-
-    Args:
-        request: Object chứa URL của ảnh cần xử lý
-
-    Returns:
-        List[OcrResponse]: Danh sách các vùng văn bản được phát hiện
-    """
-    try:
-        # Sử dụng cùng logic với multi-image để có TTS
-        return process_single_image_safe(request.image_url, request.id)
-    except Exception as e:
-        print(f"Lỗi xử lý OCR: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Lỗi xử lý OCR: {str(e)}")
-
-
 @app.post("/multi-image-ocr", response_model=List[OcrResponse], dependencies=[Depends(get_api_key)])
 async def multi_image_ocr(images: list[OcrRequest]):
     """
@@ -158,7 +139,7 @@ async def multi_image_ocr(images: list[OcrRequest]):
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             # Submit tất cả ảnh cùng lúc
             future_to_image = {
-                executor.submit(process_func, img.image_url, img.id): img
+                executor.submit(process_func, img.image_url, img.id, img.use_ai): img
                 for img in images
             }
 
@@ -185,7 +166,7 @@ async def multi_image_ocr(images: list[OcrRequest]):
         raise HTTPException(status_code=500, detail=f"Lỗi batch OCR: {e}")
 
 
-def process_single_image_safe(image_url: str, id: str) -> OcrResponse:
+def process_single_image_safe(image_url: str, id: str, use_ai: bool) -> OcrResponse:
     """
     Hàm wrapper an toàn cho xử lý đa luồng - bao gồm cả OCR và TTS
 
@@ -200,28 +181,37 @@ def process_single_image_safe(image_url: str, id: str) -> OcrResponse:
         # Xử lý OCR trước
         result = process_single_image(image_url, id)
 
-        # Tạo TTS ngay sau khi OCR xong nếu có items hợp lệ
-        if result.items and has_valid_text(result.items):
-            try:
-                os.makedirs("public/tts", exist_ok=True)
-                prompt = create_tts_prompt(result.items)
-                path_audio = f"public/tts/{result.id}"
+        if use_ai:
+            # Tạo TTS ngay sau khi OCR xong nếu có items hợp lệ
+            if result.items and has_valid_text(result.items):
+                try:
+                    os.makedirs("public/tts", exist_ok=True)
+                    prompt = create_tts_prompt(result.items)
+                    path_audio = f"public/tts/{result.id}"
+                    result.has_bubble = True
+                    if GEMINI_API_KEY:
+                        # Hiển thị thông tin rate limit trước khi gọi TTS
+                        remaining_tts = rate_limiter.get_remaining_requests(
+                            "gemini-2.5-flash-preview-tts")
+                        print(f"🎤 TTS requests remaining: {remaining_tts}/10")
+
+                        text_to_speech(prompt, GEMINI_API_KEY, path_audio)
+                        result.path_audio = f"{path_audio}.wav"
+                        print(f"✅ Hoàn thành OCR + TTS cho ảnh {id}")
+                    else:
+                        print(
+                            f"⚠️ Không có GEMINI_API_KEY để tạo TTS cho {id}")
+                except Exception as e:
+                    print(f"❌ Lỗi tạo TTS cho {id}: {str(e)}")
+                    result.path_audio = ""
+            elif result.items:
+                print(f"⏭️ Bỏ qua TTS cho ảnh {id} - không có text hợp lệ")
+        else:
+            if result.items and has_valid_text(result.items):
+                path_audio = f"public/tts/{result.id}.wav"
+                text_to_speech_v2(normalize(result.items), path_audio)
+                result.path_audio = path_audio
                 result.has_bubble = True
-                if GEMINI_API_KEY:
-                    # Hiển thị thông tin rate limit trước khi gọi TTS
-                    remaining_tts = rate_limiter.get_remaining_requests("gemini-2.5-flash-preview-tts")
-                    print(f"🎤 TTS requests remaining: {remaining_tts}/10")
-                    
-                    text_to_speech(prompt, GEMINI_API_KEY, path_audio)
-                    result.path_audio = f"{path_audio}.wav"
-                    print(f"✅ Hoàn thành OCR + TTS cho ảnh {id}")
-                else:
-                    print(f"⚠️ Không có GEMINI_API_KEY để tạo TTS cho {id}")
-            except Exception as e:
-                print(f"❌ Lỗi tạo TTS cho {id}: {str(e)}")
-                result.path_audio = ""
-        elif result.items:
-            print(f"⏭️ Bỏ qua TTS cho ảnh {id} - không có text hợp lệ")
 
         return result
     except Exception as e:
@@ -285,36 +275,11 @@ def process_single_image(image_url: str, id: str) -> OcrResponse:
             os.remove(temp_path)
 
 
-def create_tts_prompt(ocr_items: List[OcrItem]) -> str:
-    """
-    Tạo prompt TTS từ danh sách OCR items
-
-    Args:
-        ocr_items: Danh sách các item OCR
-        character_name: Tên nhân vật chính
-        story_context: Bối cảnh câu chuyện
-
-    Returns:
-        str: Prompt đã được format cho TTS
-    """
-    # Sắp xếp items theo panel_id và type
-    type_priority = {
-        TypeBubble.NARRATION: 1,
-        TypeBubble.DIALOGUE: 2,
-        TypeBubble.THOUGHT: 3,
-        TypeBubble.SOUND_EFFECT: 4,
-        TypeBubble.BACKGROUND: 5
-    }
-
-    # Sắp xếp theo panel_id trước, sau đó theo type priority
-    sorted_items = sorted(ocr_items, key=lambda x: (
-        x.panel_id, type_priority.get(x.type, 6)))
-
-    # Format nội dung
+def normalize(ocr_items: List[OcrItem]) -> str:
     formatted_content = ""
     current_panel = None
 
-    for item in sorted_items:
+    for item in ocr_items:
         if not item.text or not item.text.strip():
             continue
 
@@ -327,6 +292,22 @@ def create_tts_prompt(ocr_items: List[OcrItem]) -> str:
         text = item.text.strip()
         formatted_content += f"{text}\n"
 
+    return formatted_content
+
+
+def create_tts_prompt(ocr_items: List[OcrItem]) -> str:
+    """
+    Tạo prompt TTS từ danh sách OCR items
+
+    Args:
+        ocr_items: Danh sách các item OCR
+        character_name: Tên nhân vật chính
+        story_context: Bối cảnh câu chuyện
+
+    Returns:
+        str: Prompt đã được format cho TTS
+    """
+    formatted_content = normalize(ocr_items)
     # Tạo prompt cuối cùng
     prompt = tts_prompt_template.format(
         formatted_content=formatted_content

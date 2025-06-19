@@ -4,7 +4,7 @@ from .ocr import perform_ocr
 from .ai_processing import process_with_ai
 from .preprocessing import preprocess_image
 from .utils import ai2norm, norm2ai, merge_box_groups, assign_ids_to_bounds, cv2pil
-from .config import GOOGLE_AI_API_KEY, OCRSPACE_API_KEY
+from ..config import GOOGLE_AI_API_KEY, OCRSPACE_API_KEY
 from ..utils.rate_limiter import rate_limiter
 import time
 
