@@ -9,7 +9,7 @@ import {
   useCallback,
 } from "react";
 import { LoginResponse } from "@/types/auth";
-import { handleLogout, handleRedirectToHome } from "@/utils/authUtils";
+import { handleLogout } from "@/utils/authUtils";
 import { refreshTokenService } from "@/services/authService";
 
 interface User {

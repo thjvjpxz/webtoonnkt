@@ -5,6 +5,7 @@ from src.ocr.config import MAX_WORKERS
 from src.ocr import extract, get_image_size
 from src.tts.prompts import tts_prompt_template
 from src.tts import text_to_speech
+from src.utils.rate_limiter import rate_limiter
 from fastapi.security import APIKeyHeader
 from fastapi.staticfiles import StaticFiles
 from typing import List
@@ -207,6 +208,10 @@ def process_single_image_safe(image_url: str, id: str) -> OcrResponse:
                 path_audio = f"public/tts/{result.id}"
                 result.has_bubble = True
                 if GEMINI_API_KEY:
+                    # Hiển thị thông tin rate limit trước khi gọi TTS
+                    remaining_tts = rate_limiter.get_remaining_requests("gemini-2.5-flash-preview-tts")
+                    print(f"🎤 TTS requests remaining: {remaining_tts}/10")
+                    
                     text_to_speech(prompt, GEMINI_API_KEY, path_audio)
                     result.path_audio = f"{path_audio}.wav"
                     print(f"✅ Hoàn thành OCR + TTS cho ảnh {id}")

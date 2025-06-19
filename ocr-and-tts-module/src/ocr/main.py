@@ -5,6 +5,7 @@ from .ai_processing import process_with_ai
 from .preprocessing import preprocess_image
 from .utils import ai2norm, norm2ai, merge_box_groups, assign_ids_to_bounds, cv2pil
 from .config import GOOGLE_AI_API_KEY, OCRSPACE_API_KEY
+from ..utils.rate_limiter import rate_limiter
 import time
 
 AVAILABLE_OCR = ["easyocr", "ocrspace", "rapidocr"]
@@ -59,6 +60,10 @@ def extract(
     ocr_results = norm2ai(ocr_results, height, width)
     ocr_bound_ids = assign_ids_to_bounds(ocr_results)
 
+    # Hiển thị thông tin rate limit trước khi gọi AI
+    remaining_ocr = rate_limiter.get_remaining_requests("gemini-2.0-flash")
+    print(f"🤖 OCR AI requests remaining: {remaining_ocr}/1000")
+    
     predicted_groups = process_with_ai(cv2pil(processed_image), ocr_bound_ids, api_key.get("google_ai"))
 
     results = merge_box_groups(predicted_groups, ocr_bound_ids)

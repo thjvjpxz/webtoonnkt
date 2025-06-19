@@ -6,12 +6,16 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold, Generati
 from .prompts import comic_prompt
 import re
 from datetime import datetime
+from ..utils.rate_limiter import rate_limiter
 
 
 def process_with_ai(
     image: Image, ocr_results: Dict[str, List[Dict]], api_key: str
 ) -> Dict:
     """Process OCR results with AI."""
+    # Chờ nếu cần thiết để tránh rate limit
+    rate_limiter.wait_if_needed("gemini-2.0-flash")
+    
     model = configure_genai(api_key)
     prompt = comic_prompt.format(ocr_results)
     response = model.generate_content([image, prompt])

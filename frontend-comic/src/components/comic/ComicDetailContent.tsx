@@ -229,12 +229,6 @@ export default function ComicDetailContent({ comicDetailResponse }: ComicDetailC
                     <span className="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base">Trạng thái:</span>
                     {renderStatus(comicDetailResponse.status)}
                   </div>
-
-                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <FiBookOpen className="text-primary flex-shrink-0 text-sm sm:text-base" />
-                    <span className="font-medium text-sm sm:text-base">Số chapter:</span>
-                    <span className="text-sm sm:text-base">{comicDetailResponse.chapters.length}</span>
-                  </div>
                 </div>
 
                 {/* Thể loại */}

@@ -5,7 +5,7 @@ import { login as loginAPI, register as registerAPI } from "@/services/authServi
 import toast from "react-hot-toast";
 
 export function useAuthState() {
-  const { login: authLogin, logout: authLogout, user, isAuthenticated, isLoading, redirectToHome, refreshToken: authRefreshToken } = useAuth();
+  const { login: authLogin, logout: authLogout, user, isAuthenticated, isLoading, refreshToken: authRefreshToken } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Login với better error handling
@@ -67,9 +67,8 @@ export function useAuthState() {
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
       toast.error("Có lỗi xảy ra khi đăng xuất");
-      redirectToHome();
     }
-  }, [authLogout, redirectToHome]);
+  }, [authLogout]);
 
   // Kiểm tra quyền của user
   const hasRole = useCallback((roleNames: string[]): boolean => {

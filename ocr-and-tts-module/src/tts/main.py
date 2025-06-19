@@ -3,6 +3,7 @@ import mimetypes
 import struct
 from google import genai
 from google.genai import types
+from ..utils.rate_limiter import rate_limiter
 
 
 def save_binary_file(file_name, data):
@@ -13,6 +14,9 @@ def save_binary_file(file_name, data):
 
 
 def text_to_speech(prompt: str, api_key: str, file_name: str):
+    # Chờ nếu cần thiết để tránh rate limit
+    rate_limiter.wait_if_needed("gemini-2.5-flash-preview-tts")
+    
     client = genai.Client(
         api_key=api_key,
     )
