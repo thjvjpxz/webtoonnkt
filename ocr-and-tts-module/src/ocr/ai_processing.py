@@ -15,27 +15,45 @@ def process_with_ai(
     """Process OCR results with AI."""
     # Chờ nếu cần thiết để tránh rate limit
     rate_limiter.wait_if_needed("gemini-2.0-flash")
-    
+
     model = configure_genai(api_key)
     prompt = comic_prompt.format(ocr_results)
     response = model.generate_content([image, prompt])
     text = response.text
 
     try:
-        # Làm sạch quote marks
-        cleaned = re.sub(r"(?<=: )'|'(?=,|\n|\})", '"', text)
-        cleaned = re.sub(r'(?<!\\)""', '"', cleaned)
+        cleaned = clean_json_text(text)
 
         decoder = json.JSONDecoder(strict=False)
         data = decoder.decode(cleaned)
         return data
     except json.JSONDecodeError as e:
-        # write to file log with timestamp
         with open('log.txt', 'a') as f:
             f.write(
                 f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Lỗi parse JSON từ AI response: {str(e)}. Original text: {text}\n\n")
         raise ValueError(
             f"Lỗi parse JSON từ AI response: {str(e)}. Original text: {text[:200]}...") from e
+
+
+def clean_json_text(text: str) -> str:
+    """Làm sạch và escape các ký tự đặc biệt trong JSON text."""
+    cleaned = re.sub(r"(?<=: )'|'(?=,|\n|\})", '"', text)
+    cleaned = re.sub(r'(?<!\\)""', '"', cleaned)
+
+    placeholders = {}
+    valid_escapes = ['\\n', '\\t', '\\r', '\\b', '\\f', '\\"', '\\/', '\\\\']
+
+    for i, escape in enumerate(valid_escapes):
+        placeholder = f"__ESCAPE_{i}__"
+        placeholders[placeholder] = escape
+        cleaned = cleaned.replace(escape, placeholder)
+
+    cleaned = cleaned.replace('\\', '\\\\')
+
+    for placeholder, escape in placeholders.items():
+        cleaned = cleaned.replace(placeholder, escape)
+
+    return cleaned
 
 
 def configure_genai(api_key: str) -> genai.GenerativeModel:
