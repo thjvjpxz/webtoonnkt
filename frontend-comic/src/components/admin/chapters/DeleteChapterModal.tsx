@@ -33,7 +33,7 @@ export default function DeleteChapterModal({
     setIsDeleting(true);
     try {
       await onConfirm();
-      // onConfirm sẽ đóng modal sau khi xử lý xong
+      setIsDeleting(false);
     } catch (error) {
       console.error("Error deleting chapter:", error);
       setIsDeleting(false);

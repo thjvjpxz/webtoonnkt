@@ -40,8 +40,8 @@ export const useChapter = () => {
 
     try {
       const response = isPublisher
-        ? await publisherService.getChapters(currentPage - 1, pageSize, searchTerm, comicFilter || undefined)
-        : await chapterService.getChapters(currentPage - 1, pageSize, searchTerm, comicFilter || undefined);
+        ? await publisherService.getChapters(currentPage, pageSize, searchTerm, comicFilter || undefined)
+        : await chapterService.getChapters(currentPage, pageSize, searchTerm, comicFilter || undefined);
 
       if (response.status === 200 && response.data) {
         setTotalPages(response.totalPages || 1);

@@ -71,6 +71,10 @@ public class CrawlerServiceImpl implements CrawlerService {
     final DetailChapterRepository detailChapterRepository;
     final StorageService storageService;
 
+    int MIN_CHAPTER_SIZE = 5;
+    int MAX_CHAPTER_SIZE = 8;
+    boolean CRAWL_FULL = true;
+
     String OTRUYEN_API_URL = "https://otruyenapi.com/v1/api/danh-sach/truyen-moi?page=";
 
     String OTRUYEN_API_COMIC_DETAIL = "https://otruyenapi.com/v1/api/truyen-tranh/";
@@ -405,12 +409,11 @@ public class CrawlerServiceImpl implements CrawlerService {
                 return false;
             }
 
-            Random random = new Random();
-            int randomChapterSize = random.nextInt(5 - 1 + 1) + 1; // random từ 5 đến 8
-
             chapters = firstChapter.getServer_data();
 
-            if (chapters.size() >= 10) {
+            if (!CRAWL_FULL && chapters.size() >= 10) {
+                Random random = new Random();
+                int randomChapterSize = random.nextInt(MAX_CHAPTER_SIZE - MIN_CHAPTER_SIZE + 1) + MIN_CHAPTER_SIZE;
                 chapters = chapters.subList(0, randomChapterSize);
             }
 
