@@ -4,11 +4,12 @@ from .ocr import perform_ocr
 from .ai_processing import process_with_ai
 from .preprocessing import preprocess_image
 from .utils import ai2norm, norm2ai, merge_box_groups, assign_ids_to_bounds, cv2pil
-from ..config import GOOGLE_AI_API_KEY, OCRSPACE_API_KEY
+from ..config import GOOGLE_AI_API_KEY
 from ..utils.rate_limiter import rate_limiter
 import time
 
 AVAILABLE_OCR = ["easyocr", "ocrspace", "rapidocr"]
+
 
 def extract(
         image: Union[str], ocr: Union[str, List[str]] = "easyocr"
@@ -26,14 +27,6 @@ def extract(
 
     if GOOGLE_AI_API_KEY is None:
         raise ValueError("GOOGLE_AI_API_KEY chưa được cập nhật")
-    
-    if OCRSPACE_API_KEY is None:
-        raise ValueError("OCRSPACE_API_KEY chưa được cập nhật")
-
-    api_key = {
-        "ocrspace": OCRSPACE_API_KEY,
-        "google_ai": GOOGLE_AI_API_KEY
-    }
 
     if isinstance(image, str):
         image = cv2.imread(image)
@@ -50,7 +43,7 @@ def extract(
         )
 
     time_start = time.time()
-    ocr_results = perform_ocr(processed_image, ocr, api_key)
+    ocr_results = perform_ocr(processed_image, ocr)
     time_end = time.time()
     print(f"Thời gian xử lý OCR: {time_end - time_start} giây")
 
@@ -63,8 +56,9 @@ def extract(
     # Hiển thị thông tin rate limit trước khi gọi AI
     remaining_ocr = rate_limiter.get_remaining_requests("gemini-2.0-flash")
     print(f"🤖 OCR AI requests remaining: {remaining_ocr}/1000")
-    
-    predicted_groups = process_with_ai(cv2pil(processed_image), ocr_bound_ids, api_key.get("google_ai"))
+
+    predicted_groups = process_with_ai(
+        cv2pil(processed_image), ocr_bound_ids, GOOGLE_AI_API_KEY)
 
     results = merge_box_groups(predicted_groups, ocr_bound_ids)
     final_results = ai2norm(results, height, width)
