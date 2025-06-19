@@ -31,7 +31,6 @@ interface AuthContextType {
   logout: () => void;
   refreshToken: () => Promise<boolean>;
   isTokenExpired: () => boolean;
-  redirectToHome: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,11 +38,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Hàm redirect về trang chủ
-  const redirectToHome = useCallback(() => {
-    handleRedirectToHome();
-  }, []);
 
   // Kiểm tra token có hết hạn không
   const isTokenExpired = useCallback(() => {
@@ -63,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Logout function - đặt trước refreshToken để tránh lỗi "used before declaration"
+  // Logout function
   const logout = useCallback(() => {
     handleLogout();
   }, []);
@@ -130,24 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = localStorage.getItem("user");
 
       if (token && userData) {
-        try {
-          const parsedUser = JSON.parse(userData);
+        const parsedUser = JSON.parse(userData);
 
-          // Kiểm tra token có hết hạn không
-          if (isTokenExpired()) {
-            // Thử refresh token
-            const refreshed = await refreshToken();
-            if (refreshed) {
-              setUser(parsedUser);
-            }
-            // Nếu refresh thất bại, logout() đã được gọi trong refreshToken()
-          } else {
-            setUser(parsedUser);
-          }
-        } catch (error) {
-          console.error("Lỗi khi parse user data:", error);
-          // Xóa dữ liệu không hợp lệ và redirect
-          logout();
+        if (isTokenExpired()) {
+          await refreshToken();
+        } else {
+          setUser(parsedUser);
         }
       }
       setIsLoading(false);
@@ -207,8 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     refreshToken,
-    isTokenExpired,
-    redirectToHome,
+    isTokenExpired
   };
 
   return (
