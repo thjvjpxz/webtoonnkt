@@ -37,19 +37,25 @@ def process_with_ai(
 
 def clean_json_text(text: str) -> str:
     """Làm sạch và escape các ký tự đặc biệt trong JSON text."""
+    # Làm sạch quote marks
     cleaned = re.sub(r"(?<=: )'|'(?=,|\n|\})", '"', text)
     cleaned = re.sub(r'(?<!\\)""', '"', cleaned)
 
+    # Xử lý backslash characters - loại bỏ backslash đơn lẻ thay vì escape
+    # Trước tiên, bảo vệ các escape sequences hợp lệ
     placeholders = {}
     valid_escapes = ['\\n', '\\t', '\\r', '\\b', '\\f', '\\"', '\\/', '\\\\']
 
+    # Thay thế các escape sequences hợp lệ bằng placeholders
     for i, escape in enumerate(valid_escapes):
         placeholder = f"__ESCAPE_{i}__"
         placeholders[placeholder] = escape
         cleaned = cleaned.replace(escape, placeholder)
 
-    cleaned = cleaned.replace('\\', '\\\\')
+    # Loại bỏ tất cả backslash còn lại (backslash đơn lẻ không hợp lệ)
+    cleaned = cleaned.replace('\\', '')
 
+    # Khôi phục lại các escape sequences hợp lệ
     for placeholder, escape in placeholders.items():
         cleaned = cleaned.replace(placeholder, escape)
 
