@@ -12,6 +12,9 @@ services:
       - NEXT_PUBLIC_OCR_BASE_URL=http://ocr-tts.webtoonnkt.click
       - NEXT_PUBLIC_OCR_API_KEY=BC6325CDCBDD891515C1FEE7D7CB9
     restart: no
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     tmpfs:
       - /tmp
       - /var/tmp

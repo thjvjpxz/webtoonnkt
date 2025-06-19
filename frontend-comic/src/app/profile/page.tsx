@@ -19,7 +19,7 @@ import { chooseImageUrl } from "@/utils/string";
 import PublisherRequestModal from "@/components/profile/PublisherRequestModal";
 
 export default function ProfilePage() {
-  const { isAuthenticated } = useAuthState();
+  const { isAuthenticated, isPublisher, isAdmin } = useAuthState();
   const router = useRouter();
 
   const [userProfile, setUserProfile] = useState<UserWithNextLevel | null>(null);
@@ -261,7 +261,7 @@ export default function ProfilePage() {
                               <FiKey className="w-4 h-4 mr-2" />
                               Đổi mật khẩu
                             </Button>
-                            {userProfile.role.name !== 'ADMIN' && (
+                            {!isAdmin() && !isPublisher() && (
                               <Button
                                 variant="outline"
                                 size="sm"

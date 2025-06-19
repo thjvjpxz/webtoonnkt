@@ -97,19 +97,15 @@ export default function CommentItem({
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {
-              canDelete && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onStartReply}
-                  className="text-primary hover:text-primary/80 hover:bg-primary/10 h-8 px-2 text-xs sm:text-sm"
-                >
-                  <FiMessageCircle className="mr-1 text-xs sm:text-sm" />
-                  Phản hồi
-                </Button>
-              )
-            }
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onStartReply}
+              className="text-primary hover:text-primary/80 hover:bg-primary/10 h-8 px-2 text-xs sm:text-sm"
+            >
+              <FiMessageCircle className="mr-1 text-xs sm:text-sm" />
+              Phản hồi
+            </Button>
 
             {hasReplies && (
               <Button

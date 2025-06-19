@@ -1,7 +1,10 @@
 package com.thjvjpxx.backend_comic.controller;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thjvjpxx.backend_comic.service.PayOSService;
 import com.thjvjpxx.backend_comic.service.TransactionService;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
@@ -22,6 +25,7 @@ import vn.payos.type.WebhookData;
 @RestController
 @RequestMapping("/webhook/payos")
 @RequiredArgsConstructor
+@Slf4j
 public class PayOSWebhookController {
 
     private final PayOSService payOSService;
@@ -31,19 +35,36 @@ public class PayOSWebhookController {
     private String backendUrl;
 
     /**
-     * Đăng ký webhook URL với PayOS khi ứng dụng khởi động
+     * Đăng ký webhook URL với PayOS sau khi ứng dụng đã hoàn toàn khởi động
+     * Sử dụng ApplicationReadyEvent để đảm bảo server đã sẵn sàng
+     * Chạy async để không block quá trình startup
      * 
      * POST /webhook/payos
      * 
      * @return Response chứa thông báo thành công
      */
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
+    @Async("asyncExecutor")
     public void registerWebhook() {
         try {
+            log.info("Bắt đầu đăng ký webhook với PayOS...");
+
+            // Kiểm tra backendUrl có được cấu hình không
+            if (backendUrl == null || backendUrl.trim().isEmpty()) {
+                log.warn("Backend URL không được cấu hình, bỏ qua việc đăng ký webhook");
+                return;
+            }
+
             String finalWebhookUrl = backendUrl + "/api/webhook/payos/payment";
+            log.info("Đăng ký webhook URL: {}", finalWebhookUrl);
+
             payOSService.confirmWebhook(finalWebhookUrl);
+            log.info("Đăng ký webhook thành công với PayOS");
+
         } catch (Exception e) {
-            e.printStackTrace();
+            // Không throw exception để tránh crash ứng dụng
+            // Chỉ log lỗi để dev có thể theo dõi và xử lý thủ công nếu cần
+            log.error("Lỗi khi đăng ký webhook với PayOS: {}", e.getMessage(), e);
         }
     }
 
@@ -92,6 +113,7 @@ public class PayOSWebhookController {
 
         } catch (Exception e) {
             // Trả về lỗi để PayOS thử gửi lại webhook
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body("Internal server error");
         }
     }

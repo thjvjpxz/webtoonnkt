@@ -66,6 +66,10 @@ public class AuthServiceImpl implements AuthService {
             throw new BaseException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
+        if (!user.getActive()) {
+            throw new BaseException(ErrorCode.USER_NOT_ACTIVE);
+        }
+
         if (user.getBlocked()) {
             throw new BaseException(ErrorCode.USER_ALREADY_BLOCKED);
         }

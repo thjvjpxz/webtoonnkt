@@ -80,7 +80,7 @@ function PaymentPage() {
       const response = await createPaymentLink(amount);
       if (response.status === 200) {
         // Chuyển hướng đến link thanh toán
-        window.open(response.data?.paymentLink, "_blank");
+        window.open(response.data?.paymentLink);
         toast.success("Đã tạo liên kết thanh toán thành công!");
       } else {
         toast.error(response.message || "Có lỗi xảy ra khi tạo liên kết thanh toán");

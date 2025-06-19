@@ -379,7 +379,7 @@ public class DetailComicServiceImpl implements DetailComicService {
      * @param comic Comic cần tăng số lượt xem
      */
     private void incrementViewsCount(Comic comic) {
-        comic.setViewsCount(comic.getViewsCount() + 0);
+        comic.setViewsCount(comic.getViewsCount() + 1);
         comicRepo.save(comic);
     }
 
