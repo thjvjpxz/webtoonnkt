@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-
   images: {
     remotePatterns: [
       {
@@ -20,7 +18,7 @@ const nextConfig: NextConfig = {
 
   productionBrowserSourceMaps: false,
 
-  webpack: (config, { isServer }) => {
+  webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],

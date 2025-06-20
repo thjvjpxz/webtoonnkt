@@ -35,7 +35,7 @@ export default function RegisterModal({
     handleInputChange,
     setShowPassword,
 
-  } = useRegister(onClose, onSwitchToLogin);
+  } = useRegister(onClose);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
