@@ -72,8 +72,6 @@ public enum ErrorCode {
     PASSWORD_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Mật khẩu không được trống!"),
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "Mật khẩu không đúng!"),
     CONFIRM_PASSWORD_NOT_EMPTY(HttpStatus.BAD_REQUEST, "Mật khẩu xác nhận không được trống!"),
-    USER_INACTIVE(HttpStatus.FORBIDDEN, "Tài khoản chưa được kích hoạt!"),
-    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "Thông tin đăng nhập không hợp lệ!"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token không hợp lệ hoặc đã hết hạn!"),
     TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "Yêu cầu token!"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN, "Không có quyền truy cập!"),
@@ -84,6 +82,7 @@ public enum ErrorCode {
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "Tài khoản đã bị xóa!"),
     USER_ALREADY_BLOCKED(HttpStatus.BAD_REQUEST, "Tài khoản đã bị khóa!"),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "Tài khoản chưa được kích hoạt, vui lòng kiểm tra email để kích hoạt!"),
+    USER_ALREADY_ACTIVE(HttpStatus.BAD_REQUEST, "Tài khoản đã được kích hoạt!"),
 
     // Role
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại!"),

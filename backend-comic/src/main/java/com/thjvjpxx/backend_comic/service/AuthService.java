@@ -65,4 +65,12 @@ public interface AuthService {
      * @return Response chứa kết quả kiểm tra
      */
     BaseResponse<?> checkResetPasswordTokenExpired(String token);
+
+    /**
+     * Gửi lại email xác thực
+     * 
+     * @param email Email người dùng
+     * @return Response chứa kết quả gửi lại email xác thực
+     */
+    BaseResponse<?> resendVerificationEmail(LoginRequest loginRequest);
 }

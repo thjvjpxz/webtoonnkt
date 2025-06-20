@@ -239,6 +239,44 @@ public class AuthServiceImpl implements AuthService {
         return BaseResponse.success(checkTokenExpired(user.getUpdatedAt()));
     }
 
+    @Override
+    public BaseResponse<?> resendVerificationEmail(LoginRequest loginRequest) {
+        Optional<User> userOptByUsername = userRepository.findByUsername(loginRequest.getUsername());
+        Optional<User> userOptByEmail = userRepository.findByEmail(loginRequest.getUsername());
+
+        if (!userOptByUsername.isPresent() && !userOptByEmail.isPresent()) {
+            throw new BaseException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        User user;
+        if (userOptByUsername.isPresent()) {
+            user = userOptByUsername.get();
+        } else {
+            user = userOptByEmail.get();
+        }
+
+        if (user.getDeleted()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_DELETED);
+        }
+
+        if (user.getBlocked()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_BLOCKED);
+        }
+
+        if (user.getActive()) {
+            throw new BaseException(ErrorCode.USER_ALREADY_ACTIVE);
+        }
+
+        String verificationToken = StringUtils.generateVerificationToken();
+        String verificationUrl = frontendUrl + "/verify?token=" + verificationToken;
+        emailService.sendVerificationEmail(user.getEmail(), verificationUrl);
+
+        user.setVerificationToken(verificationToken);
+        userRepository.save(user);
+
+        return BaseResponse.success("Vui lòng kiểm tra email để kích hoạt tài khoản!");
+    }
+
     // ======================== HELPER METHODS ========================
     private boolean checkTokenExpired(LocalDateTime time) {
         long veriSeconds = verificationTokenExpiration / 1000;

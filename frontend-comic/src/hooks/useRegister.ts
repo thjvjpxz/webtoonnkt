@@ -3,8 +3,7 @@ import { RegisterRequest } from "@/types/auth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-
-export default function useRegister(onClose: () => void, onSwitchToLogin: () => void) {
+export default function useRegister(onClose: () => void) {
   const [formData, setFormData] = useState<RegisterRequest>({
     username: "",
     email: "",
@@ -70,8 +69,10 @@ export default function useRegister(onClose: () => void, onSwitchToLogin: () => 
       const response = await register(formData);
 
       if (response.status === 200) {
-        onSwitchToLogin();
-        toast.success("Đăng ký thành công, vui lòng kiểm tra email để xác minh");
+        // Đóng modal và chuyển hướng đến trang verify
+        onClose();
+        toast.success("Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
+
         // Reset form
         setFormData({ username: "", email: "", password: "", confirmPassword: "" });
         setErrors({});

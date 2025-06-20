@@ -115,4 +115,16 @@ public class AuthController {
     public BaseResponse<?> checkResetPasswordTokenExpired(@RequestParam String token) {
         return authService.checkResetPasswordTokenExpired(token);
     }
+
+    /**
+     * API gửi lại email xác thực
+     * POST /auth/resend-verification-email
+     * 
+     * @param payload DTO chứa email
+     * @return Response chứa kết quả gửi lại email xác thực
+     */
+    @PostMapping("/resend-verification-email")
+    public BaseResponse<?> resendVerificationEmail(@RequestBody LoginRequest loginRequest) {
+        return authService.resendVerificationEmail(loginRequest);
+    }
 }

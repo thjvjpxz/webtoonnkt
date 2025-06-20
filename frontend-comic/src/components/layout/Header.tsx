@@ -22,7 +22,8 @@ import {
   FiBookOpen,
   FiDollarSign
 } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import LoginModal from "../auth/LoginModal";
 import RegisterModal from "../auth/RegisterModal";
 import ForgotPasswordModal from "../auth/ForgotPasswordModal";
@@ -38,6 +39,7 @@ export default function Header() {
 
   const { user, isAuthenticated, logout, isAdmin, isPublisher } = useAuthState();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Auth modals
   const {
@@ -52,6 +54,18 @@ export default function Header() {
     switchToForgotPassword,
     switchBackToLogin,
   } = useAuthModals();
+
+  // Tự động mở modal đăng nhập khi có parameter login=true
+  useEffect(() => {
+    const shouldOpenLogin = searchParams.get('login');
+    if (shouldOpenLogin === 'true' && !isAuthenticated && !isLoginOpen) {
+      openLogin();
+      // Xóa parameter khỏi URL mà không reload trang
+      const url = new URL(window.location.href);
+      url.searchParams.delete('login');
+      window.history.replaceState(null, '', url.toString());
+    }
+  }, [searchParams, isAuthenticated, isLoginOpen, openLogin]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -270,13 +284,18 @@ export default function Header() {
                   </Button>
                   <Button
                     size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
+                    className="hidden sm:flex bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
                     onClick={openRegister}
                   >
-                    <span className="hidden sm:inline">Đăng ký</span>
-                    <span className="sm:hidden">
-                      <FiUser className="w-4 h-4" />
-                    </span>
+                    Đăng ký
+                  </Button>
+                  {/* Mobile login button */}
+                  <Button
+                    size="sm"
+                    className="sm:hidden bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all duration-200"
+                    onClick={openLogin}
+                  >
+                    <FiUser className="w-4 h-4" />
                   </Button>
                 </div>
               )}

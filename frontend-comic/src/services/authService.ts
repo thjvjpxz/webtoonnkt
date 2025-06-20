@@ -92,10 +92,29 @@ export const resetPassword = async (token: string, password: string, confirmPass
   return response;
 }
 
+/**
+ * Kiểm tra token đặt lại mật khẩu có hết hạn không
+ * @param token - Token đặt lại mật khẩu
+ * @returns void
+ */
 export const checkResetPasswordToken = async (token: string) => {
   const url = `/auth/check-reset-password-token-expired?token=${token}`;
   const response = await fetchApi<void>(url, {
     method: 'GET',
+  });
+  return response;
+}
+
+/**
+ * Gửi lại email xác thực
+ * @param body - Thông tin gửi lại email xác thực
+ * @returns void
+ */
+export const resendVerifyEmail = async (body: LoginRequest) => {
+  const url = '/auth/resend-verification-email';
+  const response = await fetchApi<void>(url, {
+    method: 'POST',
+    data: body,
   });
   return response;
 }

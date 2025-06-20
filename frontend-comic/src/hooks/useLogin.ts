@@ -3,7 +3,14 @@ import { useState } from "react";
 import { useAuthState } from "@/hooks/useAuthState";
 
 export default function useLogin(onClose: () => void) {
-  const { login, isSubmitting } = useAuthState();
+  const {
+    login,
+    isSubmitting,
+    isResendingEmail,
+    unverifiedCredentials,
+    resendVerification,
+    clearUnverifiedCredentials
+  } = useAuthState();
   const [formData, setFormData] = useState<LoginRequest>({
     username: "",
     password: "",
@@ -45,6 +52,7 @@ export default function useLogin(onClose: () => void) {
     setFormData({ username: "", password: "" });
     setErrors({});
     setShowPassword(false);
+    clearUnverifiedCredentials(); // Xóa thông tin tài khoản chưa xác thực khi đóng modal
     onClose();
   };
 
@@ -58,12 +66,19 @@ export default function useLogin(onClose: () => void) {
     }
   };
 
+  const handleResendVerification = async () => {
+    await resendVerification();
+  };
+
   return {
     isLoading: isSubmitting,
+    isResendingEmail,
+    unverifiedCredentials,
     errors,
     handleLogin,
     handleInputChange,
     handleClose,
+    handleResendVerification,
     showPassword,
     toggleShowPassword,
     formData,

@@ -10,7 +10,6 @@ import {
 } from "react";
 import { LoginResponse } from "@/types/auth";
 import { handleLogout } from "@/utils/authUtils";
-import { refreshTokenService } from "@/services/authService";
 
 interface User {
   id: string;
@@ -29,8 +28,9 @@ interface AuthContextType {
   isLoading: boolean;
   login: (loginResponse: LoginResponse) => void;
   logout: () => void;
-  refreshToken: () => Promise<boolean>;
+  updateUserFromRefresh: (loginResponse: LoginResponse) => void;
   isTokenExpired: () => boolean;
+  setUserData: (userData: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,106 +60,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Logout function
   const logout = useCallback(() => {
     handleLogout();
+    setUser(null);
   }, []);
 
-  // Refresh token function
-  const refreshToken = useCallback(async (): Promise<boolean> => {
-    const refreshTokenValue = localStorage.getItem("refreshToken");
-    if (!refreshTokenValue) {
-      // Không có refresh token, redirect về trang chủ
-      logout();
-      return false;
+  // Cập nhật user data từ refresh token response
+  const updateUserFromRefresh = useCallback((loginResponse: LoginResponse) => {
+    localStorage.setItem("accessToken", loginResponse.accessToken);
+
+    const userData: User = {
+      id: loginResponse.id,
+      username: loginResponse.username,
+      imgUrl: loginResponse.imgUrl,
+      vip: loginResponse.vip,
+      role: loginResponse.role,
+    };
+
+    // Lưu user data vào localStorage và state
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+
+    if (loginResponse.refreshToken) {
+      localStorage.setItem("refreshToken", loginResponse.refreshToken);
     }
+  }, []);
 
-    try {
-      const response = await refreshTokenService(refreshTokenValue);
-
-      if (response.status === 200) {
-        const data = response.data;
-        if (data) {
-          localStorage.setItem("accessToken", data?.accessToken || "");
-          const userData: User = {
-            id: data.id,
-            username: data.username,
-            imgUrl: data.imgUrl,
-            vip: data.vip,
-            role: data.role,
-          };
-
-          // Lưu user data vào localStorage và state
-          localStorage.setItem("user", JSON.stringify(userData));
-          setUser(userData);
-        }
-
-        if (data?.refreshToken) {
-          localStorage.setItem("refreshToken", data.refreshToken);
-        }
-        return true;
-      } else {
-        logout();
-        return false;
-      }
-    } catch (error) {
-      console.error("Lỗi khi refresh token:", error);
-      // Lỗi khi refresh, đăng xuất và redirect
-      logout();
-      return false;
-    }
-  }, [logout]);
-
-  // Kiểm tra và auto refresh token
-  const checkAndRefreshToken = useCallback(async () => {
-    if (isTokenExpired()) {
-      const refreshed = await refreshToken();
-      if (!refreshed) {
-        setUser(null);
-      }
-    }
-  }, [isTokenExpired, refreshToken]);
+  // Set user data (dùng cho các tình huống khác)
+  const setUserData = useCallback((userData: User | null) => {
+    setUser(userData);
+  }, []);
 
   // Kiểm tra token trong localStorage khi component mount
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       const token = localStorage.getItem("accessToken");
       const userData = localStorage.getItem("user");
 
       if (token && userData) {
         const parsedUser = JSON.parse(userData);
-
-        if (isTokenExpired()) {
-          await refreshToken();
-        } else {
-          setUser(parsedUser);
-        }
+        setUser(parsedUser);
       }
       setIsLoading(false);
     };
 
     initializeAuth();
-  }, [isTokenExpired, refreshToken, logout]);
-
-  // Auto refresh token mỗi 4 phút
-  useEffect(() => {
-    if (!user) return;
-
-    const interval = setInterval(() => {
-      checkAndRefreshToken();
-    }, 4 * 60 * 1000); // 4 phút
-
-    return () => clearInterval(interval);
-  }, [user, checkAndRefreshToken]);
-
-  // Lắng nghe focus window để check token
-  useEffect(() => {
-    const handleFocus = () => {
-      if (user) {
-        checkAndRefreshToken();
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [user, checkAndRefreshToken]);
+  }, []);
 
   const login = (loginResponse: LoginResponse) => {
     // Lưu tokens vào localStorage
@@ -188,8 +132,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     logout,
-    refreshToken,
-    isTokenExpired
+    updateUserFromRefresh,
+    isTokenExpired,
+    setUserData
   };
 
   return (

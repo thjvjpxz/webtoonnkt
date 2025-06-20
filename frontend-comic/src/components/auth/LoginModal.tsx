@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import useLogin from "@/hooks/useLogin";
+import ResendVerificationAlert from "./ResendVerificationAlert";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -30,8 +31,11 @@ export default function LoginModal({
     handleLogin,
     handleInputChange,
     handleClose,
+    handleResendVerification,
     toggleShowPassword,
     isLoading,
+    isResendingEmail,
+    unverifiedCredentials,
     errors,
     showPassword,
     formData,
@@ -114,6 +118,14 @@ export default function LoginModal({
           {/* General Error */}
           {errors.general && (
             <p className="text-sm text-destructive text-center">{errors.general}</p>
+          )}
+
+          {/* Unverified Account Notice */}
+          {unverifiedCredentials && (
+            <ResendVerificationAlert
+              isResending={isResendingEmail}
+              onResend={handleResendVerification}
+            />
           )}
 
           {/* Forgot Password */}
