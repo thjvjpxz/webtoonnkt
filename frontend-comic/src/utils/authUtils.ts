@@ -10,6 +10,12 @@ export function getRefreshToken(): string | null {
   return localStorage.getItem('refreshToken');
 }
 
+export function getUserFromLocalStorage() {
+  if (typeof window === 'undefined') return null;
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
+}
+
 export function handleRedirectToHome() {
   if (typeof window !== 'undefined') {
     if (window.location.pathname !== '/') {

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginRequest, RegisterRequest } from "@/types/auth";
 import { login as loginAPI, register as registerAPI, resendVerifyEmail } from "@/services/authService";

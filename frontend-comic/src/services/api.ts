@@ -1,8 +1,9 @@
 // Service cơ bản để gọi API
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@/types/api';
 import { getAccessToken, getRefreshToken, handleLogout } from '@/utils/authUtils';
 import toast from 'react-hot-toast';
+import { refreshTokenService } from './authService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -17,11 +18,11 @@ const axiosInstance = axios.create({
 // Biến để theo dõi việc refresh token
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value: any) => void;
-  reject: (error: any) => void;
+  resolve: (value: string | null) => void;
+  reject: (error: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
@@ -67,20 +68,18 @@ export const handleApiError = (error: unknown): string => {
   return error instanceof Error ? error.message : "Đã xảy ra lỗi";
 };
 
-// Hàm refresh token
-const refreshToken = async (): Promise<string | null> => {
+// Hàm refresh access token
+const refreshAccessToken = async (): Promise<string | null> => {
   try {
     const refreshTokenValue = getRefreshToken();
     if (!refreshTokenValue) {
       return null;
     }
 
-    const response = await axios.post(`${API_URL}/auth/refresh`, {
-      refreshToken: refreshTokenValue
-    });
+    const response = await refreshTokenService(refreshTokenValue);
 
-    if (response.data?.status === 200 && response.data?.data) {
-      const loginData = response.data.data;
+    if (response.status === 200 && response.data) {
+      const loginData = response.data;
 
       // Lưu token mới vào localStorage
       localStorage.setItem('accessToken', loginData.accessToken);
@@ -196,7 +195,7 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const newToken = await refreshToken();
+        const newToken = await refreshAccessToken();
 
         if (newToken) {
           // Token refresh thành công

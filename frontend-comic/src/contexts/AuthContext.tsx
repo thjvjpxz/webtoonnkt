@@ -28,7 +28,6 @@ interface AuthContextType {
   isLoading: boolean;
   login: (loginResponse: LoginResponse) => void;
   logout: () => void;
-  updateUserFromRefresh: (loginResponse: LoginResponse) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,26 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  // Cập nhật user data từ refresh token response
-  const updateUserFromRefresh = useCallback((loginResponse: LoginResponse) => {
-    localStorage.setItem("accessToken", loginResponse.accessToken);
 
-    const userData: User = {
-      id: loginResponse.id,
-      username: loginResponse.username,
-      imgUrl: loginResponse.imgUrl,
-      vip: loginResponse.vip,
-      role: loginResponse.role,
-    };
-
-    // Lưu user data vào localStorage và state
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
-
-    if (loginResponse.refreshToken) {
-      localStorage.setItem("refreshToken", loginResponse.refreshToken);
-    }
-  }, []);
 
   // Kiểm tra token trong localStorage khi component mount
   useEffect(() => {
@@ -107,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     logout,
-    updateUserFromRefresh,
   };
 
   return (

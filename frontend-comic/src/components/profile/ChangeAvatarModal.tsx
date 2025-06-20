@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useRef, useCallback } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FiUpload, FiX, FiImage } from "react-icons/fi";
-import Image from "next/image";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { updateAvatar } from "@/services/homeService";
+import { getUserFromLocalStorage } from "@/utils/authUtils";
 import { chooseImageUrl } from "@/utils/string";
-import { useAuthState } from "@/hooks/useAuthState";
+import Image from "next/image";
+import { useCallback, useRef, useState } from "react";
+import { FiImage, FiUpload, FiX } from "react-icons/fi";
 
 interface ChangeAvatarModalProps {
   isOpen: boolean;
@@ -22,7 +22,6 @@ export default function ChangeAvatarModal({
   currentAvatar,
   onAvatarUpdated
 }: ChangeAvatarModalProps) {
-  const { refreshToken } = useAuthState();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -110,10 +109,15 @@ export default function ChangeAvatarModal({
 
       const response = await updateAvatar(selectedFile);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.message) {
         onAvatarUpdated();
         handleClose();
-        refreshToken();
+        const userData = getUserFromLocalStorage();
+        if (userData) {
+          userData.imgUrl = response.data;
+          localStorage.setItem("user", JSON.stringify(userData));
+          window.location.reload();
+        }
       } else {
         setError(response.message || 'Có lỗi xảy ra khi cập nhật ảnh đại diện');
       }

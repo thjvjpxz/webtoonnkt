@@ -12,9 +12,10 @@ import toast from "react-hot-toast";
 import Main from "@/components/layout/Main";
 import Image from "next/image";
 import { buyVipPackage, getMyVipSubscription } from "@/services/homeService";
+import { getUserFromLocalStorage } from "@/utils/authUtils";
 
 export default function VipPurchasePage() {
-  const { user, isAuthenticated, refreshToken } = useAuthState();
+  const { user, isAuthenticated } = useAuthState();
   const [vipPackages, setVipPackages] = useState<VipPackage[]>([]);
   const [vipSubscription, setVipSubscription] = useState<VipSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +79,13 @@ export default function VipPurchasePage() {
           const subscriptionResponse = await getMyVipSubscription();
           if (subscriptionResponse.status === 200 && subscriptionResponse.data) {
             setVipSubscription(subscriptionResponse.data);
-            refreshToken();
+
+            const userData = getUserFromLocalStorage();
+            if (userData) {
+              userData.vip = true;
+              localStorage.setItem("user", JSON.stringify(userData));
+              window.location.reload();
+            }
           }
         } catch (error) {
           console.log("Không thể tải lại thông tin VIP", error);

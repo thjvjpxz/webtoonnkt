@@ -223,7 +223,7 @@ public class HomeServiceImpl implements HomeService {
         user.setImgUrl(newImgUrl);
         userRepo.save(user);
 
-        return BaseResponse.success("Thay đổi avatar thành công");
+        return BaseResponse.success(user.getImgUrl());
     }
 
     @Override

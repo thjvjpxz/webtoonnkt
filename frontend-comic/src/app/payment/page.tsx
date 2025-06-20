@@ -29,6 +29,7 @@ function PaymentPage() {
   // Tỉ lệ quy đổi: 1000VND = 1 Linh thạch
   const EXCHANGE_RATE = 1000;
   const MIN_AMOUNT = 2;
+  const MAX_AMOUNT = 1000;
 
   // Tính toán số tiền VND
   const vndAmount = amount * EXCHANGE_RATE;
@@ -45,9 +46,19 @@ function PaymentPage() {
 
   const handleAmountChange = (value: string) => {
     const numValue = parseInt(value) || 0;
-    if (numValue >= 0) {
+
+    // Kiểm tra giá trị trong khoảng cho phép
+    if (numValue >= 0 && numValue <= MAX_AMOUNT) {
       setAmount(numValue);
-      setError("");
+
+      // Xóa lỗi nếu giá trị hợp lệ
+      if (numValue >= MIN_AMOUNT && numValue <= MAX_AMOUNT) {
+        setError("");
+      } else if (numValue > 0 && numValue < MIN_AMOUNT) {
+        setError(`Số linh thạch tối thiểu là ${MIN_AMOUNT}`);
+      } else if (numValue > MAX_AMOUNT) {
+        setError(`Số linh thạch tối đa là ${MAX_AMOUNT}`);
+      }
     }
   };
 
@@ -64,6 +75,11 @@ function PaymentPage() {
 
     if (amount < MIN_AMOUNT) {
       setError(`Số linh thạch tối thiểu là ${MIN_AMOUNT}`);
+      return;
+    }
+
+    if (amount > MAX_AMOUNT) {
+      setError(`Số linh thạch tối đa là ${MAX_AMOUNT}`);
       return;
     }
 
@@ -176,7 +192,11 @@ function PaymentPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Nạp tối thiểu:</span>
-                    <span className="font-medium">2 Linh thạch</span>
+                    <span className="font-medium">{MIN_AMOUNT} Linh thạch</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Nạp tối đa:</span>
+                    <span className="font-medium">{MAX_AMOUNT.toLocaleString()} Linh thạch</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Phương thức:</span>
@@ -257,6 +277,7 @@ function PaymentPage() {
                         id="amount"
                         type="number"
                         min={MIN_AMOUNT}
+                        max={MAX_AMOUNT}
                         value={amount}
                         onChange={(e) => handleAmountChange(e.target.value)}
                         className="pr-28 h-12"
@@ -314,7 +335,7 @@ function PaymentPage() {
                 {/* Nút thanh toán */}
                 <Button
                   onClick={handlePaymentClick}
-                  disabled={isLoading || amount < MIN_AMOUNT || !isAuthenticated}
+                  disabled={isLoading || amount < MIN_AMOUNT || amount > MAX_AMOUNT || !isAuthenticated}
                   className="w-full h-14 text-base font-semibold"
                   size="lg"
                 >
