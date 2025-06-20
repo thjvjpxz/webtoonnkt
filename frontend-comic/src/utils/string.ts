@@ -50,30 +50,5 @@ export const chooseImageUrl = (url: string | undefined) => {
     return '/images/placeholder.svg';
   }
 
-  // Nếu là URL local hoặc blob, trả về nguyên gốc
-  if (url.startsWith('/') || url.startsWith('blob:') || url.startsWith('data:')) {
-    return url;
-  }
-
-  // Danh sách CDN được tin cậy, không cần proxy
-  const trustedCdnUrls = [
-    "https://cdn.kimthi1708.id.vn",
-    "https://sv1.otruyencdn.com",
-    "https://img.otruyen.xyz",
-    "https://img.otruyenapi.com",
-  ];
-
-  // Kiểm tra nếu URL thuộc CDN tin cậy
-  if (trustedCdnUrls.some(cdnUrl => url.startsWith(cdnUrl))) {
-    return url;
-  }
-
-  // Các URL khác cần đi qua proxy để tránh CORS
-  try {
-    // Kiểm tra URL hợp lệ trước khi encode
-    new URL(url);
-    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
-  } catch {
-    return '/images/placeholder.svg';
-  }
+  return url;
 }

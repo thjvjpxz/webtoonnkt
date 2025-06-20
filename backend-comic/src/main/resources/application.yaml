@@ -45,7 +45,7 @@ spring:
 app:
   frontend-url: ${FRONTEND_URL}
   cors:
-    allowed-origins: ${FRONTEND_URL}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:${FRONTEND_URL}}
   verification-token-expiration: 1800000 # 30p
   forgot-password-token-expiration: 1800000 # 30p
   backend-url: ${BACKEND_URL}

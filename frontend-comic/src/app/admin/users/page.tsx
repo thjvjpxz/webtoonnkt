@@ -192,12 +192,9 @@ export default function Users() {
     );
   }
 
-  // Format số dư thành tiền VND
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
+  // Hàm format số dư với icon linh thạch
+  const formatBalance = (balance: number) => {
+    return balance.toLocaleString('vi-VN');
   };
 
 
@@ -418,8 +415,17 @@ export default function Users() {
                       </TableCell>
 
                       {/* Số dư */}
-                      <TableCell className="text-center text-muted-foreground font-medium">
-                        {formatCurrency(user.balance)}
+                      <TableCell className="text-center py-4">
+                        <div className="flex items-center justify-center gap-1 font-medium">
+                          <Image
+                            src="/images/linh-thach.webp"
+                            alt="Linh thạch"
+                            width={16}
+                            height={16}
+                            className="flex-shrink-0"
+                          />
+                          <span>{formatBalance(user.balance)}</span>
+                        </div>
                       </TableCell>
 
                       {/* Ngày tạo */}
