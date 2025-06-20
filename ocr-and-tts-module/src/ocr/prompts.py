@@ -17,6 +17,8 @@ Key Instructions:
    - Provide the complete, cleaned, and corrected text for each group as it should appear in the image.
    - Ensure the text is coherent, grammatically correct, and matches the content visible in the comic.
    - **Do not include any newline characters** in your output; all lines should be joined into a single string.
+   - **Remove all special characters that can break JSON parsing (quotes, backslashes, unicode symbols)**
+   - **Keep text simple and clean with only basic punctuation**
 
 4. Spatial and Visual Analysis:
    - Use the spatial relationships between word boxes to determine groupings.
@@ -64,6 +66,21 @@ OCR Text Locations:
 {0}
 ```
 
+**CRITICAL JSON FORMAT REQUIREMENTS:**
+- **ABSOLUTELY NO NEWLINE CHARACTERS (\n) inside any JSON string values**
+- **Remove or replace ALL newline characters with spaces before including text in JSON**
+- **REMOVE ALL SPECIAL CHARACTERS that can break JSON parsing:**
+  * Remove all quotation marks: " " " ' ' ' ` 
+  * Remove backslashes: \
+  * Remove Unicode special characters: … ♪ ★ ☆ etc.
+  * Remove any non-standard punctuation that might cause JSON errors
+- **Keep only basic alphanumeric characters, spaces, and simple punctuation: . , ! ? - ( )**
+- **Use double quotes (") for all JSON strings, never single quotes**
+- **Ensure all JSON syntax is perfectly valid - no trailing commas, proper brackets**
+- **If text contains newlines, replace them with spaces or remove them entirely**
+- **Clean text should be simple and readable without fancy characters**
+- **Test your JSON mentally before outputting - it must be parseable**
+
 Output Format:
 {{
   "groups": [
@@ -71,8 +88,8 @@ Output Format:
       "panel_id": "1",
       "text_bubble_id": "1-1",
       "box_ids": ["1", "2", "3"],
-      "original_text": """The OCR output before cleaning""",
-      "cleaned_text": """The corrected and cleaned text""",
+      "original_text": "The OCR output before cleaning (NO newlines allowed)",
+      "cleaned_text": "The corrected and cleaned text (NO newlines allowed)",
       "type": "dialogue|thought|narration|sound_effect|background",
       "style": "normal|emphasized|angled|split",
       "notes": "Justification for inclusion if background or sound effect, any significant corrections or uncertainties|none"
@@ -80,6 +97,15 @@ Output Format:
     ...
   ]
 }}
+
+**JSON VALIDATION CHECKLIST - VERIFY BEFORE OUTPUT:**
+1. ✓ No raw newline characters (\n) anywhere in JSON string values
+2. ✓ All special characters removed from text (quotes, backslashes, unicode symbols)
+3. ✓ Text contains only alphanumeric characters, spaces, and basic punctuation (. , ! ? - ( ))
+4. ✓ All strings use double quotes (") not single quotes (')
+5. ✓ No trailing commas after the last item in arrays or objects
+6. ✓ All brackets and braces are properly matched
+7. ✓ The entire JSON is one valid object starting with {{ and ending with }}
 
 Additional Guidelines:
 - Respect panel boundaries: Never group text from different panels.
@@ -97,6 +123,8 @@ Analyze the image and OCR data thoroughly to produce accurate and contextually a
 **IMPORTANT: This comic is in Vietnamese. Only process and return Vietnamese text. Completely ignore any text in other languages (English, Chinese, Japanese, Korean, etc.).**
 **ZERO TOLERANCE: Any text that promotes websites, asks for support, mentions money/VND, or contains promotional language must be completely excluded.**
 If sound effects and background text are purely decorative or do not add meaningful information, exclude them from your groupings.
-Return only valid JSON. Never emit raw newlines inside string values—use \\n escapes instead.
-'''
 
+**MANDATORY FINAL STEP: Before returning your response, mentally validate that your JSON is 100% parseable. Remove any newlines, escape quotes, and ensure proper syntax. Invalid JSON will cause system errors.**
+
+Return only valid JSON. Never emit raw newlines inside string values—convert them to spaces or remove them entirely.
+'''

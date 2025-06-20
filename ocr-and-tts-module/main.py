@@ -229,9 +229,9 @@ def process_single_image(image_url: str, id: str) -> OcrResponse:
             f.write(resp.content)
 
         _, height, size_bytes = get_image_size(temp_path)
-        ocr_model = "ocrspace"
-        if height > 1500 and size_bytes >= 1024 * 1024:
-            ocr_model = "easyocr"
+        ocr_model = "google_cloud"
+        # if height > 1500 and size_bytes >= 1024 * 1024:
+        #     ocr_model = "easyocr"
 
         ocr_results = extract(temp_path, ocr=ocr_model)
 

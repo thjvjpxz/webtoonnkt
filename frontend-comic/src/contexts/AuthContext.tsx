@@ -29,8 +29,6 @@ interface AuthContextType {
   login: (loginResponse: LoginResponse) => void;
   logout: () => void;
   updateUserFromRefresh: (loginResponse: LoginResponse) => void;
-  isTokenExpired: () => boolean;
-  setUserData: (userData: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,24 +36,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Kiểm tra token có hết hạn không
-  const isTokenExpired = useCallback(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return true;
-
-    try {
-      // Decode JWT token để kiểm tra thời gian hết hạn
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-
-      // Kiểm tra nếu token sắp hết hạn trong 5 phút tới
-      return payload.exp <= (currentTime + 300);
-    } catch (error) {
-      console.error("Lỗi khi kiểm tra token:", error);
-      return true;
-    }
-  }, []);
 
   // Logout function
   const logout = useCallback(() => {
@@ -82,11 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (loginResponse.refreshToken) {
       localStorage.setItem("refreshToken", loginResponse.refreshToken);
     }
-  }, []);
-
-  // Set user data (dùng cho các tình huống khác)
-  const setUserData = useCallback((userData: User | null) => {
-    setUser(userData);
   }, []);
 
   // Kiểm tra token trong localStorage khi component mount
@@ -133,8 +108,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     updateUserFromRefresh,
-    isTokenExpired,
-    setUserData
   };
 
   return (

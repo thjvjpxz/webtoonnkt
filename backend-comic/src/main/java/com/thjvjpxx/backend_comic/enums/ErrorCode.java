@@ -139,7 +139,8 @@ public enum ErrorCode {
     // Topup
     TOPUP_AMOUNT_NOT_NULL(HttpStatus.BAD_REQUEST, "Số tiền nạp không được trống!"),
     TOPUP_AMOUNT_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, "Số tiền nạp phải lớn hơn 0!"),
-    TOPUP_AMOUNT_TOO_LOW(HttpStatus.BAD_REQUEST, "Số tiền nạp tối thiểu là 10 Linh Thạch!"),
+    TOPUP_AMOUNT_TOO_LOW(HttpStatus.BAD_REQUEST, "Số tiền nạp tối thiểu là 2 Linh Thạch!"),
+    TOPUP_AMOUNT_TOO_HIGH(HttpStatus.BAD_REQUEST, "Số tiền nạp tối đa là 1,000 Linh Thạch!"),
     PAYOS_CREATE_PAYMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Tạo link thanh toán thất bại!"),
 
     // Vip Package

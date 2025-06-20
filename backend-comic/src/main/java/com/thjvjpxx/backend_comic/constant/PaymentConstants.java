@@ -12,7 +12,7 @@ public class PaymentConstants {
     public static final double MIN_TOPUP_LINHHACH = 2.0; // 2 linh thạch = 2,000 VND
 
     // Số linh thạch lớn nhất có thể nạp một lần
-    public static final double MAX_TOPUP_LINHHACH = 10000.0; // 10,000 linh thạch = 10,000,000 VND
+    public static final double MAX_TOPUP_LINHHACH = 1000.0; // 1,000 linh thạch = 1,000,000 VND
 
     // Số tiền VND nhỏ nhất có thể nạp
     public static final double MIN_TOPUP_VND = MIN_TOPUP_LINHHACH * VND_TO_LINHHACH_RATE;

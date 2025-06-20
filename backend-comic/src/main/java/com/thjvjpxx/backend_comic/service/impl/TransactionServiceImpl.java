@@ -47,9 +47,11 @@ public class TransactionServiceImpl implements TransactionService {
     public BaseResponse<?> createTopup(TopupRequest request, User user) {
         try {
             // Validate số linh thạch nạp
-            if (request.getAmount() < PaymentConstants.MIN_TOPUP_LINHHACH ||
-                    request.getAmount() > PaymentConstants.MAX_TOPUP_LINHHACH) {
+            if (request.getAmount() < PaymentConstants.MIN_TOPUP_LINHHACH) {
                 throw new BaseException(ErrorCode.TOPUP_AMOUNT_TOO_LOW);
+            }
+            if (request.getAmount() > PaymentConstants.MAX_TOPUP_LINHHACH) {
+                throw new BaseException(ErrorCode.TOPUP_AMOUNT_TOO_HIGH);
             }
 
             // Tính số tiền VND cần thanh toán

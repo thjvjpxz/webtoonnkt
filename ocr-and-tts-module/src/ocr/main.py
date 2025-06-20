@@ -8,7 +8,7 @@ from ..config import GOOGLE_AI_API_KEY
 from ..utils.rate_limiter import rate_limiter
 import time
 
-AVAILABLE_OCR = ["easyocr", "ocrspace", "rapidocr"]
+AVAILABLE_OCR = ["easyocr", "ocrspace", "rapidocr", "google_cloud"]
 
 
 def extract(
