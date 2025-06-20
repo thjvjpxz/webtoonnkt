@@ -34,7 +34,8 @@ import {
   FiPause,
   FiPlay,
   FiVolume2,
-  FiVolumeX
+  FiVolumeX,
+  FiSettings
 } from 'react-icons/fi';
 import { chooseImageUrl } from '@/utils/string';
 
@@ -61,10 +62,14 @@ export default function ReadComic({
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const [showControls, setShowControls] = useState(true);
 
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hideControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
   const detailChapters = chapter.detailChapters;
   const chapterSummaries = chapter.chapterSummaries || [];
   const urlAudio = process.env.NEXT_PUBLIC_OCR_BASE_URL + '/';
@@ -76,11 +81,84 @@ export default function ReadComic({
   const NO_BUBBLE_DELAY = 2000; // 2 giây
   const AUDIO_END_DELAY = 1000; // 1 giây sau khi audio kết thúc
 
+  // Xử lý ẩn/hiện controls trong chế độ ngang
+  useEffect(() => {
+    if (readingMode === 'horizontal') {
+      const resetHideTimer = () => {
+        if (hideControlsTimeoutRef.current) {
+          clearTimeout(hideControlsTimeoutRef.current);
+        }
+
+        setShowControls(true);
+        hideControlsTimeoutRef.current = setTimeout(() => {
+          setShowControls(false);
+        }, 3000); // Ẩn sau 3 giây
+      };
+
+      const handleMouseMove = () => resetHideTimer();
+      const handleTouchStart = () => resetHideTimer();
+
+      resetHideTimer();
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('touchstart', handleTouchStart);
+
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('touchstart', handleTouchStart);
+        if (hideControlsTimeoutRef.current) {
+          clearTimeout(hideControlsTimeoutRef.current);
+        }
+      };
+    }
+  }, [readingMode, currentPage]);
+
+  // Touch gesture handling
+  useEffect(() => {
+    if (readingMode === 'horizontal' && containerRef.current) {
+      const container = containerRef.current;
+
+      const handleTouchStart = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+      };
+
+      const handleTouchEnd = (e: TouchEvent) => {
+        if (!touchStartRef.current) return;
+
+        const touch = e.changedTouches[0];
+        const deltaX = touch.clientX - touchStartRef.current.x;
+        const deltaY = touch.clientY - touchStartRef.current.y;
+
+        // Kiểm tra nếu là swipe ngang (không phải scroll dọc)
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+          e.preventDefault();
+          if (deltaX > 0) {
+            // Swipe phải - trang trước
+            handlePrevPage();
+          } else {
+            // Swipe trái - trang tiếp
+            handleNextPage();
+          }
+        }
+
+        touchStartRef.current = null;
+      };
+
+      container.addEventListener('touchstart', handleTouchStart, { passive: true });
+      container.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+      return () => {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [readingMode]);
+
   // Xử lý tự động lướt khi không có audio
   useEffect(() => {
     if (autoMode === 'scroll' && isAutoPlaying && readingMode === 'horizontal') {
       const currentImage = detailChapters[currentPage];
-      const delay = currentImage?.hasBubble ? 4000 : NO_BUBBLE_DELAY; // 4s cho có bubble, 2s cho không có bubble
+      const delay = currentImage?.hasBubble ? 4000 : NO_BUBBLE_DELAY;
 
       autoScrollIntervalRef.current = setTimeout(() => {
         setCurrentPage(prev => {
@@ -352,75 +430,155 @@ export default function ReadComic({
             ))}
           </div>
         ) : (
-          // Chế độ đọc ngang
-          <div className="fixed inset-0 flex flex-col overflow-hidden">
+          // Chế độ đọc ngang - với theme responsive
+          <div className="fixed inset-0 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
             {/* Header thu gọn cho chế độ ngang */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm p-2 flex items-center justify-between z-10">
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {currentPage + 1}/{detailChapters.length}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setReadingMode('vertical')}
-                >
-                  <FiColumns className="w-4 h-4 rotate-90 mr-2" />
-                  Chế độ dọc
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {/* Chọn chapter cho chế độ ngang */}
-                {chapterSummaries.length > 0 && (
-                  <Select value={chapter.id} onValueChange={handleChapterChange}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {chapterSummaries.map((ch) => (
-                        <SelectItem key={ch.id} value={ch.id}>
-                          Chapter {ch.chapterNumber}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-
-                {/* Chế độ tự động */}
-                <div className="flex items-center gap-2">
-                  <Select value={autoMode} onValueChange={(value) => handleAutoModeChange(value as AutoMode)}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Thủ công</SelectItem>
-                      <SelectItem value="scroll">Tự động lướt</SelectItem>
-                      {hasAudioSupport && (
-                        <SelectItem value="audio">Tự động đọc</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Điều khiển phát/dừng */}
-                {autoMode !== 'none' && (
+            <div className={`
+              transition-transform duration-300 ease-in-out bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
+              border-b border-gray-200 dark:border-gray-700 z-20
+              ${showControls ? 'translate-y-0' : '-translate-y-full'}
+            `}>
+              <div className="flex items-center justify-between p-2 sm:p-4">
+                {/* Left section */}
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                  <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                    {currentPage + 1}/{detailChapters.length}
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={toggleAutoPlay}
-                    className="flex items-center gap-1"
+                    onClick={() => setReadingMode('vertical')}
+                    className="hidden sm:flex"
                   >
-                    {isAutoPlaying ? <FiPause className="w-4 h-4" /> : <FiPlay className="w-4 h-4" />}
-                    {autoMode === 'audio' && isAudioLoading && (
-                      <div className="w-3 h-3 border border-gray-300 border-t-transparent rounded-full animate-spin" />
-                    )}
-                    {autoMode === 'audio' && audioError && (
-                      <FiVolumeX className="w-4 h-4 text-red-500" />
-                    )}
+                    <FiColumns className="w-4 h-4 rotate-90 mr-2" />
+                    Dọc
                   </Button>
-                )}
+                  {/* Nút settings cho mobile */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="sm:hidden"
+                  >
+                    <FiSettings className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Right section */}
+                <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
+                  {/* Chọn chapter - ẩn trên mobile nhỏ */}
+                  {chapterSummaries.length > 0 && (
+                    <div className="hidden md:block">
+                      <Select value={chapter.id} onValueChange={handleChapterChange}>
+                        <SelectTrigger className="w-24 lg:w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {chapterSummaries.map((ch) => (
+                            <SelectItem key={ch.id} value={ch.id}>
+                              Chapter {ch.chapterNumber}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Chế độ tự động - ẩn trên mobile nhỏ */}
+                  <div className="hidden sm:block">
+                    <Select value={autoMode} onValueChange={(value) => handleAutoModeChange(value as AutoMode)}>
+                      <SelectTrigger className="w-20 lg:w-32 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Thủ công</SelectItem>
+                        <SelectItem value="scroll">Tự động</SelectItem>
+                        {hasAudioSupport && (
+                          <SelectItem value="audio">Âm thanh</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Điều khiển phát/dừng */}
+                  {autoMode !== 'none' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleAutoPlay}
+                      className="p-1 sm:p-2"
+                    >
+                      {isAutoPlaying ? <FiPause className="w-3 h-3 sm:w-4 sm:h-4" /> : <FiPlay className="w-3 h-3 sm:w-4 sm:h-4" />}
+                      {autoMode === 'audio' && isAudioLoading && (
+                        <div className="w-2 h-2 sm:w-3 sm:h-3 border border-gray-300 dark:border-gray-600 border-t-transparent rounded-full animate-spin ml-1" />
+                      )}
+                      {autoMode === 'audio' && audioError && (
+                        <FiVolumeX className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 ml-1" />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
+
+              {/* Mobile menu dropdown */}
+              {isMenuOpen && (
+                <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:hidden bg-gray-50 dark:bg-gray-800">
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setReadingMode('vertical');
+                        setIsMenuOpen(false);
+                      }}
+                      className="justify-start"
+                    >
+                      <FiColumns className="w-4 h-4 rotate-90 mr-2" />
+                      Chế độ dọc
+                    </Button>
+
+                    {chapterSummaries.length > 0 && (
+                      <div>
+                        <Label className="text-xs">Chapter:</Label>
+                        <Select value={chapter.id} onValueChange={(value) => {
+                          handleChapterChange(value);
+                          setIsMenuOpen(false);
+                        }}>
+                          <SelectTrigger className="w-full mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {chapterSummaries.map((ch) => (
+                              <SelectItem key={ch.id} value={ch.id}>
+                                Chapter {ch.chapterNumber}: {ch.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    <div>
+                      <Label className="text-xs">Chế độ tự động:</Label>
+                      <Select value={autoMode} onValueChange={(value) => {
+                        handleAutoModeChange(value as AutoMode);
+                        setIsMenuOpen(false);
+                      }}>
+                        <SelectTrigger className="w-full mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Thủ công</SelectItem>
+                          <SelectItem value="scroll">Tự động lướt</SelectItem>
+                          {hasAudioSupport && (
+                            <SelectItem value="audio">Tự động đọc</SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Container ảnh chính */}
@@ -434,8 +592,11 @@ export default function ReadComic({
                 sizes="100vw"
               />
 
-              {/* Indicator cho ảnh có/không có bubble */}
-              <div className="absolute top-4 left-4 z-10">
+              {/* Indicator cho ảnh có/không có bubble - responsive */}
+              <div className={`
+                absolute top-2 left-2 z-10 transition-opacity duration-300
+                ${showControls ? 'opacity-100' : 'opacity-0'}
+              `}>
                 <div className={`px-2 py-1 rounded text-xs font-medium ${detailChapters[currentPage]?.hasBubble
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-500 text-white'
@@ -446,58 +607,81 @@ export default function ReadComic({
 
               {/* Indicator cho audio */}
               {autoMode === 'audio' && detailChapters[currentPage]?.ttsUrl && (
-                <div className="absolute top-4 right-4 z-10">
+                <div className={`
+                  absolute top-2 right-2 z-10 transition-opacity duration-300
+                  ${showControls ? 'opacity-100' : 'opacity-0'}
+                `}>
                   <div className="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white flex items-center gap-1">
                     <FiVolume2 className="w-3 h-3" />
-                    Có âm thanh
+                    Audio
                   </div>
                 </div>
               )}
 
-              {/* Nút điều khiển bên trái */}
+              {/* Nút điều khiển bên trái - responsive */}
               <div className="absolute left-0 inset-y-0 flex items-center z-10">
                 <Button
                   variant="ghost"
                   size="lg"
                   onClick={handlePrevPage}
                   disabled={currentPage === 0}
-                  className="h-full w-16 rounded-none text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 disabled:opacity-30"
+                  className={`
+                    h-full w-8 sm:w-12 lg:w-16 rounded-none text-gray-900 dark:text-white 
+                    hover:bg-black/10 dark:hover:bg-white/10 disabled:opacity-30 transition-opacity duration-300
+                    ${showControls ? 'opacity-70 hover:opacity-100' : 'opacity-0 hover:opacity-70'}
+                  `}
                 >
-                  <FiChevronLeft className="w-8 h-8" />
+                  <FiChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
                 </Button>
               </div>
 
-              {/* Nút điều khiển bên phải */}
+              {/* Nút điều khiển bên phải - responsive */}
               <div className="absolute right-0 inset-y-0 flex items-center z-10">
                 <Button
                   variant="ghost"
                   size="lg"
                   onClick={handleNextPage}
                   disabled={currentPage === detailChapters.length - 1}
-                  className="h-full w-16 rounded-none text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 disabled:opacity-30"
+                  className={`
+                    h-full w-8 sm:w-12 lg:w-16 rounded-none text-gray-900 dark:text-white 
+                    hover:bg-black/10 dark:hover:bg-white/10 disabled:opacity-30 transition-opacity duration-300
+                    ${showControls ? 'opacity-70 hover:opacity-100' : 'opacity-0 hover:opacity-70'}
+                  `}
                 >
-                  <FiChevronRight className="w-8 h-8" />
+                  <FiChevronRight className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
                 </Button>
               </div>
 
-              {/* Vùng click để chuyển trang */}
+              {/* Vùng click để chuyển trang - responsive */}
               <div
-                className="absolute left-16 top-0 bottom-0 w-1/3 cursor-pointer z-5"
+                className="absolute left-8 sm:left-12 lg:left-16 top-0 bottom-0 w-1/3 cursor-pointer z-5"
                 onClick={handlePrevPage}
               />
               <div
-                className="absolute right-16 top-0 bottom-0 w-1/3 cursor-pointer z-5"
+                className="absolute right-8 sm:right-12 lg:right-16 top-0 bottom-0 w-1/3 cursor-pointer z-5"
                 onClick={handleNextPage}
               />
             </div>
 
             {/* Footer với thanh tiến trình */}
-            <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 backdrop-blur-sm p-3">
-              <div className="bg-gray-200 dark:bg-gray-600 rounded-full h-1 max-w-md mx-auto">
-                <div
-                  className="bg-primary h-1 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentPage + 1) / detailChapters.length) * 100}%` }}
-                />
+            <div className={`
+              transition-transform duration-300 ease-in-out bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
+              border-t border-gray-200 dark:border-gray-700 z-20
+              ${showControls ? 'translate-y-0' : 'translate-y-full'}
+            `}>
+              <div className="p-2 sm:p-3">
+                <div className="bg-gray-200 dark:bg-gray-600 rounded-full h-1 max-w-md mx-auto">
+                  <div
+                    className="bg-primary h-1 rounded-full transition-all duration-300"
+                    style={{ width: `${((currentPage + 1) / detailChapters.length) * 100}%` }}
+                  />
+                </div>
+                {/* Page info trên mobile */}
+                <div className="text-center mt-2 sm:hidden">
+                  <span className="text-gray-900 dark:text-white text-xs">
+                    {currentPage + 1} / {detailChapters.length}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -505,7 +689,7 @@ export default function ReadComic({
       </div>
 
       {/* Navigation giữa các chapter */}
-      {(prevChapter || nextChapter) && (
+      {(prevChapter || nextChapter) && readingMode === 'vertical' && (
         <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-center gap-2">
