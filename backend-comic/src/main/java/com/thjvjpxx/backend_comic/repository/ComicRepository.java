@@ -132,7 +132,7 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
             GROUP BY
                 c.id, c.thumb_url, c.slug, c.name, v.viewCount
             ORDER BY
-                viewCount DESC, c.updated_at DESC
+                viewCount DESC
             LIMIT 10;
             """, nativeQuery = true)
     List<PopulerToday> findTopComicsByStartAndEndDate(LocalDate startDate, LocalDate endDate);
@@ -157,7 +157,7 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
             GROUP BY
                 c.id, c.thumb_url, c.slug, c.name
             ORDER BY
-                viewCount DESC, c.updated_at DESC
+                viewCount DESC
             LIMIT 10
             """, nativeQuery = true)
     List<PopulerToday> findTopComicsAll();
@@ -258,7 +258,8 @@ public interface ComicRepository extends JpaRepository<Comic, String> {
      * Tính từ purchased chapters và tổng lượt xem
      * 
      * @return List<Object[]> Danh sách thông tin publisher với thứ tự:
-     *         [publisher_id, publisher_name, total_comics, total_revenue, total_views]
+     *         [publisher_id, publisher_name, total_comics, total_revenue,
+     *         total_views]
      */
     @Query(value = """
             SELECT

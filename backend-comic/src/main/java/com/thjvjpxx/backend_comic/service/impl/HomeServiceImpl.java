@@ -265,31 +265,61 @@ public class HomeServiceImpl implements HomeService {
 
     // ======================= HELPER METHODS =======================
 
+    /**
+     * Lấy danh sách category phổ biến
+     * 
+     * @return Danh sách category phổ biến
+     */
     private List<Category> getPopulerCategories() {
         return categoryRepo.findTop10CategoriesWithMostComics();
     }
 
+    /**
+     * Lấy danh sách comic phổ biến hôm nay
+     * 
+     * @return Danh sách comic phổ biến hôm nay
+     */
     private List<PopulerToday> getTopDayComics() {
         LocalDate startDate = LocalDate.now();
         return comicRepo.findTopComicsByStartAndEndDate(startDate, startDate);
     }
 
+    /**
+     * Lấy danh sách comic phổ biến trong tuần
+     * 
+     * @return Danh sách comic phổ biến trong tuần
+     */
     private List<PopulerToday> getTopWeekComics() {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(7);
         return comicRepo.findTopComicsByStartAndEndDate(startDate, endDate);
     }
 
+    /**
+     * Lấy danh sách comic phổ biến trong tháng
+     * 
+     * @return Danh sách comic phổ biến trong tháng
+     */
     private List<PopulerToday> getTopMonthComics() {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(30);
         return comicRepo.findTopComicsByStartAndEndDate(startDate, endDate);
     }
 
+    /**
+     * Lấy danh sách comic phổ biến trong tất cả thời gian
+     * 
+     * @return Danh sách comic phổ biến trong tất cả thời gian
+     */
     private List<PopulerToday> getTopAllComics() {
         return comicRepo.findTopComicsAll();
     }
 
+    /**
+     * Lấy danh sách comic có chương mới nhất
+     * 
+     * @return Danh sách comic có chương mới nhất
+     */
     private List<ComicLastUpdate> getLastUpdateComics() {
         List<PopulerToday> populerTodays = comicRepo.findLastUpdateComics();
         List<ComicLastUpdate> comicLastUpdates = new ArrayList<>();

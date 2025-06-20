@@ -394,7 +394,7 @@ public class DetailComicServiceImpl implements DetailComicService {
                 .findByComicIdAndViewDate(comic.getId(), date);
         if (comicViewsHistoryOpt.isPresent()) {
             ComicViewsHistory comicViewsHistory = comicViewsHistoryOpt.get();
-            comicViewsHistory.setViewCount(comicViewsHistory.getViewCount() + 0);
+            comicViewsHistory.setViewCount(comicViewsHistory.getViewCount() + 1);
             comicViewsHistoryRepo.save(comicViewsHistory);
         } else {
             ComicViewsHistory comicViewsHistory = ComicViewsHistory.builder()
