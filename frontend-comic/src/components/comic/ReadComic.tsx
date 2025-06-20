@@ -24,7 +24,7 @@ import CommentSection from './CommentSection';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FiChevronLeft,
   FiChevronRight,
@@ -112,6 +112,15 @@ export default function ReadComic({
     }
   }, [readingMode, currentPage]);
 
+  // Định nghĩa các hàm điều khiển trang
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage(prev => Math.max(0, prev - 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setCurrentPage(prev => Math.min(detailChapters.length - 1, prev + 1));
+  }, [detailChapters.length]);
+
   // Touch gesture handling
   useEffect(() => {
     if (readingMode === 'horizontal' && containerRef.current) {
@@ -152,7 +161,7 @@ export default function ReadComic({
         container.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [readingMode]);
+  }, [readingMode, handlePrevPage, handleNextPage]);
 
   // Xử lý tự động lướt khi không có audio
   useEffect(() => {
@@ -285,14 +294,6 @@ export default function ReadComic({
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [readingMode, autoMode, detailChapters.length]);
-
-  const handlePrevPage = () => {
-    setCurrentPage(prev => Math.max(0, prev - 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage(prev => Math.min(detailChapters.length - 1, prev + 1));
-  };
 
   const toggleAutoPlay = () => {
     setIsAutoPlaying(prev => !prev);

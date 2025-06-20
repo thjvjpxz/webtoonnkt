@@ -42,6 +42,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  // Cập nhật user data khi token được refresh
+  const updateUserFromStorage = useCallback(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Lỗi khi parse user data:', error);
+        logout();
+      }
+    }
+  }, [logout]);
+
 
 
   // Kiểm tra token trong localStorage khi component mount
@@ -77,9 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Lưu user data vào localStorage và state
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
-    // Reload page
-    window.location.reload();
   };
+
+  // Lắng nghe storage changes để cập nhật user khi refresh token
+  useEffect(() => {
+    const handleStorageChange = () => {
+      updateUserFromStorage();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [updateUserFromStorage]);
 
   const value = {
     user,

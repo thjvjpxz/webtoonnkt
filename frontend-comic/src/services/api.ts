@@ -3,7 +3,6 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@/types/api';
 import { getAccessToken, getRefreshToken, handleLogout } from '@/utils/authUtils';
 import toast from 'react-hot-toast';
-import { refreshTokenService } from './authService';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -76,7 +75,17 @@ const refreshAccessToken = async (): Promise<string | null> => {
       return null;
     }
 
-    const response = await refreshTokenService(refreshTokenValue);
+    // Tạo một instance axios riêng để tránh interceptor loop
+    const refreshInstance = axios.create({
+      baseURL: API_URL,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const response = await refreshInstance.post('/auth/refresh', {
+      refreshToken: refreshTokenValue,
+    });
 
     if (response.status === 200 && response.data) {
       const loginData = response.data;
@@ -179,6 +188,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+
       if (isRefreshing) {
         // Nếu đang refresh token, thêm request vào queue
         return new Promise((resolve, reject) => {
