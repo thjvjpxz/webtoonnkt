@@ -281,8 +281,8 @@ export default function VipPurchasePage() {
                 {vipPackage.onDiscount && discountPercent > 0 && (
                   <div className="absolute top-4 left-4 z-10">
                     <Badge variant="destructive" className="flex items-center gap-1">
+                      -{discountPercent}
                       <FiPercent className="w-3 h-3" />
-                      -{discountPercent}%
                     </Badge>
                   </div>
                 )}
@@ -414,16 +414,6 @@ export default function VipPurchasePage() {
                 <div className="text-center space-y-2">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                     <FiGift className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold">Đọc trước</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Đọc trước các chương mới nhất
-                  </p>
-                </div>
-
-                <div className="text-center space-y-2">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                    <FiStar className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="font-semibold">Không quảng cáo</h3>
                   <p className="text-sm text-muted-foreground">

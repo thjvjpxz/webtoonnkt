@@ -128,6 +128,9 @@ public class Comic {
     }
 
     public boolean belongsToPublisher(User user) {
+        if (this.publisher == null) {
+            return false;
+        }
         return this.publisher.getId().equals(user.getId());
     }
 }
