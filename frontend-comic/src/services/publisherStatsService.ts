@@ -29,28 +29,3 @@ export async function getPersonalStatsInRange(params: PersonalStatsDateRangePara
     }
   });
 }
-
-/**
- * Helper function để format date thành ISO string cho API
- * @param date - Date object
- * @returns ISO datetime string
- */
-export function formatDateForAPI(date: Date): string {
-  return date.toISOString();
-}
-
-/**
- * Helper function để tạo params cho range query với Date objects
- * @param startDate - Ngày bắt đầu
- * @param endDate - Ngày kết thúc
- * @returns PersonalStatsDateRangeParams
- */
-export function createDateRangeParams(
-  startDate: Date,
-  endDate: Date
-): PersonalStatsDateRangeParams {
-  return {
-    startDate: formatDateForAPI(startDate),
-    endDate: formatDateForAPI(endDate)
-  };
-} 

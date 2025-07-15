@@ -77,8 +77,21 @@ public class Chapter {
     @JsonIgnore
     Comic comic;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<DetailChapter> detailChapters;
+
+    // Thêm cascade delete cho các entity liên quan
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<Comment> comments;
+
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<PurchasedChapter> purchasedChapters;
+
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<ReadingHistory> readingHistories;
 
     @Column(name = "has_audio")
     Boolean hasAudio;

@@ -275,7 +275,7 @@ export default function ChapterModal({
                   onChange={(e) => setPrice(e.target.value ? parseFloat(e.target.value) : undefined)}
                   min="0"
                   step="0.01"
-                  placeholder="Nhập giá (VNĐ)"
+                  placeholder="Nhập giá (Linh thạch)"
                 />
               </div>
             )}

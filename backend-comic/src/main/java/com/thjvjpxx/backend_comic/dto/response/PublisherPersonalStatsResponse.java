@@ -1,14 +1,14 @@
 package com.thjvjpxx.backend_comic.dto.response;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * DTO response cho thống kê cá nhân của publisher
@@ -28,9 +28,6 @@ public class PublisherPersonalStatsResponse {
 
     // Top truyện
     List<TopComicStats> topComics;
-
-    // Tỉ lệ chuyển đổi
-    ConversionStats conversionStats;
 
     // Chương bán chạy nhất
     List<TopChapterStats> topSellingChapters;
@@ -55,9 +52,7 @@ public class PublisherPersonalStatsResponse {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class ViewFollowStats {
         Long totalViews; // Tổng lượt xem tất cả truyện
-        Long monthlyViews; // Lượt xem trong tháng
         Long totalFollowers; // Tổng số follow
-        Long monthlyFollowers; // Số follow mới trong tháng
         List<MonthlyViewFollow> monthlyHistory; // Lịch sử theo tháng
     }
 
@@ -86,18 +81,6 @@ public class PublisherPersonalStatsResponse {
         Long totalFollowers; // Tổng số theo dõi
         Double totalRevenue; // Tổng doanh thu từ truyện này
         LocalDateTime lastUpdated;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class ConversionStats {
-        Double overallConversionRate; // Tỉ lệ chuyển đổi tổng thể (purchased / total views)
-        Double averageRevenuePerView; // Doanh thu trung bình mỗi lượt xem
-        Long totalUniqueViewers; // Số lượt xem unique
-        Long totalPurchasers; // Số người đã mua
     }
 
     @Data

@@ -20,16 +20,17 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
 	/**
 	 * Kiểm tra xem người dùng đã mua chapter này chưa
 	 * 
-	 * @param user người dùng cần kiểm tra
+	 * @param user    người dùng cần kiểm tra
 	 * @param chapter chapter cần kiểm tra
 	 * @return true nếu người dùng đã mua chapter, false nếu chưa
 	 */
 	boolean existsByUserAndChapter(User user, Chapter chapter);
 
 	/**
-	 * Lấy danh sách các chapter đã mua của người dùng theo comic, sắp xếp theo số chapter tăng dần
+	 * Lấy danh sách các chapter đã mua của người dùng theo comic, sắp xếp theo số
+	 * chapter tăng dần
 	 * 
-	 * @param user người dùng cần lấy danh sách chapter đã mua
+	 * @param user  người dùng cần lấy danh sách chapter đã mua
 	 * @param comic truyện cần lấy danh sách chapter
 	 * @return danh sách các chapter đã mua của người dùng theo comic
 	 */
@@ -52,8 +53,9 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
 	 * 
 	 * @param publisher publisher cần tính doanh thu
 	 * @param startDate ngày bắt đầu (bao gồm)
-	 * @param endDate ngày kết thúc (không bao gồm)
-	 * @return doanh thu của publisher trong khoảng thời gian, trả về 0 nếu không có doanh thu
+	 * @param endDate   ngày kết thúc (không bao gồm)
+	 * @return doanh thu của publisher trong khoảng thời gian, trả về 0 nếu không có
+	 *         doanh thu
 	 */
 	@Query("SELECT COALESCE(SUM(pc.purchasePrice), 0) FROM purchased_chapters pc WHERE pc.chapter.comic.publisher = :publisher AND pc.purchasedAt >= :startDate AND pc.purchasedAt < :endDate")
 	Double getRevenueByPublisherBetweenDates(@Param("publisher") User publisher,
@@ -73,7 +75,7 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
 	 * 
 	 * @param publisher publisher cần đếm số lượt mua
 	 * @param startDate ngày bắt đầu (bao gồm)
-	 * @param endDate ngày kết thúc (không bao gồm)
+	 * @param endDate   ngày kết thúc (không bao gồm)
 	 * @return số lượt mua chapter của publisher trong khoảng thời gian
 	 */
 	@Query("SELECT COUNT(pc) FROM purchased_chapters pc WHERE pc.chapter.comic.publisher = :publisher AND pc.purchasedAt >= :startDate AND pc.purchasedAt < :endDate")
@@ -84,8 +86,9 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
 	 * Lấy danh sách top truyện theo doanh thu cao nhất của publisher
 	 * 
 	 * @param publisher publisher cần lấy thống kê
-	 * @param pageable thông tin phân trang và sắp xếp
-	 * @return danh sách Object[] chứa thông tin [Comic, totalRevenue] sắp xếp theo doanh thu giảm dần
+	 * @param pageable  thông tin phân trang và sắp xếp
+	 * @return danh sách Object[] chứa thông tin [Comic, totalRevenue] sắp xếp theo
+	 *         doanh thu giảm dần
 	 */
 	@Query("""
 			SELECT pc.chapter.comic, SUM(pc.purchasePrice) as totalRevenue
@@ -100,8 +103,9 @@ public interface PurchasedChapterRepository extends JpaRepository<PurchasedChapt
 	 * Lấy top chapter bán chạy nhất của publisher với thông tin chi tiết
 	 * 
 	 * @param publisher publisher cần lấy thống kê
-	 * @param pageable thông tin phân trang để giới hạn số lượng kết quả
-	 * @return danh sách Object[] chứa thông tin [Chapter, purchaseCount, totalRevenue, Comic] 
+	 * @param pageable  thông tin phân trang để giới hạn số lượng kết quả
+	 * @return danh sách Object[] chứa thông tin [Chapter, purchaseCount,
+	 *         totalRevenue, Comic]
 	 *         sắp xếp theo số lượt mua giảm dần
 	 */
 	@Query("""

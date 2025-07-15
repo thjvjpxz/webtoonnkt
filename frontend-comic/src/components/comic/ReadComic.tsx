@@ -74,12 +74,10 @@ export default function ReadComic({
   const chapterSummaries = chapter.chapterSummaries || [];
   const urlAudio = process.env.NEXT_PUBLIC_OCR_BASE_URL + '/';
 
-  // Kiểm tra chapter có hỗ trợ audio không
   const hasAudioSupport = chapter.hasAudio;
 
-  // Thời gian delay cho ảnh không có bubble (ms)
-  const NO_BUBBLE_DELAY = 2000; // 2 giây
-  const AUDIO_END_DELAY = 1000; // 1 giây sau khi audio kết thúc
+  const NO_BUBBLE_DELAY = 2000;
+  const AUDIO_END_DELAY = 1000;
 
   // Xử lý ẩn/hiện controls trong chế độ ngang
   useEffect(() => {

@@ -333,7 +333,7 @@ export default function VipPackageModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="originalPrice" className="text-foreground">
-                Giá gốc (VNĐ) <span className="text-destructive">*</span>
+                Giá gốc (Linh thạch) <span className="text-destructive">*</span>
               </Label>
               <Input
                 type="number"

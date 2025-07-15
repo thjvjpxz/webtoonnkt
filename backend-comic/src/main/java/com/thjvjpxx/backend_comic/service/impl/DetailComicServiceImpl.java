@@ -196,8 +196,9 @@ public class DetailComicServiceImpl implements DetailComicService {
 
             boolean hasPurchased = purchasedChapterRepo.existsByUserAndChapter(currentUser, chapter);
             boolean isAdmin = currentUser.getRole().getName().equals("ADMIN");
+            boolean isBelongsToPublisher = chapter.getComic().belongsToPublisher(currentUser);
 
-            if (!hasPurchased && !currentUser.getVip() && !isAdmin) {
+            if (!hasPurchased && !currentUser.getVip() && !isAdmin && !isBelongsToPublisher) {
                 throw new BaseException(ErrorCode.CHAPTER_NOT_PURCHASED);
             }
 

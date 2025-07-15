@@ -2,7 +2,6 @@
 
 import ChapterModal from "@/components/admin/chapters/ChapterModal";
 import DeleteChapterModal from "@/components/admin/chapters/DeleteChapterModal";
-import ViewChapterModal from "@/components/admin/chapters/ViewChapterModal";
 import DashboardLayout from "@/components/admin/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,7 @@ import { renderBadge } from "@/components/ui/comic-render";
 import { constructImageUrl, formatDate } from "@/utils/helpers";
 import { chooseImageUrl } from "@/utils/string";
 import Image from "next/image";
-import { FiAlertCircle, FiBookOpen, FiEdit, FiEye, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
+import { FiAlertCircle, FiBookOpen, FiEdit, FiPlus, FiSearch, FiTrash2 } from "react-icons/fi";
 
 export default function Chapters() {
 
@@ -40,7 +39,6 @@ export default function Chapters() {
 
 
     // handle
-    handleOpenViewModal,
     handleOpenDeleteModal,
     handleOpenAddModal,
     handleOpenEditModal,
@@ -55,10 +53,8 @@ export default function Chapters() {
     comicOptions,
 
     // modal
-    isViewModalOpen,
     isDeleteModalOpen,
     isAddEditModalOpen,
-    setIsViewModalOpen,
     setIsDeleteModalOpen,
     setIsAddEditModalOpen,
 
@@ -347,7 +343,7 @@ export default function Chapters() {
                       {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleOpenViewModal(chapter)}
@@ -356,7 +352,7 @@ export default function Chapters() {
                             title="Xem chi tiết"
                           >
                             <FiEye size={14} />
-                          </Button>
+                          </Button> */}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -400,11 +396,11 @@ export default function Chapters() {
       </Card>
 
       {/* Modals */}
-      <ViewChapterModal
+      {/* <ViewChapterModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         chapter={selectedChapter}
-      />
+      /> */}
 
       {selectedChapter && (
         <DeleteChapterModal

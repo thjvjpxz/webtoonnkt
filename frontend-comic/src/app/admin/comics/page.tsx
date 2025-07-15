@@ -2,7 +2,6 @@
 
 import ComicModal from "@/components/admin/comics/ComicModal";
 import DeleteComicModal from "@/components/admin/comics/DeleteComicModal";
-import ViewComic from "@/components/admin/comics/ViewComic";
 import DashboardLayout from "@/components/admin/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +39,6 @@ export default function Comics() {
     isDeleteModalOpen,
     currentComic,
     totalPages,
-    isViewModalOpen,
     isDeleting,
     isPublisher,
 
@@ -50,12 +48,10 @@ export default function Comics() {
     setCurrentPage,
     setIsModalOpen,
     setIsDeleteModalOpen,
-    setIsViewModalOpen,
     handleSearch,
     handleOpenAddModal,
     handleOpenEditModal,
     handleOpenDeleteModal,
-    handleOpenViewModal,
     handlePageChange,
     handleAddComic,
     handleUpdateComic,
@@ -285,7 +281,7 @@ export default function Comics() {
                       {/* Thao tác */}
                       <TableCell>
                         <div className="flex justify-center gap-1">
-                          <Button
+                          {/* <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleOpenViewModal(comic)}
@@ -294,7 +290,7 @@ export default function Comics() {
                             title="Xem chi tiết"
                           >
                             <FiEye size={14} />
-                          </Button>
+                          </Button> */}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -357,13 +353,13 @@ export default function Comics() {
         />
       )}
 
-      {isViewModalOpen && currentComic && (
+      {/* {isViewModalOpen && currentComic && (
         <ViewComic
           isOpen={isViewModalOpen}
           comic={currentComic}
           onClose={() => setIsViewModalOpen(false)}
         />
-      )}
+      )} */}
     </DashboardLayout>
   );
 }

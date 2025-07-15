@@ -136,7 +136,7 @@ export default function Header() {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/favorites" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
+          <Link href="/follows" className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
             <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <FiBookmark className="w-4 h-4 text-green-600 dark:text-green-400" />
             </div>

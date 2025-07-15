@@ -99,7 +99,7 @@ export default function FavoritesPage() {
           <div className="flex-1 min-w-0">
             <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
               <h2 className="text-lg font-bold p-4 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
-                Truyện yêu thích
+                Truyện theo dõi
               </h2>
               <div className="flex flex-col items-center justify-center py-16 px-4">
                 <div className="text-center">
@@ -107,10 +107,10 @@ export default function FavoritesPage() {
                     <FiBookmark className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    Chưa có truyện yêu thích
+                    Chưa có truyện theo dõi
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-md">
-                    Bạn chưa thêm truyện nào vào danh sách yêu thích.
+                    Bạn chưa thêm truyện nào vào danh sách theo dõi.
                     Hãy khám phá và thêm những bộ truyện hay vào danh sách nhé!
                   </p>
                   <Link
@@ -162,7 +162,7 @@ export default function FavoritesPage() {
               <BreadcrumbItem>
                 <BreadcrumbPage className="flex items-center gap-1">
                   <FiBookmark className="w-4 h-4" />
-                  Truyện yêu thích
+                  Truyện theo dõi
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -193,7 +193,7 @@ export default function FavoritesPage() {
             {isLoadingComics ? (
               <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
                 <h2 className="text-lg font-bold p-4 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
-                  Truyện yêu thích
+                  Truyện theo dõi
                 </h2>
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
@@ -206,7 +206,7 @@ export default function FavoritesPage() {
               <>
                 <CategoryComicsGrid
                   comics={comics}
-                  categoryName="Truyện yêu thích"
+                  categoryName="Truyện theo dõi"
                 />
 
                 {/* Pagination */}
