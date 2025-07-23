@@ -1,0 +1,9 @@
+easyocr
+google-generativeai==0.8.4
+requests
+fastapi
+uvicorn[standard]
+rapidocr_onnxruntime
+google-genai
+google-cloud-texttospeech
+google-cloud-vision

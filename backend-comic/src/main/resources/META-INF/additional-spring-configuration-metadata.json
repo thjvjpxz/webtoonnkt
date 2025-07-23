@@ -1,0 +1,52 @@
+{"properties": [
+  {
+    "name": "app.cors.allowed-origins",
+    "type": "java.lang.String",
+    "description": "A description for 'app.cors.allowed-origins'"
+  },
+  {
+    "name": "google-drive.folder-id",
+    "type": "java.lang.String",
+    "description": "A description for 'google-drive.folder-id'"
+  },
+  {
+    "name": "crawler.otruyen.api-url",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.otruyen.api-url'"
+  },
+  {
+    "name": "crawler.otruyen.api-comic-detail",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.otruyen.api-comic-detail'"
+  },
+  {
+    "name": "crawler.otruyen.image-cdn",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.otruyen.image-cdn'"
+  },
+  {
+    "name": "crawler.request.delay-ms",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.request.delay-ms'"
+  },
+  {
+    "name": "crawler.batch.size",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.batch.size'"
+  },
+  {
+    "name": "crawler.batch.delay-ms",
+    "type": "java.lang.String",
+    "description": "A description for 'crawler.batch.delay-ms'"
+  },
+  {
+    "name": "jwt.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.expiration'"
+  },
+  {
+    "name": "jwt.refresh-expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.refresh-expiration'"
+  }
+]}
