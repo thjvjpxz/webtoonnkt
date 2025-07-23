@@ -90,10 +90,6 @@
 			<artifactId>google-auth-library-credentials</artifactId>
 			<version>${google-auth.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

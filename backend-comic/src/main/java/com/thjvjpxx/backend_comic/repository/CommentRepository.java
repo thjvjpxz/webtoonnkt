@@ -17,6 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm tất cả comment có phân trang
+	 * 
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment theo trang
 	 */
@@ -24,7 +25,8 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment theo comic id
-	 * @param comicId id của comic
+	 * 
+	 * @param comicId  id của comic
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment theo comic với phân trang
 	 */
@@ -32,8 +34,9 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment theo comic id và trạng thái
-	 * @param comicId id của comic
-	 * @param status trạng thái comment
+	 * 
+	 * @param comicId  id của comic
+	 * @param status   trạng thái comment
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment theo comic và trạng thái với phân trang
 	 */
@@ -41,24 +44,27 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment theo chapter id
+	 * 
 	 * @param chapterId id của chapter
-	 * @param pageable thông tin phân trang
+	 * @param pageable  thông tin phân trang
 	 * @return danh sách comment theo chapter với phân trang
 	 */
 	Page<Comment> findByChapterId(String chapterId, Pageable pageable);
 
 	/**
 	 * Tìm comment theo chapter id và trạng thái
+	 * 
 	 * @param chapterId id của chapter
-	 * @param status trạng thái comment
-	 * @param pageable thông tin phân trang
+	 * @param status    trạng thái comment
+	 * @param pageable  thông tin phân trang
 	 * @return danh sách comment theo chapter và trạng thái với phân trang
 	 */
 	Page<Comment> findByChapterIdAndStatus(String chapterId, CommentStatus status, Pageable pageable);
 
 	/**
 	 * Tìm comment theo user id
-	 * @param userId id của người dùng
+	 * 
+	 * @param userId   id của người dùng
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment của người dùng với phân trang
 	 */
@@ -66,8 +72,9 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment theo user id và trạng thái
-	 * @param userId id của người dùng
-	 * @param status trạng thái comment
+	 * 
+	 * @param userId   id của người dùng
+	 * @param status   trạng thái comment
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment của người dùng theo trạng thái với phân trang
 	 */
@@ -75,7 +82,8 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment cha (parent comment là null) theo comic
-	 * @param comicId id của comic
+	 * 
+	 * @param comicId  id của comic
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment cha theo comic với phân trang
 	 */
@@ -83,8 +91,9 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm comment cha theo comic và trạng thái
-	 * @param comicId id của comic
-	 * @param status trạng thái comment
+	 * 
+	 * @param comicId  id của comic
+	 * @param status   trạng thái comment
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment cha theo comic và trạng thái với phân trang
 	 */
@@ -92,15 +101,17 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Tìm reply comment (comment con) theo parent id
+	 * 
 	 * @param parentId id của comment cha
-	 * @param status trạng thái comment
+	 * @param status   trạng thái comment
 	 * @return danh sách comment con theo comment cha và trạng thái
 	 */
 	List<Comment> findByParentIdAndStatus(String parentId, CommentStatus status);
 
 	/**
 	 * Tìm comment theo trạng thái
-	 * @param status trạng thái comment
+	 * 
+	 * @param status   trạng thái comment
 	 * @param pageable thông tin phân trang
 	 * @return danh sách comment theo trạng thái với phân trang
 	 */
@@ -108,6 +119,7 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Đếm số comment theo comic id
+	 * 
 	 * @param comicId id của comic
 	 * @return tổng số comment của comic
 	 */
@@ -115,14 +127,16 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Đếm số comment theo comic id và trạng thái
+	 * 
 	 * @param comicId id của comic
-	 * @param status trạng thái comment
+	 * @param status  trạng thái comment
 	 * @return tổng số comment của comic theo trạng thái
 	 */
 	long countByComicIdAndStatus(String comicId, CommentStatus status);
 
 	/**
 	 * Đếm số comment theo chapter id
+	 * 
 	 * @param chapterId id của chapter
 	 * @return tổng số comment của chapter
 	 */
@@ -130,28 +144,31 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
 
 	/**
 	 * Đếm số comment theo chapter id và trạng thái
+	 * 
 	 * @param chapterId id của chapter
-	 * @param status trạng thái comment
+	 * @param status    trạng thái comment
 	 * @return tổng số comment của chapter theo trạng thái
 	 */
 	long countByChapterIdAndStatus(String chapterId, CommentStatus status);
 
 	/**
 	 * Đếm số reply cho một comment
+	 * 
 	 * @param parentId id của comment cha
-	 * @param status trạng thái comment
+	 * @param status   trạng thái comment
 	 * @return tổng số comment con của comment cha theo trạng thái
 	 */
 	long countByParentIdAndStatus(String parentId, CommentStatus status);
 
 	/**
 	 * Tìm comment theo nhiều tiêu chí với câu truy vấn tùy chỉnh
-	 * @param comicId id của comic (có thể null)
+	 * 
+	 * @param comicId   id của comic (có thể null)
 	 * @param chapterId id của chapter (có thể null)
-	 * @param userId id của người dùng (có thể null)
-	 * @param status trạng thái comment (có thể null)
-	 * @param content nội dung tìm kiếm (có thể null)
-	 * @param pageable thông tin phân trang
+	 * @param userId    id của người dùng (có thể null)
+	 * @param status    trạng thái comment (có thể null)
+	 * @param content   nội dung tìm kiếm (có thể null)
+	 * @param pageable  thông tin phân trang
 	 * @return danh sách comment phù hợp với các tiêu chí với phân trang
 	 */
 	@Query("""

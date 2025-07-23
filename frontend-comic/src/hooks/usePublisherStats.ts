@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import {
   getPersonalStats,
-  getPersonalStatsInRange,
-  createDateRangeParams
+  getPersonalStatsInRange
 } from '@/services/publisherStatsService';
 import {
   PublisherPersonalStatsResponse,
@@ -61,7 +60,11 @@ export function usePublisherStats(autoFetch: boolean = true): UsePublisherStatsR
       setIsLoading(true);
       setError(null);
 
-      const params = createDateRangeParams(startDate, endDate);
+      const params = {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      }
+
       const response = await getPersonalStatsInRange(params);
 
       if (response.status === 200 && response.data) {

@@ -3,7 +3,6 @@
 import DashboardLayout from "@/components/admin/DashboardLayout";
 import StatisticsCards from "@/components/admin/stats/StatisticsCards";
 import StatisticsCharts from "@/components/admin/stats/StatisticsCharts";
-import QuickMetrics from "@/components/admin/stats/QuickMetrics";
 import TransactionStats from "@/components/admin/stats/TransactionStats";
 import { useAdminStatistics } from "@/hooks/useAdminStatistics";
 import { Button } from "@/components/ui/button";
@@ -42,11 +41,6 @@ export default function Dashboard() {
       {/* Statistics Cards với dữ liệu từ API */}
       <div className="mb-6">
         <StatisticsCards statistics={statistics} isLoading={isLoading} />
-      </div>
-
-      {/* Quick Metrics - Tăng trưởng */}
-      <div className="mb-6">
-        <QuickMetrics statistics={statistics} isLoading={isLoading} />
       </div>
 
       {/* Charts và Stats với dữ liệu từ API */}

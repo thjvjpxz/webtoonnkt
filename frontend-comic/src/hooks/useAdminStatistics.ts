@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import { dashboardService } from '@/services/dashboardService';
 import { AdminStatistics } from '@/types/statistics';
 import toast from 'react-hot-toast';
+import { getStatistics } from '@/services/dashboardService';
 
 export function useAdminStatistics() {
   const [statistics, setStatistics] = useState<AdminStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch dữ liệu thống kê từ API /admin/statistics
   const fetchStatistics = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await dashboardService.getStatistics();
+      const response = await getStatistics();
 
       if (response.status === 200 && response.data) {
         setStatistics(response.data);

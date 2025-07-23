@@ -26,7 +26,6 @@ export default function StatisticsCards({ statistics, isLoading }: StatisticsCar
       title: "Tổng người dùng",
       value: statistics?.totalUsers || 0,
       icon: <FiUsers className="h-4 w-4" />,
-      change: statistics?.userGrowth,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-100 dark:bg-blue-900/20"
     },
@@ -48,12 +47,11 @@ export default function StatisticsCards({ statistics, isLoading }: StatisticsCar
       title: "Tổng lượt xem",
       value: statistics?.totalViews || 0,
       icon: <FiEye className="h-4 w-4" />,
-      change: statistics?.viewsGrowth,
       color: "text-orange-600 dark:text-orange-400",
       bgColor: "bg-orange-100 dark:bg-orange-900/20"
     },
     {
-      title: "Tác giả/Publisher",
+      title: "Nhà xuất bản",
       value: statistics?.totalPublishers || 0,
       icon: <FiEdit className="h-4 w-4" />,
       color: "text-indigo-600 dark:text-indigo-400",
@@ -70,7 +68,6 @@ export default function StatisticsCards({ statistics, isLoading }: StatisticsCar
       title: "Tổng doanh thu",
       value: statistics?.totalRevenue || 0,
       icon: <FiDollarSign className="h-4 w-4" />,
-      change: statistics?.revenueGrowth,
       color: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
       isCurrency: true
@@ -117,14 +114,6 @@ export default function StatisticsCards({ statistics, isLoading }: StatisticsCar
                 : formatNumber(card.value)
               }
             </div>
-            {card.change !== undefined && (
-              <p className={`text-xs ${card.change >= 0
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-                }`}>
-                {card.change >= 0 ? '+' : ''}{card.change}% so với tháng trước
-              </p>
-            )}
           </CardContent>
         </Card>
       ))}

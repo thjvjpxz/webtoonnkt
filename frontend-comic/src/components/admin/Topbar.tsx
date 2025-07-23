@@ -78,7 +78,7 @@ export default function Topbar({ title }: TopbarProps) {
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="text-xs px-2 py-1 rounded font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                    Publisher
+                    Nhà xuất bản
                   </span>
                 </div>
               </div>

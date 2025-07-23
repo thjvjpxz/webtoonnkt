@@ -9,9 +9,6 @@ export interface PublisherPersonalStatsResponse {
   // Top truyện
   topComics: TopComicStats[];
 
-  // Tỉ lệ chuyển đổi
-  conversionStats: ConversionStats;
-
   // Chương bán chạy nhất
   topSellingChapters: TopChapterStats[];
 }
@@ -26,9 +23,7 @@ export interface RevenueStats {
 
 export interface ViewFollowStats {
   totalViews: number; // Tổng lượt xem tất cả truyện
-  monthlyViews: number; // Lượt xem trong tháng
   totalFollowers: number; // Tổng số follow
-  monthlyFollowers: number; // Số follow mới trong tháng
   monthlyHistory: MonthlyViewFollow[]; // Lịch sử theo tháng
 }
 
@@ -47,13 +42,6 @@ export interface TopComicStats {
   totalFollowers: number; // Tổng số theo dõi
   totalRevenue: number; // Tổng doanh thu từ truyện này
   lastUpdated: string; // ISO date string
-}
-
-export interface ConversionStats {
-  overallConversionRate: number; // Tỉ lệ chuyển đổi tổng thể (purchased / total views)
-  averageRevenuePerView: number; // Doanh thu trung bình mỗi lượt xem
-  totalUniqueViewers: number; // Số lượt xem unique
-  totalPurchasers: number; // Số người đã mua
 }
 
 export interface TopChapterStats {

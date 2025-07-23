@@ -1,14 +1,14 @@
-// Component demo để minh họa cách sử dụng thống kê publisher
 import { useState } from 'react';
 import { usePublisherStats } from '@/hooks/usePublisherStats';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, RefreshCw, DollarSign, Eye, Users, TrendingUp } from 'lucide-react';
+import { Loader2, RefreshCw, DollarSign, Eye, Users, TrendingUp, Calendar, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { chooseImageUrl } from '@/utils/string';
+import { LoadingSpinner } from '../ui/loading-spinner';
 
 export function PublisherStats() {
   const { stats, isLoading, error, refetch, fetchStatsInRange } = usePublisherStats();
@@ -36,8 +36,7 @@ export function PublisherStats() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin mr-2" />
-        <span>Đang tải thống kê...</span>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -87,7 +86,7 @@ export function PublisherStats() {
               <Label htmlFor="startDate">Từ ngày</Label>
               <Input
                 id="startDate"
-                type="datetime-local"
+                type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
@@ -96,7 +95,7 @@ export function PublisherStats() {
               <Label htmlFor="endDate">Đến ngày</Label>
               <Input
                 id="endDate"
-                type="datetime-local"
+                type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
@@ -133,7 +132,7 @@ export function PublisherStats() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Doanh thu tháng</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -144,6 +143,33 @@ export function PublisherStats() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Doanh thu tuần</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats.revenueStats.weeklyRevenue.toLocaleString()} VNĐ
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Doanh thu hôm nay</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {stats.revenueStats.dailyRevenue.toLocaleString()} VNĐ
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Thống kê lượt xem và theo dõi */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tổng lượt xem</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -151,9 +177,6 @@ export function PublisherStats() {
             <div className="text-2xl font-bold">
               {stats.viewFollowStats.totalViews.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              +{stats.viewFollowStats.monthlyViews.toLocaleString()} tháng này
-            </p>
           </CardContent>
         </Card>
 
@@ -166,12 +189,43 @@ export function PublisherStats() {
             <div className="text-2xl font-bold">
               {stats.viewFollowStats.totalFollowers.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              +{stats.viewFollowStats.monthlyFollowers} tháng này
-            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Lịch sử theo tháng */}
+      {stats.viewFollowStats.monthlyHistory && stats.viewFollowStats.monthlyHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Lịch Sử Theo Tháng</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.viewFollowStats.monthlyHistory.map((history) => (
+                <div key={history.month} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="font-medium">
+                    Tháng {history.month}
+                  </div>
+                  <div className="flex gap-6 text-sm">
+                    <div className="text-center">
+                      <div className="font-medium text-blue-600">
+                        {history.views.toLocaleString()}
+                      </div>
+                      <div className="text-gray-600">Lượt xem</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-medium text-green-600">
+                        {history.follows.toLocaleString()}
+                      </div>
+                      <div className="text-gray-600">Theo dõi</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Top truyện */}
       <Card>
@@ -191,7 +245,10 @@ export function PublisherStats() {
                 />
                 <div className="flex-1">
                   <h3 className="font-semibold">{comic.comicName}</h3>
-                  <div className="grid grid-cols-3 gap-4 mt-2 text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Cập nhật: {new Date(comic.lastUpdated).toLocaleDateString('vi-VN')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
                     <div>
                       <span className="block font-medium">Lượt xem</span>
                       {comic.totalViews.toLocaleString()}
@@ -212,41 +269,6 @@ export function PublisherStats() {
         </CardContent>
       </Card>
 
-      {/* Thống kê chuyển đổi */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tỷ Lệ Chuyển Đổi</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {(stats.conversionStats.overallConversionRate * 100).toFixed(2)}%
-              </div>
-              <p className="text-sm text-gray-600">Tỷ lệ chuyển đổi</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {stats.conversionStats.averageRevenuePerView.toLocaleString()} VNĐ
-              </div>
-              <p className="text-sm text-gray-600">Doanh thu/lượt xem</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {stats.conversionStats.totalUniqueViewers.toLocaleString()}
-              </div>
-              <p className="text-sm text-gray-600">Người xem duy nhất</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {stats.conversionStats.totalPurchasers.toLocaleString()}
-              </div>
-              <p className="text-sm text-gray-600">Người đã mua</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Top chương bán chạy */}
       <Card>
         <CardHeader>
@@ -261,6 +283,9 @@ export function PublisherStats() {
                   <p className="text-sm text-gray-600">
                     {chapter.comicName} - Chương {chapter.chapterNumber}
                   </p>
+                  <p className="text-xs text-gray-500">
+                    Xuất bản: {new Date(chapter.publishedAt).toLocaleDateString('vi-VN')}
+                  </p>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-green-600">
@@ -268,6 +293,9 @@ export function PublisherStats() {
                   </div>
                   <div className="text-sm text-gray-600">
                     {chapter.purchaseCount} lượt mua
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Giá: {chapter.price.toLocaleString()} VNĐ
                   </div>
                 </div>
               </div>

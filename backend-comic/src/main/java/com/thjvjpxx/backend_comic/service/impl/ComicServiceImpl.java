@@ -3,7 +3,6 @@ package com.thjvjpxx.backend_comic.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,8 +13,6 @@ import com.thjvjpxx.backend_comic.dto.request.ComicRequest;
 import com.thjvjpxx.backend_comic.dto.response.BaseResponse;
 import com.thjvjpxx.backend_comic.dto.response.ComicResponse;
 import com.thjvjpxx.backend_comic.enums.ComicStatus;
-import com.thjvjpxx.backend_comic.enums.ErrorCode;
-import com.thjvjpxx.backend_comic.exception.BaseException;
 import com.thjvjpxx.backend_comic.model.Category;
 import com.thjvjpxx.backend_comic.model.Comic;
 import com.thjvjpxx.backend_comic.model.User;
@@ -141,13 +138,7 @@ public class ComicServiceImpl implements ComicService {
         // Xóa thumbnail từ storage
         storageUtils.removeOldThumbnail(comic.getThumbUrl());
 
-        try {
-            comicRepository.delete(comic);
-        } catch (DataIntegrityViolationException e) {
-            throw new BaseException(ErrorCode.COMIC_HAS_CHAPTERS);
-        } catch (Exception e) {
-            throw new BaseException(ErrorCode.HAS_ERROR);
-        }
+        comicRepository.delete(comic);
 
         return BaseResponse.success(comic);
     }

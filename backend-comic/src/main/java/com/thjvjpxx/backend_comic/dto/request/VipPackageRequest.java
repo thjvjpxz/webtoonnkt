@@ -44,10 +44,7 @@ public class VipPackageRequest {
             if (discountStartDate == null || discountEndDate == null) {
                 return false;
             }
-            // Giá giảm phải nhỏ hơn giá gốc
-            if (originalPrice != null && discountedPrice >= originalPrice) {
-                return false;
-            }
+
             // Ngày kết thúc phải sau ngày bắt đầu
             if (discountEndDate.isBefore(discountStartDate)) {
                 return false;

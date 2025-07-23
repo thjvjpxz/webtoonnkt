@@ -24,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -90,9 +91,25 @@ public class Comic {
     @JsonIgnore
     User publisher;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = { CascadeType.REMOVE }, fetch = FetchType.EAGER)
     @JoinTable(name = "comic_categories", joinColumns = @JoinColumn(name = "comic_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     List<Category> categories;
+
+    @OneToMany(mappedBy = "comic", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<Chapter> chapters;
+
+    @OneToMany(mappedBy = "comic", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<Comment> comments;
+
+    @OneToMany(mappedBy = "comic", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<UserFollow> userFollows;
+
+    @OneToMany(mappedBy = "comic", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    List<ComicViewsHistory> comicViewsHistories;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -110,4 +127,10 @@ public class Comic {
         this.categories.removeAll(categories);
     }
 
+    public boolean belongsToPublisher(User user) {
+        if (this.publisher == null) {
+            return false;
+        }
+        return this.publisher.getId().equals(user.getId());
+    }
 }

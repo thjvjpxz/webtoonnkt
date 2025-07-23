@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.thjvjpxx.backend_comic.dto.request.CategoryRequest;
@@ -28,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public BaseResponse<List<Category>> getAllCategories(int page, int limit, String search) {
-        Pageable pageable = PaginationUtils.createPageable(page, limit);
+        Pageable pageable = PaginationUtils.createPageableWithSort(page, limit, "updatedAt", Sort.Direction.DESC);
         int originalPage = page;
 
         Page<Category> categories = null;
